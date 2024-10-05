@@ -75,8 +75,12 @@ WSGI_APPLICATION = 'vrindapots.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'vrindapots',
+        'USER': 'postgres',
+        'PASSWORD': 'sarath',
+        'HOST': 'localhost',  # or your database server's IP address
+        'PORT': '5432',        # default PostgreSQL port
     }
 }
 
