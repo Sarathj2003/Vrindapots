@@ -241,8 +241,8 @@
                                 <div class="intro-slide">
                                     <figure class="slide-image">
                                         <picture>
-                                            <source media="(max-width: 480px)" srcset="assets/images/demos/demo-9/slider/slide-1-480w.jpg">
-                                            <img src="assets/images/demos/demo-9/slider/slide-1.jpg" alt="Image Desc">
+                                            <source media="(max-width: 480px)" srcset="{% static 'assets/images/demos/demo-9/slider/slide-1-480w.jpg' %}">
+                                            <img src="{% static 'assets/images/demos/demo-9/slider/slide-1.jpg' %}" alt="Image Desc">
                                         </picture>
                                     </figure><!-- End .slide-image -->
 
@@ -261,8 +261,8 @@
                                 <div class="intro-slide">
                                     <figure class="slide-image">
                                         <picture>
-                                            <source media="(max-width: 480px)" srcset="assets/images/demos/demo-9/slider/slide-2-480w.jpg">
-                                            <img src="assets/images/demos/demo-9/slider/slide-2.jpg" alt="Image Desc">
+                                            <source media="(max-width: 480px)" srcset="{% static 'assets/images/demos/demo-9/slider/slide-2-480w.jpg' %}">
+                                            <img src="{% static 'assets/images/demos/demo-9/slider/slide-2.jpg' %}" alt="Image Desc">
                                         </picture>
                                     </figure><!-- End .slide-image -->
 
@@ -279,8 +279,8 @@
                                 <div class="intro-slide">
                                     <figure class="slide-image">
                                         <picture>
-                                            <source media="(max-width: 480px)" srcset="assets/images/demos/demo-9/slider/slide-3-480w.jpg">
-                                            <img src="assets/images/demos/demo-9/slider/slide-3.jpg" alt="Image Desc">
+                                            <source media="(max-width: 480px)" srcset="{% static 'assets/images/demos/demo-9/slider/slide-3-480w.jpg' %}">
+                                            <img src="{% static 'assets/images/demos/demo-9/slider/slide-3.jpg' %}" alt="Image Desc">
                                         </picture>
                                     </figure><!-- End .slide-image -->
 
@@ -327,49 +327,7 @@
                                     }
                                 }
                             }'>
-                                <div class="icon-box icon-box-side">
-                                    <span class="icon-box-icon">
-                                        <i class="icon-rocket"></i>
-                                    </span>
-
-                                    <div class="icon-box-content">
-                                        <h3 class="icon-box-title">Free Shipping</h3><!-- End .icon-box-title -->
-                                        <p>Orders $50 or more</p>
-                                    </div><!-- End .icon-box-content -->
-                                </div><!-- End .icon-box -->
-                            
-                                <div class="icon-box icon-box-side">
-                                    <span class="icon-box-icon">
-                                        <i class="icon-rotate-left"></i>
-                                    </span>
-
-                                    <div class="icon-box-content">
-                                        <h3 class="icon-box-title">Free Returns</h3><!-- End .icon-box-title -->
-                                        <p>Within 30 days</p>
-                                    </div><!-- End .icon-box-content -->
-                                </div><!-- End .icon-box -->
-
-                                <div class="icon-box icon-box-side">
-                                    <span class="icon-box-icon">
-                                        <i class="icon-info-circle"></i>
-                                    </span>
-
-                                    <div class="icon-box-content">
-                                        <h3 class="icon-box-title">Get 20% Off 1 Item</h3><!-- End .icon-box-title -->
-                                        <p>When you sign up</p>
-                                    </div><!-- End .icon-box-content -->
-                                </div><!-- End .icon-box -->
-
-                                <div class="icon-box icon-box-side">
-                                    <span class="icon-box-icon">
-                                        <i class="icon-life-ring"></i>
-                                    </span>
-
-                                    <div class="icon-box-content">
-                                        <h3 class="icon-box-title">We Support</h3><!-- End .icon-box-title -->
-                                        <p>24/7 amazing services</p>
-                                    </div><!-- End .icon-box-content -->
-                                </div><!-- End .icon-box -->
+                                
                         </div><!-- End .owl-carousel -->
                     </div><!-- End .container -->
                 </div><!-- End .icon-boxes-container -->
@@ -382,7 +340,7 @@
                             <div class="col-sm-6 col-lg-4">
                                 <div class="banner banner-overlay banner-lg">
                                     <a href="#">
-                                        <img src="assets/images/demos/demo-9/banners/banner-1.jpg" alt="Banner">
+                                        <img src="{% static 'assets/images/demos/demo-9/banners/banner-1.jpg' %}" alt="Banner">
                                     </a>
 
                                     <div class="banner-content banner-content-bottom">
@@ -397,7 +355,7 @@
                             <div class="col-sm-6 col-lg-4 order-lg-last">
                                 <div class="banner banner-overlay banner-lg">
                                     <a href="#">
-                                        <img src="assets/images/demos/demo-9/banners/banner-4.jpg" alt="Banner">
+                                        <img src="{% static 'assets/images/demos/demo-9/banners/banner-4.jpg' %}" alt="Banner">
                                     </a>
 
                                     <div class="banner-content banner-content-top">
@@ -414,7 +372,7 @@
                                     <div class="col-sm-6 col-lg-12">
                                         <div class="banner banner-overlay">
                                             <a href="#">
-                                                <img src="assets/images/demos/demo-9/banners/banner-2.jpg" alt="Banner">
+                                                <img src="{% static 'assets/images/demos/demo-9/banners/banner-2.jpg' %}" alt="Banner">
                                             </a>
 
                                             <div class="banner-content">
@@ -428,7 +386,7 @@
                                     <div class="col-sm-6 col-lg-12">
                                         <div class="banner banner-overlay">
                                             <a href="#">
-                                                <img src="assets/images/demos/demo-9/banners/banner-3.jpg" alt="Banner">
+                                                <img src="{% static 'assets/images/demos/demo-9/banners/banner-3.jpg' %}" alt="Banner">
                                             </a>
 
                                             <div class="banner-content">
@@ -468,31 +426,31 @@
                             }
                         }'>
                         <a href="#" class="brand">
-                            <img src="assets/images/brands/1.png" alt="Brand Name">
+                            <img src="{% static 'assets/images/brands/1.png' %}" alt="Brand Name">
                         </a>
 
                         <a href="#" class="brand">
-                            <img src="assets/images/brands/2.png" alt="Brand Name">
+                            <img src="{% static 'assets/images/brands/2.png' %}" alt="Brand Name">
                         </a>
 
                         <a href="#" class="brand">
-                            <img src="assets/images/brands/3.png" alt="Brand Name">
+                            <img src="{% static 'assets/images/brands/3.png' %}" alt="Brand Name">
                         </a>
 
                         <a href="#" class="brand">
-                            <img src="assets/images/brands/4.png" alt="Brand Name">
+                            <img src="{% static 'assets/images/brands/4.png' %}" alt="Brand Name">
                         </a>
 
                         <a href="#" class="brand">
-                            <img src="assets/images/brands/5.png" alt="Brand Name">
+                            <img src="{% static 'assets/images/brands/5.png' %}" alt="Brand Name">
                         </a>
 
                         <a href="#" class="brand">
-                            <img src="assets/images/brands/6.png" alt="Brand Name">
+                            <img src="{% static 'assets/images/brands/6.png' %}" alt="Brand Name">
                         </a>
 
                         <a href="#" class="brand">
-                            <img src="assets/images/brands/7.png" alt="Brand Name">
+                            <img src="{% static 'assets/images/brands/7.png' %}" alt="Brand Name">
                         </a>
                     </div><!-- End .owl-carousel -->
                 </div><!-- End .container -->
@@ -547,8 +505,8 @@
                                 <div class="product product-7 text-center">
                                     <figure class="product-media">
                                         <a href="product.html">
-                                            <img src="assets/images/demos/demo-9/products/product-1-1.jpg" alt="Product image" class="product-image">
-                                            <img src="assets/images/demos/demo-9/products/product-1-2.jpg" alt="Product image" class="product-image-hover">
+                                            <img src="{% static 'assets/images/demos/demo-9/products/product-1-1.jpg' %}" alt="Product image" class="product-image">
+                                            <img src="{% static 'assets/images/demos/demo-9/products/product-1-2.jpg' %}" alt="Product image" class="product-image-hover">
                                         </a>
 
                                         <div class="product-action-vertical">
@@ -576,13 +534,13 @@
 
                                         <div class="product-nav product-nav-thumbs">
                                             <a href="#" class="active">
-                                                <img src="assets/images/demos/demo-9/products/product-1-thumb.jpg" alt="product desc">
+                                                <img src="{% static 'assets/images/demos/demo-9/products/product-1-thumb.jpg' %}" alt="product desc">
                                             </a>
                                             <a href="#">
-                                                <img src="assets/images/demos/demo-9/products/product-1-2-thumb.jpg" alt="product desc">
+                                                <img src="{% static 'assets/images/demos/demo-9/products/product-1-2-thumb.jpg' %}" alt="product desc">
                                             </a>
                                             <a href="#">
-                                                <img src="assets/images/demos/demo-9/products/product-1-3-thumb.jpg" alt="product desc">
+                                                <img src="{% static 'assets/images/demos/demo-9/products/product-1-3-thumb.jpg' %}" alt="product desc">
                                             </a>
                                         </div><!-- End .product-nav -->
                                     </div><!-- End .product-body -->
@@ -591,8 +549,8 @@
                                 <div class="product product-7 text-center">
                                     <figure class="product-media">
                                         <a href="product.html">
-                                            <img src="assets/images/demos/demo-9/products/product-2-1.jpg" alt="Product image" class="product-image">
-                                            <img src="assets/images/demos/demo-9/products/product-2-2.jpg" alt="Product image" class="product-image-hover">
+                                            <img src="{% static 'assets/images/demos/demo-9/products/product-2-1.jpg' %}" alt="Product image" class="product-image">
+                                            <img src="{% static 'assets/images/demos/demo-9/products/product-2-2.jpg' %}" alt="Product image" class="product-image-hover">
                                         </a>
 
                                         <div class="product-action-vertical">
@@ -624,8 +582,8 @@
                                     <figure class="product-media">
                                         <span class="product-label label-sale">sale</span>
                                         <a href="product.html">
-                                            <img src="assets/images/demos/demo-9/products/product-3-1.jpg" alt="Product image" class="product-image">
-                                            <img src="assets/images/demos/demo-9/products/product-3-2.jpg" alt="Product image" class="product-image-hover">
+                                            <img src="{% static 'assets/images/demos/demo-9/products/product-3-1.jpg' %}" alt="Product image" class="product-image">
+                                            <img src="{% static 'assets/images/demos/demo-9/products/product-3-2.jpg' %}" alt="Product image" class="product-image-hover">
                                         </a>
 
                                         <div class="product-action-vertical">
@@ -657,8 +615,8 @@
                                 <div class="product product-7 text-center">
                                     <figure class="product-media">
                                         <a href="product.html">
-                                            <img src="assets/images/demos/demo-9/products/product-4-1.jpg" alt="Product image" class="product-image">
-                                            <img src="assets/images/demos/demo-9/products/product-4-2.jpg" alt="Product image" class="product-image-hover">
+                                            <img src="{% static 'assets/images/demos/demo-9/products/product-4-1.jpg' %}" alt="Product image" class="product-image">
+                                            <img src="{% static 'assets/images/demos/demo-9/products/product-4-2.jpg' %}" alt="Product image" class="product-image-hover">
                                         </a>
 
                                         <div class="product-action-vertical">
@@ -686,10 +644,10 @@
 
                                         <div class="product-nav product-nav-thumbs">
                                             <a href="#" class="active">
-                                                <img src="assets/images/demos/demo-9/products/product-4-thumb.jpg" alt="product desc">
+                                                <img src="{% static 'assets/images/demos/demo-9/products/product-4-thumb.jpg' %}" alt="product desc">
                                             </a>
                                             <a href="#">
-                                                <img src="assets/images/demos/demo-9/products/product-4-2-thumb.jpg" alt="product desc">
+                                                <img src="{% static 'assets/images/demos/demo-9/products/product-4-2-thumb.jpg' %}" alt="product desc">
                                             </a>
                                         </div><!-- End .product-nav -->
                                     </div><!-- End .product-body -->
@@ -698,8 +656,8 @@
                                 <div class="product product-7 text-center">
                                     <figure class="product-media">
                                         <a href="product.html">
-                                            <img src="assets/images/demos/demo-9/products/product-1-1.jpg" alt="Product image" class="product-image">
-                                            <img src="assets/images/demos/demo-9/products/product-1-2.jpg" alt="Product image" class="product-image-hover">
+                                            <img src="{% static 'assets/images/demos/demo-9/products/product-1-1.jpg' %}" alt="Product image" class="product-image">
+                                            <img src="{% static 'assets/images/demos/demo-9/products/product-1-2.jpg' %}" alt="Product image" class="product-image-hover">
                                         </a>
 
                                         <div class="product-action-vertical">
@@ -726,13 +684,13 @@
                                         </div><!-- End .rating-container -->
                                         <div class="product-nav product-nav-thumbs">
                                             <a href="#" class="active">
-                                                <img src="assets/images/demos/demo-9/products/product-1-thumb.jpg" alt="product desc">
+                                                <img src="{% static 'assets/images/demos/demo-9/products/product-1-thumb.jpg' %}" alt="product desc">
                                             </a>
                                             <a href="#">
-                                                <img src="assets/images/demos/demo-9/products/product-1-2-thumb.jpg" alt="product desc">
+                                                <img src="{% static 'assets/images/demos/demo-9/products/product-1-2-thumb.jpg' %}" alt="product desc">
                                             </a>
                                             <a href="#">
-                                                <img src="assets/images/demos/demo-9/products/product-1-3-thumb.jpg" alt="product desc">
+                                                <img src="{% static 'assets/images/demos/demo-9/products/product-1-3-thumb.jpg' %}" alt="product desc">
                                             </a>
                                         </div><!-- End .product-nav -->
                                     </div><!-- End .product-body -->
@@ -794,7 +752,7 @@
                     <div class="col-lg-3">
                         <div class="banner banner-overlay product-banner">
                             <a href="#">
-                                <img src="assets/images/demos/demo-9/banners/banner-5.jpg" alt="banner image">
+                                <img src="{% static 'assets/images/demos/demo-9/banners/banner-5.jpg' %}" alt="banner image">
                             </a>
                             <div class="banner-content">
                                 <div class="banner-top">
@@ -848,8 +806,8 @@
                                         <figure class="product-media">
                                             <span class="product-label label-sale">30% off</span>
                                             <a href="product.html">
-                                                <img src="assets/images/demos/demo-9/products/product-5-1.jpg" alt="Product image" class="product-image">
-                                                <img src="assets/images/demos/demo-9/products/product-5-2.jpg" alt="Product image" class="product-image-hover">
+                                                <img src="{% static 'assets/images/demos/demo-9/products/product-5-1.jpg' %}" alt="Product image" class="product-image">
+                                                <img src="{% static 'assets/images/demos/demo-9/products/product-5-2.jpg' %}" alt="Product image" class="product-image-hover">
                                             </a>
 
                                             <div class="product-action-vertical">
@@ -880,8 +838,8 @@
                                     <div class="product product-7">
                                         <figure class="product-media">
                                             <a href="product.html">
-                                                <img src="assets/images/demos/demo-9/products/product-6-1.jpg" alt="Product image" class="product-image">
-                                                <img src="assets/images/demos/demo-9/products/product-6-2.jpg" alt="Product image" class="product-image-hover">
+                                                <img src="{% static 'assets/images/demos/demo-9/products/product-6-1.jpg' %}" alt="Product image" class="product-image">
+                                                <img src="{% static 'assets/images/demos/demo-9/products/product-6-2.jpg' %}" alt="Product image" class="product-image-hover">
                                             </a>
 
                                             <div class="product-action-vertical">
@@ -911,8 +869,8 @@
                                     <div class="product product-7">
                                         <figure class="product-media">
                                             <a href="product.html">
-                                                <img src="assets/images/demos/demo-9/products/product-7-1.jpg" alt="Product image" class="product-image">
-                                                <img src="assets/images/demos/demo-9/products/product-7-2.jpg" alt="Product image" class="product-image-hover">
+                                                <img src="{% static 'assets/images/demos/demo-9/products/product-7-1.jpg' %}" alt="Product image" class="product-image">
+                                                <img src="{% static 'assets/images/demos/demo-9/products/product-7-2.jpg' %}" alt="Product image" class="product-image-hover">
                                             </a>
 
                                             <div class="product-action-vertical">
@@ -943,8 +901,8 @@
                                         <figure class="product-media">
                                             <span class="product-label label-sale">30% off</span>
                                             <a href="product.html">
-                                                <img src="assets/images/demos/demo-9/products/product-5-1.jpg" alt="Product image" class="product-image">
-                                                <img src="assets/images/demos/demo-9/products/product-5-2.jpg" alt="Product image" class="product-image-hover">
+                                                <img src="{% static 'assets/images/demos/demo-9/products/product-5-1.jpg' %}" alt="Product image" class="product-image">
+                                                <img src="{% static 'assets/images/demos/demo-9/products/product-5-2.jpg' %}" alt="Product image" class="product-image-hover">
                                             </a>
 
                                             <div class="product-action-vertical">
@@ -1029,7 +987,7 @@
                     <div class="col-lg-3">
                         <div class="banner banner-overlay product-banner">
                             <a href="#">
-                                <img src="assets/images/demos/demo-9/banners/banner-6.jpg" alt="banner image">
+                                <img src="{% static 'assets/images/demos/demo-9/banners/banner-6.jpg' %}" alt="banner image">
                             </a>
                             <div class="banner-content">
                                 <div class="banner-top">
@@ -1082,8 +1040,8 @@
                                     <div class="product product-7 text-center">
                                         <figure class="product-media">
                                             <a href="product.html">
-                                                <img src="assets/images/demos/demo-9/products/product-8-1.jpg" alt="Product image" class="product-image">
-                                                <img src="assets/images/demos/demo-9/products/product-8-2.jpg" alt="Product image" class="product-image-hover">
+                                                <img src="{% static 'assets/images/demos/demo-9/products/product-8-1.jpg' %}" alt="Product image" class="product-image">
+                                                <img src="{% static 'assets/images/demos/demo-9/products/product-8-2.jpg' %}" alt="Product image" class="product-image-hover">
                                             </a>
 
                                             <div class="product-action-vertical">
@@ -1113,8 +1071,8 @@
                                     <div class="product product-7 text-center">
                                         <figure class="product-media">
                                             <a href="product.html">
-                                                <img src="assets/images/demos/demo-9/products/product-9-1.jpg" alt="Product image" class="product-image">
-                                                <img src="assets/images/demos/demo-9/products/product-9-2.jpg" alt="Product image" class="product-image-hover">
+                                                <img src="{% static 'assets/images/demos/demo-9/products/product-9-1.jpg' %}" alt="Product image" class="product-image">
+                                                <img src="{% static 'assets/images/demos/demo-9/products/product-9-2.jpg' %}" alt="Product image" class="product-image-hover">
                                             </a>
 
                                             <div class="product-action-vertical">
@@ -1144,8 +1102,8 @@
                                     <div class="product product-7 text-center">
                                         <figure class="product-media">
                                             <a href="product.html">
-                                                <img src="assets/images/demos/demo-9/products/product-10-1.jpg" alt="Product image" class="product-image">
-                                                <img src="assets/images/demos/demo-9/products/product-10-2.jpg" alt="Product image" class="product-image-hover">
+                                                <img src="{% static 'assets/images/demos/demo-9/products/product-10-1.jpg' %}" alt="Product image" class="product-image">
+                                                <img src="{% static 'assets/images/demos/demo-9/products/product-10-2.jpg' %}" alt="Product image" class="product-image-hover">
                                             </a>
 
                                             <div class="product-action-vertical">
@@ -1172,10 +1130,10 @@
                                             </div><!-- End .rating-container -->
                                             <div class="product-nav product-nav-thumbs">
                                                 <a href="#" class="active">
-                                                    <img src="assets/images/demos/demo-9/products/product-10-thumb.jpg" alt="product desc">
+                                                    <img src="{% static 'assets/images/demos/demo-9/products/product-10-thumb.jpg' %}" alt="product desc">
                                                 </a>
                                                 <a href="#">
-                                                    <img src="assets/images/demos/demo-9/products/product-10-2-thumb.jpg" alt="product desc">
+                                                    <img src="{% static 'assets/images/demos/demo-9/products/product-10-2-thumb.jpg' %}" alt="product desc">
                                                 </a>
                                             </div><!-- End .product-nav -->
                                         </div><!-- End .product-body -->
@@ -1271,7 +1229,7 @@
                     }
                 }'>
                 <div class="instagram-feed">
-                    <img src="assets/images/demos/demo-9/instagram/1.jpg" alt="img">
+                    <img src="{% static 'assets/images/demos/demo-9/instagram/1.jpg' %}" alt="img">
 
                     <div class="instagram-feed-content">
                         <a href="#"><i class="icon-heart-o"></i>466</a>
@@ -1280,7 +1238,7 @@
                 </div><!-- End .instagram-feed -->
 
                 <div class="instagram-feed">
-                    <img src="assets/images/demos/demo-9/instagram/2.jpg" alt="img">
+                    <img src="{% static 'assets/images/demos/demo-9/instagram/2.jpg' %}" alt="img">
 
                     <div class="instagram-feed-content">
                         <a href="#"><i class="icon-heart-o"></i>39</a>
@@ -1289,7 +1247,7 @@
                 </div><!-- End .instagram-feed -->
 
                 <div class="instagram-feed">
-                    <img src="assets/images/demos/demo-9/instagram/3.jpg" alt="img">
+                    <img src="{% static 'assets/images/demos/demo-9/instagram/3.jpg' %}" alt="img">
 
                     <div class="instagram-feed-content">
                         <a href="#"><i class="icon-heart-o"></i>691</a>
@@ -1298,7 +1256,7 @@
                 </div><!-- End .instagram-feed -->
 
                 <div class="instagram-feed">
-                    <img src="assets/images/demos/demo-9/instagram/4.jpg" alt="img">
+                    <img src="{% static 'assets/images/demos/demo-9/instagram/4.jpg' %}" alt="img">
 
                     <div class="instagram-feed-content">
                         <a href="#"><i class="icon-heart-o"></i>508</a>
@@ -1307,7 +1265,7 @@
                 </div><!-- End .instagram-feed -->
 
                 <div class="instagram-feed">
-                    <img src="assets/images/demos/demo-9/instagram/5.jpg" alt="img">
+                    <img src="{% static 'assets/images/demos/demo-9/instagram/5.jpg' %}" alt="img">
 
                     <div class="instagram-feed-content">
                         <a href="#"><i class="icon-heart-o"></i>433</a>
@@ -1316,7 +1274,7 @@
                 </div><!-- End .instagram-feed -->
 
                 <div class="instagram-feed">
-                    <img src="assets/images/demos/demo-9/instagram/6.jpg" alt="img">
+                    <img src="{% static 'assets/images/demos/demo-9/instagram/6.jpg' %}" alt="img">
 
                     <div class="instagram-feed-content">
                         <a href="#"><i class="icon-heart-o"></i>122</a>
@@ -1332,7 +1290,7 @@
                     <div class="row">
                         <div class="col-sm-12 col-lg-6">
                             <div class="widget widget-about">
-                                <img src="assets/images/demos/demo-9/logo-footer.png" class="footer-logo" alt="Footer Logo" width="82" height="25">
+                                <img src="{% static 'assets/images/demos/demo-9/logo-footer.png' %}" class="footer-logo" alt="Footer Logo" width="82" height="25">
                                 <p>Praesent dapibus, neque id cursus ucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Aliquam erat volutpat. Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus. </p>
                                 
                                 <div class="widget-about-info">
@@ -1344,7 +1302,7 @@
                                         <div class="col-sm-6 col-md-8">
                                             <span class="widget-about-title">Payment Method</span>
                                             <figure class="footer-payments">
-                                                <img src="assets/images/payments.png" alt="Payment methods" width="272" height="20">
+                                                <img src="{% static 'assets/images/demos/demo-9/logo-footer.png' %}" alt="Payment methods" width="272" height="20">
                                             </figure><!-- End .footer-payments -->
                                         </div><!-- End .col-sm-6 -->
                                     </div><!-- End .row -->
