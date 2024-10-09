@@ -92,13 +92,15 @@
             </div><!-- End .heading -->
 
             <div class="row">
+                
+                {% for product in Exclusive_Offer_products %}
                 <!-- product card stating -->
                 <div class="col-6 col-md-4 col-lg-4">
                     <div class="product product-7 text-center">
                         <figure class="product-media">
 
                             <a href="product.html">
-                                <img src="{% static 'assets/images/demos/demo-9/products/product-3-1.jpg' %}"
+                                <img src="{{ product.image1.url }}"
                                     alt="Product image" class="product-image">
                             </a>
 
@@ -115,11 +117,11 @@
                         </figure><!-- End .product-media -->
 
                         <div class="product-body">
-                            <h3 class="product-title"><a href="product.html">Printed sweatshirt 1</a></h3>
+                            <h3 class="product-title"><a href="product.html">{{ product.name }}</a></h3>
                             <!-- End .product-title -->
                             <div class="product-price">
-                                <span class="new-price">Now $7.99</span>
-                                <span class="old-price">Was $12.99</span>
+                                <span class="new-price">Now ₹{{ product.new_price }}</span>
+                                <span class="old-price">Was ₹{{ product.old_price }}</span>
                             </div><!-- End .product-price -->
 
                             <div class="ratings-container">
@@ -132,6 +134,8 @@
                     </div><!-- End .product -->
                 </div>
                 <!-- product card ending -->
+                {% endfor %}
+
             </div>
         </div><!-- End .container -->
     </div>
