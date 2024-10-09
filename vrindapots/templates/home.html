@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<main class="main">
+    <div class="">
+        <div class="">
+            <div class="container">
+                <div class="intro-slider-container slider-container-ratio mb-0">
+                    <div class="intro-slider owl-carousel owl-simple owl-light" data-toggle="owl" 
+                        data-owl-options='{
+                            "nav": false, 
+                            "dots": true,
+                            "responsive": {
+                                "1200": {
+                                    "nav": true,
+                                    "dots": false
+                                }
+                            }
+                        }'>
+                        <div class="intro-slide">
+                            <figure class="slide-image">
+                                <picture>
+                                    <source media="(max-width: 480px)" srcset="{% static 'assets/images/demos/demo-9/slider/slide-1-480w.jpg' %}">
+                                    <img src="{% static 'assets/images/demos/demo-9/slider/slide-1.jpg' %}" alt="Image Desc">
+                                </picture>
+                            </figure><!-- End .slide-image -->
+
+                            <div class="intro-content">
+                                <h3 class="intro-subtitle">New Collection</h3><!-- End .h3 intro-subtitle -->
+                                <h1 class="intro-title text-white">Women’s <br>Sportswear & Joggers</h1><!-- End .intro-title -->
+
+                                <div class="intro-text text-white">2019</div><!-- End .intro-text -->
+
+                                <a href="category.html" class="btn btn-primary">
+                                    <span>DISCOVER NOW</span>
+                                </a>
+                            </div><!-- End .intro-content -->
+                        </div><!-- End .intro-slide -->
+
+                        
+                    </div><!-- End .intro-slider owl-carousel owl-simple -->
+                            
+                    <span class="slider-loader"></span><!-- End .slider-loader -->
+                </div><!-- End .intro-slider-container -->
+            </div><!-- End .container -->
+        </div><!-- End .intro-section-slider -->
+
+        <div class="icon-boxes-container pt-0 pb-0">
+            <div class="container">
+                <div class="owl-carousel owl-simple" data-toggle="owl" 
+                    data-owl-options='{
+                        "nav": false, 
+                        "dots": false,
+                        "margin": 30,
+                        "loop": false,
+                        "autoplay": true,
+                        "autoplayTimeout": 8000,
+                        "responsive": {
+                            "0": {
+                                "items":1
+                            },
+                            "480": {
+                                "items":2
+                            },
+                            "992": {
+                                "items":3
+                            },
+                            "1200": {
+                                "items":4
+                            }
+                        }
+                    }'>
+                        
+                </div><!-- End .owl-carousel -->
+            </div><!-- End .container -->
+        </div><!-- End .icon-boxes-container -->
+    </div><!-- End .intro-section -->
+
+
+    <!-- new container for listing products -->
+    <div class="bg-lighter pt-6">
+        <div class="container">
+            <div class="heading heading-flex mb-3">
+                <div class="heading-left text-center">
+                    <h2 class="title text-center">Exclusive Offers</h2><!-- End .title -->
+                </div><!-- End .heading-left -->
+
+               
+            </div><!-- End .heading -->
+
+            <div class="row">
+                <!-- product card stating -->
+                <div class="col-6 col-md-4 col-lg-4">
+                    <div class="product product-7 text-center">
+                        <figure class="product-media">
+                            
+                            <a href="product.html">
+                                <img src="{% static 'assets/images/demos/demo-9/products/product-3-1.jpg' %}" alt="Product image" class="product-image">
+                            </a>
+
+                            <div class="product-action-vertical">
+                                <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
+                                <a href="popup/quickView.html" class="btn-product-icon btn-quickview" title="Quick view"><span>Quick view</span></a>
+                            </div><!-- End .product-action-vertical -->
+
+                            <div class="product-action">
+                                <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
+                            </div><!-- End .product-action -->
+                        </figure><!-- End .product-media -->
+
+                        <div class="product-body">
+                            <h3 class="product-title"><a href="product.html">Printed sweatshirt 1</a></h3><!-- End .product-title -->
+                            <div class="product-price">
+                                <span class="new-price">Now $7.99</span>
+                                <span class="old-price">Was $12.99</span>
+                            </div><!-- End .product-price -->
+
+                            <div class="ratings-container">
+                                <div class="ratings">
+                                    <div class="ratings-val" style="width: 30%;"></div><!-- End .ratings-val -->
+                                </div><!-- End .ratings -->
+                                <span class="ratings-text">( 3 Reviews )</span>
+                            </div><!-- End .rating-container -->
+                        </div><!-- End .product-body -->
+                    </div><!-- End .product -->
+                </div>
+                <!-- product card ending -->
+            </div>
+        </div><!-- End .container -->
+    </div>
+    <!-- end container for listing products -->
+{% endblock %}
