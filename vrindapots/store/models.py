@@ -16,7 +16,9 @@ class Tag(models.Model):
         return self.name
 
 
-
+class Banner(models.Model):
+    desc = models.CharField(max_length=100)
+    image = models.ImageField(upload_to='uploads/banners/')
 
 
 
