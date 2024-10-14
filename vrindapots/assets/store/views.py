@@ -19,10 +19,24 @@ def home_page(request):
             output_field=FloatField()
         )
     )
+    New_Arrivals_products = Product.objects.filter(tag__name='New Arrivals').annotate(
+        discount=ExpressionWrapper(
+            (F('old_price') - F('new_price')) * 100 / F('old_price'),
+            output_field=FloatField()
+        )
+    )
+    Seasonal_Specials_products = Product.objects.filter(tag__name='Seasonal Specials').annotate(
+        discount=ExpressionWrapper(
+            (F('old_price') - F('new_price')) * 100 / F('old_price'),
+            output_field=FloatField()
+        )
+    )
     
     return render(request, 'home.html', {
         'banner': banner,
         'Exclusive_Offer_products': Exclusive_Offer_products,
         'Best_Seller_products': Best_Seller_products,
+        'New_Arrivals_products': New_Arrivals_products,
+        'Seasonal_Specials_products': Seasonal_Specials_products,
         
     })
