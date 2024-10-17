@@ -65,7 +65,7 @@
             <nav class="mobile-nav">
                 <ul class="mobile-menu">
                     <li class="">
-                        <a href="index.html">Home</a>
+                        <a href="{% url 'home' %}">Home</a>
                     </li>
                     <li>
                         <a href="#" class="sf-with-ul">Shop</a>
@@ -79,7 +79,7 @@
                     <li>
                         <a href="#" class="sf-with-ul">Account</a>
                         <ul>
-                            <li><a href="#">Account Overview</a></li>
+                            <li><a href="{% url 'user_profile' %}">Account</a></li>
                             <li><a href="#">My Orders</a></li>
                             <li><a href="#">My Wishlist</a></li>
                             <li><a href="#">My Cart</a></li>

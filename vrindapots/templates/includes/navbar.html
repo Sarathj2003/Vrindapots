@@ -32,7 +32,10 @@
                     <li>
                         <a href="#">Links</a>
                         <ul>
+                            
                             <li><a href="{% url 'user_login' %}" data-toggle=""><i class="icon-user"></i>Login</a></li>
+                            <li><a href="{% url 'user_logout' %}" data-toggle=""><i class="icon-user"></i>Logout</a></li>
+                            
                         </ul>
                     </li>
                 </ul><!-- End .top-menu -->
@@ -107,7 +110,7 @@
                         <li>
                             <a href="" class="sf-with-ul">Account</a>
                             <ul>
-                                <li><a href="">Account Overview</a></li>
+                                <li><a href="{% url 'user_profile' %}">Account</a></li>
                                 <li><a href="">My Orders</a></li>
                                 <li><a href="#">My Wishlist</a></li>
                                 <li><a href="#">My Cart</a></li>

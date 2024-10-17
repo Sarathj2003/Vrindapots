@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from .models import Category,Product,Tag,Banner
-from authentication.models import Customer
 from django.db.models import F, ExpressionWrapper, FloatField
 # Create your views here.
 
