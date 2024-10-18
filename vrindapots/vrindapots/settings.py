@@ -36,11 +36,17 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'social_django',
     'store',
     'authentication',
+
 ]
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -50,6 +56,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'vrindapots.urls'
@@ -65,6 +73,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
+                # signin with google
+                'social_django.context_processors.backends',
                 
                 #custom context processors
                 'store.context_processors.categories_processor',
@@ -138,3 +149,21 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+AUTHENTICATION_BACKENDS = [
+    'social_core.backends.google.GoogleOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+
+LOGIN_URL = 'user_login'
+LOGIN_REDIRECT_URL = 'home'  # Redirect after login
+LOGOUT_URL = 'user_logout'
+LOGOUT_REDIRECT_URL = 'user_login'  # Redirect after logout
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '717314752145-8r0nk3ab87n4qeamrslg233tfi720u6f.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+
+
+
