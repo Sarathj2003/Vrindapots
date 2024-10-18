@@ -31,6 +31,8 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+SITE_ID = 2
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -39,12 +41,26 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    'social_django',
     'store',
     'authentication',
 
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+
 ]
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email'
+        ],
+        'AUTH_PARAMS': {'access_type': 'online'}
+
+    }
+}
 
 
 
@@ -56,7 +72,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'social_django.middleware.SocialAuthExceptionMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
     
 ]
 
@@ -74,8 +90,6 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
 
-                # signin with google
-                'social_django.context_processors.backends',
                 
                 #custom context processors
                 'store.context_processors.categories_processor',
@@ -151,19 +165,16 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-AUTHENTICATION_BACKENDS = [
-    'social_core.backends.google.GoogleOAuth2',
+AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
-]
+    'allauth.account.auth_backends.AuthenticationBackend'
+)
 
 
-LOGIN_URL = 'user_login'
 LOGIN_REDIRECT_URL = 'home'  # Redirect after login
-LOGOUT_URL = 'user_logout'
 LOGOUT_REDIRECT_URL = 'user_login'  # Redirect after logout
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '717314752145-8r0nk3ab87n4qeamrslg233tfi720u6f.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+
 
 
 

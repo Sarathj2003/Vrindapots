@@ -18,13 +18,12 @@ from django.contrib import admin
 from django.urls import path,include
 from . import settings
 from django.conf.urls.static import static
-from django.contrib.auth import views as auth_views
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',include('store.urls')),
     path('',include('authentication.urls')),
-    path('logout/',auth_views.LogoutView.as_view(), name='user_logout'),
-    path('social-auth/', include('social_django.urls', namespace='social')),
+    path('accounts/',include('allauth.urls')),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
