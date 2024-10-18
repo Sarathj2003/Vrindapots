@@ -1,8 +1,12 @@
 from django.shortcuts import render
 from .models import Category,Product,Tag,Banner
 from django.db.models import F, ExpressionWrapper, FloatField
+from django.views.decorators.cache import cache_control
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def home_page(request):
     banner = Banner.objects.first()
 

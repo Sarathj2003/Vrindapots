@@ -13,6 +13,8 @@ from django.contrib.auth.decorators import login_required
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def user_login(request):
+    if request.user.is_authenticated:
+        return redirect('home')
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
@@ -32,25 +34,27 @@ def user_login(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def user_logout(request):
     logout(request)
-    return redirect('home')
+    return redirect('user_login')
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def user_signup(request):
+    if request.user.is_authenticated:
+        return redirect('home')
     if request.method == 'POST':
         email = request.POST.get('email')
         password1 = request.POST.get('password1')
-        password2 = request.POST.get('password2')
 
         if User.objects.filter(email=email).exists():
             messages.error(request, 'Email is already registered.')
-            return redirect('user_login')
+            return redirect('user_signup')
         
         user = User.objects.create_user(username=email, email=email, password=password1)
         login(request, user)  # Automatically log the user in after registration
         return redirect('user_profile')
 
-    return render(request,'login.html')
+    return render(request,'signup.html')
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)

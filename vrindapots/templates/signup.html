@@ -3,45 +3,46 @@
 
 {% block content %}
 <main class="container ">
-    <div class="login-page bg-image pt-3 pb-8 pt-md-12 pb-md-12 pt-lg-17 pb-lg-17" style="background-image: url('{% static 'assets/images/home_img_1.jpg' %}');background-size: cover;background-position: center;background-repeat: no-repeat;height: 800px;">
-    <div class="container" style="margin-top: -70px;">
-        
+    <div class="login-page bg-image pt-8 pb-8 pt-md-12 pb-md-12 pt-lg-17 pb-lg-17" style="background-image: url('{% static 'assets/images/home_img_1.jpg' %}');background-size: cover;background-position: center;background-repeat: no-repeat;height: 800px;">
+        <div class="container" style="margin-top: -70px;">
         <div class="form-box">
             <div class="form-tab">
                 <ul class="nav nav-pills nav-fill" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link active" id="" data-toggle="" href="{% url 'user_login' %}" role=""
+                        <a class="nav-link" id="" data-toggle="" href="{% url 'user_login' %}" role=""
                             aria-controls="" aria-selected="">Sign In</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link " id="" data-toggle="" href="{% url 'user_signup' %}" role=""
+                        <a class="nav-link active" id="" data-toggle="" href="{% url 'user_signup' %}" role=""
                             aria-controls="" aria-selected="">Register</a>
                     </li>
                 </ul>
                 <div class="tab-content">
-                    <div class="tab-pane fade show active" id="" role="tabpanel" aria-labelledby="">
-                        <form method="post" action="{% url 'user_login' %}">
+                
+                    <div class="tab-pane fade show active" id="" role="tabpanel"
+                        aria-labelledby="">
+                        <form method="post" action="{% url 'user_signup' %}">
                             {% csrf_token %}
                             <div class="form-group">
                                 <label for="email">Email address *</label>
-                                <input type="text" class="form-control" id="email" name="email"
+                                <input type="email" class="form-control" id="email" name="email"
                                     required>
                             </div><!-- End .form-group -->
 
                             <div class="form-group">
-                                <label for="password">Password *</label>
-                                <input type="password" class="form-control" id="password"
-                                    name="password" required>
+                                <label for="password1">Password *</label>
+                                <input type="password" class="form-control" id="password1"
+                                    name="password1" required>
                             </div><!-- End .form-group -->
+
 
                             <div class="form-footer">
                                 <button type="submit" class="btn btn-outline-primary-2">
-                                    <span>LOG IN</span>
+                                    <span>SIGN UP</span>
                                     <i class="icon-long-arrow-right"></i>
                                 </button>
 
-
-                                <a href="#" class="forgot-link">Forgot Your Password?</a>
+                                
                             </div><!-- End .form-footer -->
                         </form>
                         <div class="form-choice">
@@ -54,7 +55,7 @@
                                     </a>
                                 </div><!-- End .col-6 -->
                                 <div class="col-sm-6">
-                                    <a href="#" class="btn btn-login btn-f">
+                                    <a href="#" class="btn btn-login  btn-f">
                                         <i class="icon-facebook-f"></i>
                                         Login With Facebook
                                     </a>
@@ -62,7 +63,6 @@
                             </div><!-- End .row -->
                         </div><!-- End .form-choice -->
                     </div><!-- .End .tab-pane -->
-        
                 </div><!-- End .tab-content -->
             </div><!-- End .form-tab -->
         </div><!-- End .form-box -->
