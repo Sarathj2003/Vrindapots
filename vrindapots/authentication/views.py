@@ -38,7 +38,6 @@ def user_logout(request):
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-@login_required(login_url='user_login')
 def user_signup(request):
     if request.user.is_authenticated:
         return redirect('home')

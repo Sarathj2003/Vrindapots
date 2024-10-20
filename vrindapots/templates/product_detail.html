@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container">
+    <div class="product-details-top">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="product-gallery product-gallery-vertical">
+                    <div class="row">
+                        <style>
+                            #imageZoom {
+                                position: relative;
+                            }
+                            #imageZoom img {
+                                width: 100%;
+                                height: 100%;
+                                object-fit: cover;
+                                object-position: 0 0;
+                            }
+                            #imageZoom::after {
+                                display: var(--display);
+                                content: '';
+                                width: 100%;
+                                height: 100%;
+                                background-color: black;
+                                background-image: var(--url);
+                                background-size: 200%; /* Control the zoom level here */
+                                background-position: var(--zoom-x) var(--zoom-y);
+                                position: absolute;
+                                left: 0;
+                                top: 0;
+                                pointer-events: none;
+                            }
+                        </style>
+                        
+                        <div class="product-main-image" id="imageZoom" style="
+                            --url: url('{{ product.image1.url }}');
+                            --zoom-x: 0%; --zoom-y: 0%;
+                            --display: none;
+                        ">
+                            <img src="{{ product.image1.url }}" alt="">
+                        </div>
+                        
+                        <script>
+                            const imageZoom = document.getElementById('imageZoom');
+                            const imgElement = imageZoom.querySelector('img');
+                        
+                            imageZoom.addEventListener('mousemove', (event) => {
+                                const rect = imageZoom.getBoundingClientRect(); // Get image bounds
+                                const offsetX = event.clientX - rect.left; // Mouse X relative to image
+                                const offsetY = event.clientY - rect.top;  // Mouse Y relative to image
+                        
+                                // Calculate zoom percentage relative to the image size
+                                const pointerX = Math.min(Math.max((offsetX / rect.width) * 100, 0), 100);
+                                const pointerY = Math.min(Math.max((offsetY / rect.height) * 100, 0), 100);
+                        
+                                // Apply zoom coordinates and display the zoom
+                                imageZoom.style.setProperty('--zoom-x', pointerX + '%');
+                                imageZoom.style.setProperty('--zoom-y', pointerY + '%');
+                                imageZoom.style.setProperty('--display', 'block');
+                            });
+                        
+                            imageZoom.addEventListener('mouseout', () => {
+                                imageZoom.style.setProperty('--display', 'none');
+                            });
+                        </script>
+                        
+                        <div id="product-zoom-gallery" class="product-image-gallery" style="height: 200px;">
+                            <a class="product-gallery-item active" href="product_detail" data-image="assets/images/products/single/1.jpg" data-zoom-image="assets/images/products/single/1-big.jpg">
+                                <img src="{{ product.image1.url }}" alt="product side">
+                            </a>
+
+                            <a class="product-gallery-item" href="" data-image="assets/images/products/single/2.jpg" data-zoom-image="assets/images/products/single/2-big.jpg">
+                                <img src="{{ product.image2.url }}" alt="product cross">
+                            </a>
+
+                            <a class="product-gallery-item" href="" data-image="assets/images/products/single/2.jpg" data-zoom-image="assets/images/products/single/2-big.jpg">
+                                <img src="{{ product.image3.url }}" alt="product cross">
+                            </a>
+                        </div><!-- End .product-image-gallery -->
+                        
+                    </div><!-- End .row -->
+                </div><!-- End .product-gallery -->
+            </div><!-- End .col-md-6 -->
+
+            <div class="col-md-6">
+                <div class="product-details">
+                    <h1 class="product-title">Dark yellow lace cut out swing dress</h1><!-- End .product-title -->
+
+                    <div class="ratings-container">
+                        <div class="ratings">
+                            <div class="ratings-val" style="width: 80%;"></div><!-- End .ratings-val -->
+                        </div><!-- End .ratings -->
+                        <a class="ratings-text" href="#product-review-link" id="review-link">( 2 Reviews )</a>
+                    </div><!-- End .rating-container -->
+
+                    <div class="product-price">
+                        $84.00
+                    </div><!-- End .product-price -->
+
+                    <div class="product-content">
+                        <p>Sed egestas, ante et vulputate volutpat, eros pede semper est, vitae luctus metus libero eu augue. Morbi purus libero, faucibus adipiscing. Sed lectus. </p>
+                    </div><!-- End .product-content -->
+
+                    <div class="details-filter-row details-row-size">
+                        <label>Color:</label>
+
+                        <div class="product-nav product-nav-thumbs">
+                            <a href="#" class="active">
+                                <img src="assets/images/products/single/1-thumb.jpg" alt="product desc">
+                            </a>
+                            <a href="#">
+                                <img src="assets/images/products/single/2-thumb.jpg" alt="product desc">
+                            </a>
+                        </div><!-- End .product-nav -->
+                    </div><!-- End .details-filter-row -->
+
+                    <div class="details-filter-row details-row-size">
+                        <label for="size">Size:</label>
+                        <div class="select-custom">
+                            <select name="size" id="size" class="form-control">
+                                <option value="#" selected="selected">Select a size</option>
+                                <option value="s">Small</option>
+                                <option value="m">Medium</option>
+                                <option value="l">Large</option>
+                                <option value="xl">Extra Large</option>
+                            </select>
+                        </div><!-- End .select-custom -->
+
+                        <a href="#" class="size-guide"><i class="icon-th-list"></i>size guide</a>
+                    </div><!-- End .details-filter-row -->
+
+                    <div class="details-filter-row details-row-size">
+                        <label for="qty">Qty:</label>
+                        <div class="product-details-quantity">
+                            <input type="number" id="qty" class="form-control" value="1" min="1" max="10" step="1" data-decimals="0" required>
+                        </div><!-- End .product-details-quantity -->
+                    </div><!-- End .details-filter-row -->
+
+                    <div class="product-details-action">
+                        <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
+
+                        <div class="details-action-wrapper">
+                            <a href="#" class="btn-product btn-wishlist" title="Wishlist"><span>Add to Wishlist</span></a>
+                            <a href="#" class="btn-product btn-compare" title="Compare"><span>Add to Compare</span></a>
+                        </div><!-- End .details-action-wrapper -->
+                    </div><!-- End .product-details-action -->
+
+                    <div class="product-details-footer">
+                        <div class="product-cat">
+                            <span>Category:</span>
+                            <a href="#">Women</a>,
+                            <a href="#">Dresses</a>,
+                            <a href="#">Yellow</a>
+                        </div><!-- End .product-cat -->
+
+                        <div class="social-icons social-icons-sm">
+                            <span class="social-label">Share:</span>
+                            <a href="#" class="social-icon" title="Facebook" target="_blank"><i class="icon-facebook-f"></i></a>
+                            <a href="#" class="social-icon" title="Twitter" target="_blank"><i class="icon-twitter"></i></a>
+                            <a href="#" class="social-icon" title="Instagram" target="_blank"><i class="icon-instagram"></i></a>
+                            <a href="#" class="social-icon" title="Pinterest" target="_blank"><i class="icon-pinterest"></i></a>
+                        </div>
+                    </div><!-- End .product-details-footer -->
+                </div><!-- End .product-details -->
+            </div><!-- End .col-md-6 -->
+        </div><!-- End .row -->
+    </div><!-- End .product-details-top -->
+</div>
+
+{% endblock %}

@@ -43,3 +43,31 @@ def home_page(request):
         'Seasonal_Specials_products': Seasonal_Specials_products,
         
     })
+
+
+def product_detail_view(request, id):
+    product = Product.objects.get(id=id)
+
+    context = {
+        'product': product,
+    }
+
+    return render(request, 'product_detail.html', context)
+
+def product_detail_view_2(request, id):
+    product = Product.objects.get(id=id)
+
+    context = {
+        'product': product,
+    }
+
+    return render(request, 'product_detail_2.html', context)
+
+def product_detail_view_3(request, id):
+    product = Product.objects.get(id=id)
+
+    context = {
+        'product': product,
+    }
+
+    return render(request, 'product_detail_3.html', context)
