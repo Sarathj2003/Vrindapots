@@ -17,7 +17,6 @@
                                 width: 100%;
                                 height: 100%;
                                 object-fit: cover;
-                                object-position: 0 0;
                             }
                             #imageZoom::after {
                                 display: var(--display);
@@ -26,7 +25,7 @@
                                 height: 100%;
                                 background-color: black;
                                 background-image: var(--url);
-                                background-size: 200%; /* Control the zoom level here */
+                                background-size: 200%; /* Adjust the zoom level here */
                                 background-position: var(--zoom-x) var(--zoom-y);
                                 position: absolute;
                                 left: 0;
@@ -40,54 +39,59 @@
                             --zoom-x: 0%; --zoom-y: 0%;
                             --display: none;
                         ">
-                            <img src="{{ product.image1.url }}" alt="">
+                            <img id="mainImage" src="{{ product.image1.url }}" alt="">
                         </div>
                         
                         <script>
                             const imageZoom = document.getElementById('imageZoom');
-                            const imgElement = imageZoom.querySelector('img');
-                        
+                            const mainImage = document.getElementById('mainImage');
+                    
+                            // Function to update the image and zoom
+                            function updateImage(imageSrc, zoomImageSrc) {
+                                mainImage.src = imageSrc;
+                                imageZoom.style.setProperty('--url', `url('${zoomImageSrc}')`);
+                            }
+                    
+                            // Zoom functionality
                             imageZoom.addEventListener('mousemove', (event) => {
-                                const rect = imageZoom.getBoundingClientRect(); // Get image bounds
-                                const offsetX = event.clientX - rect.left; // Mouse X relative to image
-                                const offsetY = event.clientY - rect.top;  // Mouse Y relative to image
-                        
-                                // Calculate zoom percentage relative to the image size
+                                const rect = imageZoom.getBoundingClientRect();
+                                const offsetX = event.clientX - rect.left;
+                                const offsetY = event.clientY - rect.top;
+                                
                                 const pointerX = Math.min(Math.max((offsetX / rect.width) * 100, 0), 100);
                                 const pointerY = Math.min(Math.max((offsetY / rect.height) * 100, 0), 100);
-                        
-                                // Apply zoom coordinates and display the zoom
+                                
                                 imageZoom.style.setProperty('--zoom-x', pointerX + '%');
                                 imageZoom.style.setProperty('--zoom-y', pointerY + '%');
                                 imageZoom.style.setProperty('--display', 'block');
                             });
-                        
+                    
                             imageZoom.addEventListener('mouseout', () => {
                                 imageZoom.style.setProperty('--display', 'none');
                             });
                         </script>
                         
                         <div id="product-zoom-gallery" class="product-image-gallery" style="height: 200px;">
-                            <a class="product-gallery-item active" href="product_detail" data-image="assets/images/products/single/1.jpg" data-zoom-image="assets/images/products/single/1-big.jpg">
+                            <a class="product-gallery-item " href="#" onclick="updateImage('{{ product.image1.url }}', '{{ product.image1.url }}'); return false;">
                                 <img src="{{ product.image1.url }}" alt="product side">
                             </a>
-
-                            <a class="product-gallery-item" href="" data-image="assets/images/products/single/2.jpg" data-zoom-image="assets/images/products/single/2-big.jpg">
+                    
+                            <a class="product-gallery-item" href="#" onclick="updateImage('{{ product.image2.url }}', '{{ product.image2.url }}'); return false;">
                                 <img src="{{ product.image2.url }}" alt="product cross">
                             </a>
-
-                            <a class="product-gallery-item" href="" data-image="assets/images/products/single/2.jpg" data-zoom-image="assets/images/products/single/2-big.jpg">
+                    
+                            <a class="product-gallery-item" href="#" onclick="updateImage('{{ product.image3.url }}', '{{ product.image3.url }}'); return false;">
                                 <img src="{{ product.image3.url }}" alt="product cross">
                             </a>
                         </div><!-- End .product-image-gallery -->
-                        
                     </div><!-- End .row -->
+                    
                 </div><!-- End .product-gallery -->
             </div><!-- End .col-md-6 -->
 
             <div class="col-md-6">
                 <div class="product-details">
-                    <h1 class="product-title">Dark yellow lace cut out swing dress</h1><!-- End .product-title -->
+                    <h1 class="product-title">{{ product.name }}</h1><!-- End .product-title -->
 
                     <div class="ratings-container">
                         <div class="ratings">
@@ -97,25 +101,14 @@
                     </div><!-- End .rating-container -->
 
                     <div class="product-price">
-                        $84.00
+                        ₹{{ product.new_price }}
                     </div><!-- End .product-price -->
 
                     <div class="product-content">
-                        <p>Sed egestas, ante et vulputate volutpat, eros pede semper est, vitae luctus metus libero eu augue. Morbi purus libero, faucibus adipiscing. Sed lectus. </p>
+                        <p>{{ product.description }} </p>
                     </div><!-- End .product-content -->
 
-                    <div class="details-filter-row details-row-size">
-                        <label>Color:</label>
-
-                        <div class="product-nav product-nav-thumbs">
-                            <a href="#" class="active">
-                                <img src="assets/images/products/single/1-thumb.jpg" alt="product desc">
-                            </a>
-                            <a href="#">
-                                <img src="assets/images/products/single/2-thumb.jpg" alt="product desc">
-                            </a>
-                        </div><!-- End .product-nav -->
-                    </div><!-- End .details-filter-row -->
+                    
 
                     <div class="details-filter-row details-row-size">
                         <label for="size">Size:</label>
