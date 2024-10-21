@@ -48,8 +48,7 @@
                 <div class="col-6 col-md-4 col-lg-4">
                     <div class="product product-7 text-center">
                         <figure class="product-media">
-
-                            <a href="product.html">
+                            <a href="{% url 'product_detail' product.id %}">
                                 <div style="height: 376px;width:376px;">
                                 <img src="{{ product.image1.url }}" style="width: 100%;height: 100%;object-fit: cover;"
                                     alt="Product image" class="product-image">
@@ -59,7 +58,7 @@
                             <div class="product-action-vertical">
                                 <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to
                                         wishlist</span></a>
-                                <a href="popup/quickView.html" class="btn-product-icon btn-quickview"
+                                <a href="{% url 'product_detail' product.id %}" class="btn-product-icon btn-quickview"
                                     title="Quick view"><span>Quick view</span></a>
                             </div><!-- End .product-action-vertical -->
 
@@ -69,21 +68,27 @@
                         </figure><!-- End .product-media -->
 
                         <div class="product-body">
-                            <span class="product-title" style="font-size: 18px;font-weight: bold;"><a href="product.html">{{ product.name }} <span class="new-price " style="font-size: 15px;font-weight: lighter;">-{{ product.discount|floatformat:0 }}% off</span></a></span><br>
+                            <span class="product-title" style="font-size: 18px;font-weight: bold;">
+                                <a href="{% url 'product_detail' product.id %}">{{ product.name }}
+                                    <span class="new-price" style="font-size: 15px;font-weight: lighter;">
+                                        -{{ product.discount|floatformat:0 }}% off
+                                    </span>
+                                </a>
+                            </span>
+                            <br>
                             <span>{{ product.category }}</span>
                             <!-- End .product-title -->
                             <div class="product-price">
                                 <span class="new-price">Now ₹{{ product.new_price }}</span>
                                 <span class="old-price">Was ₹{{ product.old_price }}</span>
-                                
                             </div><!-- End .product-price -->
-                            
+                        
                             <div class="ratings-container">
                                 <div class="ratings">
                                     <div class="ratings-val" style="width: 30%;"></div><!-- End .ratings-val -->
                                 </div><!-- End .ratings -->
-                                <span class="ratings-text">( 3 Reviews )</span>
-                            </div><!-- End .rating-container -->
+                                <span class="ratings-text">(3 Reviews)</span>
+                            </div><!-- End .ratings-container -->
                         </div><!-- End .product-body -->
                     </div><!-- End .product -->
                 </div>
@@ -117,8 +122,7 @@
                 <div class="col-6 col-md-4 col-lg-4">
                     <div class="product product-7 text-center">
                         <figure class="product-media">
-
-                            <a href="product.html">
+                            <a href="{% url 'product_detail' product.id %}">
                                 <div style="height: 376px;width:376px;">
                                 <img src="{{ product.image1.url }}" style="width: 100%;height: 100%;object-fit: cover;"
                                     alt="Product image" class="product-image">
@@ -128,7 +132,7 @@
                             <div class="product-action-vertical">
                                 <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to
                                         wishlist</span></a>
-                                <a href="popup/quickView.html" class="btn-product-icon btn-quickview"
+                                <a href="{% url 'product_detail' product.id %}" class="btn-product-icon btn-quickview"
                                     title="Quick view"><span>Quick view</span></a>
                             </div><!-- End .product-action-vertical -->
 
@@ -138,21 +142,27 @@
                         </figure><!-- End .product-media -->
 
                         <div class="product-body">
-                            <span class="product-title" style="font-size: 18px;font-weight: bold;"><a href="product.html">{{ product.name }} <span class="new-price " style="font-size: 15px;font-weight: lighter;">-{{ product.discount|floatformat:0 }}% off</span></a></span><br>
+                            <span class="product-title" style="font-size: 18px;font-weight: bold;">
+                                <a href="{% url 'product_detail' product.id %}">{{ product.name }}
+                                    <span class="new-price" style="font-size: 15px;font-weight: lighter;">
+                                        -{{ product.discount|floatformat:0 }}% off
+                                    </span>
+                                </a>
+                            </span>
+                            <br>
                             <span>{{ product.category }}</span>
                             <!-- End .product-title -->
                             <div class="product-price">
                                 <span class="new-price">Now ₹{{ product.new_price }}</span>
                                 <span class="old-price">Was ₹{{ product.old_price }}</span>
-                                
                             </div><!-- End .product-price -->
-                            
+                        
                             <div class="ratings-container">
                                 <div class="ratings">
                                     <div class="ratings-val" style="width: 30%;"></div><!-- End .ratings-val -->
                                 </div><!-- End .ratings -->
-                                <span class="ratings-text">( 3 Reviews )</span>
-                            </div><!-- End .rating-container -->
+                                <span class="ratings-text">(3 Reviews)</span>
+                            </div><!-- End .ratings-container -->
                         </div><!-- End .product-body -->
                     </div><!-- End .product -->
                 </div>
@@ -186,8 +196,7 @@
                 <div class="col-6 col-md-4 col-lg-4">
                     <div class="product product-7 text-center">
                         <figure class="product-media">
-                        
-                            <a href="product.html">
+                            <a href="{% url 'product_detail' product.id %}">
                                 <div style="height: 376px;width:376px;">
                                 <img src="{{ product.image1.url }}" style="width: 100%;height: 100%;object-fit: cover;"
                                     alt="Product image" class="product-image">
@@ -197,7 +206,7 @@
                             <div class="product-action-vertical">
                                 <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to
                                         wishlist</span></a>
-                                <a href="popup/quickView.html" class="btn-product-icon btn-quickview"
+                                <a href="{% url 'product_detail' product.id %}" class="btn-product-icon btn-quickview"
                                     title="Quick view"><span>Quick view</span></a>
                             </div><!-- End .product-action-vertical -->
 
@@ -207,21 +216,27 @@
                         </figure><!-- End .product-media -->
 
                         <div class="product-body">
-                            <span class="product-title" style="font-size: 18px;font-weight: bold;"><a href="product.html">{{ product.name }} <span class="new-price " style="font-size: 15px;font-weight: lighter;">-{{ product.discount|floatformat:0 }}% off</span></a></span><br>
+                            <span class="product-title" style="font-size: 18px;font-weight: bold;">
+                                <a href="{% url 'product_detail' product.id %}">{{ product.name }}
+                                    <span class="new-price" style="font-size: 15px;font-weight: lighter;">
+                                        -{{ product.discount|floatformat:0 }}% off
+                                    </span>
+                                </a>
+                            </span>
+                            <br>
                             <span>{{ product.category }}</span>
                             <!-- End .product-title -->
                             <div class="product-price">
                                 <span class="new-price">Now ₹{{ product.new_price }}</span>
                                 <span class="old-price">Was ₹{{ product.old_price }}</span>
-                                
                             </div><!-- End .product-price -->
-                            
+                        
                             <div class="ratings-container">
                                 <div class="ratings">
                                     <div class="ratings-val" style="width: 30%;"></div><!-- End .ratings-val -->
                                 </div><!-- End .ratings -->
-                                <span class="ratings-text">( 3 Reviews )</span>
-                            </div><!-- End .rating-container -->
+                                <span class="ratings-text">(3 Reviews)</span>
+                            </div><!-- End .ratings-container -->
                         </div><!-- End .product-body -->
                     </div><!-- End .product -->
                 </div>
@@ -255,7 +270,7 @@
                 <div class="col-6 col-md-4 col-lg-4">
                     <div class="product product-7 text-center">
                         <figure class="product-media">
-                            <a href="product.html">
+                            <a href="{% url 'product_detail' product.id %}">
                                 <div style="height: 376px;width:376px;">
                                 <img src="{{ product.image1.url }}" style="width: 100%;height: 100%;object-fit: cover;"
                                     alt="Product image" class="product-image">
@@ -265,7 +280,7 @@
                             <div class="product-action-vertical">
                                 <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to
                                         wishlist</span></a>
-                                <a href="popup/quickView.html" class="btn-product-icon btn-quickview"
+                                <a href="{% url 'product_detail' product.id %}" class="btn-product-icon btn-quickview"
                                     title="Quick view"><span>Quick view</span></a>
                             </div><!-- End .product-action-vertical -->
 
@@ -275,21 +290,27 @@
                         </figure><!-- End .product-media -->
 
                         <div class="product-body">
-                            <span class="product-title" style="font-size: 18px;font-weight: bold;"><a href="product.html">{{ product.name }} <span class="new-price " style="font-size: 15px;font-weight: lighter;">-{{ product.discount|floatformat:0 }}% off</span></a></span><br>
+                            <span class="product-title" style="font-size: 18px;font-weight: bold;">
+                                <a href="{% url 'product_detail' product.id %}">{{ product.name }}
+                                    <span class="new-price" style="font-size: 15px;font-weight: lighter;">
+                                        -{{ product.discount|floatformat:0 }}% off
+                                    </span>
+                                </a>
+                            </span>
+                            <br>
                             <span>{{ product.category }}</span>
                             <!-- End .product-title -->
                             <div class="product-price">
                                 <span class="new-price">Now ₹{{ product.new_price }}</span>
                                 <span class="old-price">Was ₹{{ product.old_price }}</span>
-                                
                             </div><!-- End .product-price -->
-                            
+                        
                             <div class="ratings-container">
                                 <div class="ratings">
                                     <div class="ratings-val" style="width: 30%;"></div><!-- End .ratings-val -->
                                 </div><!-- End .ratings -->
-                                <span class="ratings-text">( 3 Reviews )</span>
-                            </div><!-- End .rating-container -->
+                                <span class="ratings-text">(3 Reviews)</span>
+                            </div><!-- End .ratings-container -->
                         </div><!-- End .product-body -->
                     </div><!-- End .product -->
                 </div>
@@ -338,58 +359,7 @@
         </div><!-- End .container -->
     </div><!-- End .cta -->
 
-    <div class="owl-carousel owl-simple" data-toggle="owl" 
-        data-owl-options='{
-            "nav": false, 
-            "dots": false,
-            "items": 6,
-            "margin": 0,
-            "loop": false,
-            "responsive": {
-                "0": {
-                    "items":2
-                },
-                "360": {
-                    "items":2
-                },
-                "600": {
-                    "items":3
-                },
-                "992": {
-                    "items":4
-                },
-                "1200": {
-                    "items":5
-                },
-                "1500": {
-                    "items":6
-                }
-            }
-        }'>
-        <div class="instagram-feed">
-            <img src="{% static 'assets/images/demos/demo-9/instagram/1.jpg' %}" alt="img">
-        </div><!-- End .instagram-feed -->
-
-        <div class="instagram-feed">
-            <img src="{% static 'assets/images/demos/demo-9/instagram/2.jpg' %}" alt="img">
-        </div><!-- End .instagram-feed -->
-
-        <div class="instagram-feed">
-            <img src="{% static 'assets/images/demos/demo-9/instagram/3.jpg' %}" alt="img">
-        </div><!-- End .instagram-feed -->
-
-        <div class="instagram-feed">
-            <img src="{% static 'assets/images/demos/demo-9/instagram/4.jpg' %}" alt="img">
-        </div><!-- End .instagram-feed -->
-
-        <div class="instagram-feed">
-            <img src="{% static 'assets/images/demos/demo-9/instagram/5.jpg' %}" alt="img">
-        </div><!-- End .instagram-feed -->
-
-        <div class="instagram-feed">
-            <img src="{% static 'assets/images/demos/demo-9/instagram/6.jpg' %}" alt="img">
-        </div><!-- End .instagram-feed -->
-    </div><!-- End .owl-carousel -->
+    
 </main><!-- End .main -->
 
 {% endblock %}

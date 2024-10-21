@@ -70,9 +70,9 @@
                     <li>
                         <a href="#" class="sf-with-ul">Shop</a>
                         <ul>
-                            <li><a href="#">All Products</a></li>
+                            <li><a href="{% url 'all_products' %}">All Products</a></li>
                             {% for category in categories %}
-                                <li><a href="">{{ category.name }}</a></li>
+                                <li><a href="{% url 'category_products' category.id %}">{{ category.name }}</a></li>
                             {% endfor %}
                         </ul>
                     </li>
@@ -89,11 +89,10 @@
                     <li>
                         <a href="#" class="sf-with-ul">Top Deals</a>
                         <ul>
-                            <li><a href="#">Exclusive Offers</a></li>
-                            <li><a href="#">Best Sellers</a></li>
-                            <li><a href="#">New Arrivals</a></li>
-                            <li><a href="#">Pots & Planters</a></li>
-                            <li><a href="#">Seasonal Specials</a></li>
+                            <li><a href="{% url 'tag_products' 2 %}">Exclusive Offers</a></li>
+                            <li><a href="{% url 'tag_products' 3 %}">Best Sellers</a></li>
+                            <li><a href="{% url 'tag_products' 4 %}">New Arrivals</a></li>
+                            <li><a href="{% url 'tag_products' 5 %}">Seasonal Specials</a></li>
                         </ul>
                     </li>
 

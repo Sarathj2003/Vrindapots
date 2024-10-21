@@ -44,6 +44,49 @@ def home_page(request):
         
     })
 
+def all_products_page(request):
+    banner = Banner.objects.first()
+    all_products = Product.objects.all().annotate(
+        discount=ExpressionWrapper(
+            (F('old_price') - F('new_price')) * 100 / F('old_price'),
+            output_field=FloatField()
+        )
+    )
+    return render(request, 'all_products.html', {
+        'banner': banner,
+        'all_products': all_products,
+    })
+
+def category_products_page(request, id):
+    banner = Banner.objects.first()
+    category_name = Category.objects.filter(id=id).first()
+    category_products = Product.objects.filter(category__id=id).annotate(
+        discount=ExpressionWrapper(
+            (F('old_price') - F('new_price')) * 100 / F('old_price'),
+            output_field=FloatField()
+        )
+    )
+    return render(request, 'category_products.html', {
+        'banner': banner,
+        'category_products': category_products,
+        'category_name' : category_name,
+    })
+
+def tag_products_page(request, id):
+    banner = Banner.objects.first()
+    tag_name = Tag.objects.filter(id=id).first()
+    tag_products = Product.objects.filter(tag__id=id).annotate(
+        discount=ExpressionWrapper(
+            (F('old_price') - F('new_price')) * 100 / F('old_price'),
+            output_field=FloatField()
+        )
+    )
+    return render(request, 'tag_products.html', {
+        'banner': banner,
+        'tag_products': tag_products,
+        'tag_name' : tag_name,
+    })
+
 
 def product_detail_view(request, id):
     product = Product.objects.get(id=id)
