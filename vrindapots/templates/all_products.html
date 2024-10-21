@@ -87,9 +87,9 @@
                         
                             <div class="ratings-container">
                                 <div class="ratings">
-                                    <div class="ratings-val" style="width: 30%;"></div><!-- End .ratings-val -->
+                                    <div class="ratings-val" style="width: {{ product.rating_percentage }}%;"></div><!-- End .ratings-val -->
                                 </div><!-- End .ratings -->
-                                <span class="ratings-text">(3 Reviews)</span>
+                                <span class="ratings-text">( {{ product.total_reviews }} Reviews )</span>
                             </div><!-- End .ratings-container -->
                         </div><!-- End .product-body -->
                     </div><!-- End .product -->

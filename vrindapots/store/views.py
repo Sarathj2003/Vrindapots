@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from .models import Category,Product,Tag,Banner,Review
-from django.db.models import F, ExpressionWrapper, FloatField, Avg, Count
+from django.db.models import F, ExpressionWrapper, FloatField, Avg, Count, Q, Value
 from django.views.decorators.cache import cache_control
 from django.contrib.auth.decorators import login_required
+from django.db.models.functions import Coalesce
 # Create your views here.
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -50,7 +51,10 @@ def all_products_page(request):
         discount=ExpressionWrapper(
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
             output_field=FloatField()
-        )
+        ),
+        total_reviews=Count('reviews'),  # Count of reviews for each product
+        average_rating=Coalesce(Avg('reviews__rating'), Value(0, output_field=FloatField())),  # Average rating for each product
+        rating_percentage=Coalesce(Avg('reviews__rating') * 20, Value(0, output_field=FloatField()))  # Percentage rating for each product
     )
     return render(request, 'all_products.html', {
         'banner': banner,
@@ -64,7 +68,10 @@ def category_products_page(request, id):
         discount=ExpressionWrapper(
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
             output_field=FloatField()
-        )
+        ),
+        total_reviews=Count('reviews'),  # Count of reviews for each product
+        average_rating=Coalesce(Avg('reviews__rating'), Value(0, output_field=FloatField())),  # Average rating for each product
+        rating_percentage=Coalesce(Avg('reviews__rating') * 20, Value(0, output_field=FloatField()))  # Percentage rating for each product
     )
     return render(request, 'category_products.html', {
         'banner': banner,
@@ -79,7 +86,10 @@ def tag_products_page(request, id):
         discount=ExpressionWrapper(
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
             output_field=FloatField()
-        )
+        ),
+        total_reviews=Count('reviews'),  # Count of reviews for each product
+        average_rating=Coalesce(Avg('reviews__rating'), Value(0, output_field=FloatField())),  # Average rating for each product
+        rating_percentage=Coalesce(Avg('reviews__rating') * 20, Value(0, output_field=FloatField()))  # Percentage rating for each product
     )
     return render(request, 'tag_products.html', {
         'banner': banner,
@@ -97,12 +107,26 @@ def product_detail_view(request, id):
     # Retrieve all reviews for this product
     reviews = Review.objects.filter(product=product).select_related('user').order_by('-created_at')
     rating_percentage = average_rating * 20
+
+    related_products = Product.objects.filter(
+        Q(category=product.category) & ~Q(id=product.id)
+    ).annotate(
+        discount=ExpressionWrapper(
+            (F('old_price') - F('new_price')) * 100 / F('old_price'),
+            output_field=FloatField()
+        ),
+        total_reviews=Count('reviews'),  
+        average_rating=Coalesce(Avg('reviews__rating'), Value(0,output_field=FloatField())),  
+        rating_percentage=Coalesce(Avg('reviews__rating') * 20, Value(0,output_field=FloatField()))  
+    )[:3] 
+
     context = {
         'product': product,
         'average_rating': average_rating,
         'total_reviews': total_reviews,
         'reviews': reviews,
         'rating_percentage': rating_percentage,
+        'related_products' : related_products,
     }
     return render(request, 'product_detail.html', context)
 

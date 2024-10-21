@@ -182,7 +182,81 @@
     </div><!-- End .product-details-top -->
 
 
-    
+    <div class="container">
+        <hr class="mt-2 mb-1">
+    </div><!-- End .container -->
+
+    <!-- product section -->
+
+    <!-- new container for listing Exclusive Offer products -->
+    <div class="bg-lighter ">
+        <div class="container">
+            <div class="heading heading-flex mb-3">
+                <div class="heading-left text-center">
+                    <h2 class="title text-center"> Related Products</h2><!-- End .title -->
+                </div><!-- End .heading-left -->
+
+
+            </div><!-- End .heading -->
+
+            <div class="row">
+                
+                {% for r_product in related_products %}
+                <!-- product card stating -->
+                <div class="col-6 col-md-4 col-lg-4">
+                    <div class="product product-7 text-center">
+                        <figure class="product-media">
+                            <a href="{% url 'product_detail' product.id %}">
+                                <div style="height: 376px;width:376px;">
+                                <img src="{{ r_product.image1.url }}" style="width: 100%;height: 100%;object-fit: cover;"
+                                    alt="Product image" class="product-image">
+                                </div>
+                            </a>
+
+                            <div class="product-action-vertical">
+                                <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to
+                                        wishlist</span></a>
+                                <a href="{% url 'product_detail' product.id %}" class="btn-product-icon btn-quickview"
+                                    title="Quick view"><span>Quick view</span></a>
+                            </div><!-- End .product-action-vertical -->
+
+                            <div class="product-action">
+                                <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
+                            </div><!-- End .product-action -->
+                        </figure><!-- End .product-media -->
+
+                        <div class="product-body">
+                            <span class="product-title" style="font-size: 18px;font-weight: bold;">
+                                <a href="{% url 'product_detail' product.id %}">{{ r_product.name }}
+                                    <span class="new-price" style="font-size: 15px;font-weight: lighter;">
+                                        -{{ r_product.discount|floatformat:0 }}% off
+                                    </span>
+                                </a>
+                            </span>
+                            <br>
+                            
+                            <!-- End .product-title -->
+                            <div class="product-price">
+                                <span class="new-price">Now ₹{{ r_product.new_price }}</span>
+                                <span class="old-price">Was ₹{{ r_product.old_price }}</span>
+                            </div><!-- End .product-price -->
+                        
+                            <div class="ratings-container">
+                                <div class="ratings">
+                                    <div class="ratings-val" style="width: {{ r_product.rating_percentage }}%;"></div><!-- End .ratings-val -->
+                                </div><!-- End .ratings -->
+                                <span class="ratings-text">( {{ r_product.total_reviews }} Reviews )</span>
+                            </div><!-- End .ratings-container -->
+                        </div><!-- End .product-body -->
+                    </div><!-- End .product -->
+                </div>
+                <!-- product card ending -->
+                {% endfor %}
+
+            </div>
+        </div><!-- End .container -->
+    </div>
+    <!-- end container for listing all products -->
 </div>
 
 {% endblock %}
