@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from .models import Category,Product,Tag,Banner
-from django.db.models import F, ExpressionWrapper, FloatField
+from .models import Category,Product,Tag,Banner,Review
+from django.db.models import F, ExpressionWrapper, FloatField, Avg, Count
 from django.views.decorators.cache import cache_control
 from django.contrib.auth.decorators import login_required
 # Create your views here.
@@ -89,11 +89,39 @@ def tag_products_page(request, id):
 
 
 def product_detail_view(request, id):
+    # Get the product and its details
     product = Product.objects.get(id=id)
-
+    # Calculate the average rating and total number of reviews
+    average_rating = Review.objects.filter(product=product).aggregate(Avg('rating'))['rating__avg'] or 0
+    total_reviews = Review.objects.filter(product=product).count()
+    # Retrieve all reviews for this product
+    reviews = Review.objects.filter(product=product).select_related('user').order_by('-created_at')
+    rating_percentage = average_rating * 20
     context = {
         'product': product,
+        'average_rating': average_rating,
+        'total_reviews': total_reviews,
+        'reviews': reviews,
+        'rating_percentage': rating_percentage,
     }
-
     return render(request, 'product_detail.html', context)
 
+
+
+# def add_review(request, product_id):
+#     product = get_object_or_404(Product, id=product_id)
+#     if request.method == 'POST':
+#         rating = request.POST.get('rating')  
+#         comment = request.POST.get('comment')
+
+        
+#         if Review.objects.filter(product=product, user=request.user).exists():
+#             messages.error(request, 'You have already reviewed this product.')
+#             return redirect('product_detail', product_id=product_id)
+
+        
+#         Review.objects.create(product=product, user=request.user, rating=rating, comment=comment)
+#         messages.success(request, 'Your review has been added.')
+#         return redirect('product_detail', product_id=product_id)
+
+#     return render(request, 'add_review.html', {'product': product})

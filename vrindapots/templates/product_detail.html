@@ -96,9 +96,9 @@
 
                     <div class="ratings-container">
                         <div class="ratings">
-                            <div class="ratings-val" style="width: 80%;"></div><!-- End .ratings-val -->
+                            <div class="ratings-val" style="width: {{ rating_percentage }}%;"></div><!-- End .ratings-val -->
                         </div><!-- End .ratings -->
-                        <a class="ratings-text" href="#product-review-link" id="review-link">( 2 Reviews )</a>
+                        <a class="ratings-text" href="#product-review-link" id="review-link">( {{ total_reviews }} Reviews )</a>
                     </div><!-- End .rating-container -->
                     
                     <div class="product-price" style="font-size: 30px;">
@@ -136,7 +136,53 @@
                 </div><!-- End .product-details -->
             </div><!-- End .col-md-6 -->
         </div><!-- End .row -->
+
+        <!-- review section -->
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card" style="width: 40rem;">
+                    <div class="card-body">
+                        <h5 class="card-title" style="margin-bottom: 10px;">Customer Reviews</h5>
+                        <div class="ratings-container">
+                            <div class="ratings" >
+                                <div class="ratings-val" style="width: {{ rating_percentage }}%;" ></div><!-- End .ratings-val -->
+                                <h6 style="margin-top: 10px;"> {{ average_rating|default:"No ratings yet" }} </h6>
+                            </div><!-- End .ratings -->
+                        </div><!-- End .ratings-container -->
+                        <span class="ratings-text">( {{ total_reviews }} Reviews )</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-1">
+            </div>
+            <div class="col-md-7">
+                <div class="card" style="width: 60rem;">
+                    {% for review in reviews %}
+                    <div class="card-body">
+                        <div class="card-title" style="margin-bottom: 10px; color: black;">{{ review.user.profile.full_name }}</div>
+                        <div class="ratings-container">
+                            <div class="ratings">
+                                <div class="ratings-val" style="width: 50%;"></div><!-- End .ratings-val -->
+                            </div><!-- End .ratings -->
+                        </div><!-- End .ratings-container -->
+                        <div class="card-text" style="color: rgba(0, 0, 0, 0.473);">Reviewed on {{ review.created_at|date:"F j, Y" }}</div>
+                        <p class="card-text">{{ review.comment }}</p>
+                    </div>
+                    {% empty %}
+                    <li>No reviews yet. Be the first to review this product!</li>
+                    {% endfor %}
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- review section end -->
+
     </div><!-- End .product-details-top -->
+
+
+    
 </div>
 
 {% endblock %}

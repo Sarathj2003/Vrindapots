@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 import datetime
 # Create your models here.
 
@@ -38,7 +39,26 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def average_rating(self):
+        reviews = self.reviews.all()
+        if reviews:
+            return reviews.aggregate(models.Avg('rating'))['rating__avg']  # Calculate average rating
+        return None  # Or return a default value like 0
 
+
+class Review(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    rating = models.IntegerField()  # Rating out of 5, for example
+    comment = models.TextField(blank=True, null=True)  # Optional review text
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('product', 'user')  # Ensure one review per user per product
+
+    def __str__(self):
+        return f"{self.user.username} - {self.product.name} Review"
 
 
 # class Order(models.Model):
