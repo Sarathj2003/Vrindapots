@@ -60,7 +60,7 @@ def user_login(request):
 @login_required(login_url='user_login')
 def user_logout(request):
     logout(request)
-    messages.success(request, 'Your account has been activated successfully!')
+    messages.success(request, 'Your have logged out successfully!')
     return redirect('user_login')
 
 
