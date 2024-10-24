@@ -18,27 +18,49 @@ from django.core.exceptions import ValidationError
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def user_login(request):
+    # If the user is already authenticated, redirect them to the home page
     if request.user.is_authenticated:
         return redirect('home')
+
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
 
+        # 1. Check if email is empty
+        if not email:
+            messages.error(request, "Email cannot be blank.")
+            return redirect('user_login')
+
+        # 2. Validate email format using regex
+        email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+        if not re.match(email_regex, email):
+            messages.error(request, "Invalid email format.")
+            return redirect('user_login')
+
+        # 3. Check if password is empty
+        if not password:
+            messages.error(request, "Password cannot be blank.")
+            return redirect('user_login')
+
+        # Authenticate the user
         user = authenticate(request, username=email, password=password)
 
         if user is not None:
             login(request, user)
+            messages.success(request, "You have successfully logged in.")
             return redirect('home')
         else:
+            messages.error(request, "Invalid email or password.")
             return redirect('user_login')
 
-    return render(request,'login.html')
-
+    return render(request, 'login.html')
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def user_logout(request):
     logout(request)
+    messages.success(request, 'Your account has been activated successfully!')
     return redirect('user_login')
 
 

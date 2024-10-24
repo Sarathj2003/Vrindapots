@@ -71,7 +71,7 @@
                             <span class="product-title" style="font-size: 18px;font-weight: bold;">
                                 <a href="{% url 'product_detail' product.id %}">{{ product.name }}
                                     <span class="new-price" style="font-size: 15px;font-weight: lighter;">
-                                        --{{ related_product.discount|floatformat:0 }}% off
+                                        -{{ product.discount|floatformat:0 }}% off
                                     </span>
                                 </a>
                             </span>
