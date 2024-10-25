@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
+from django.shortcuts import get_object_or_404
 from .models import Category,Product,Tag,Banner,Review
 from django.db.models import F, ExpressionWrapper, FloatField, Avg, Count, Q, Value
 from django.views.decorators.cache import cache_control
@@ -99,12 +100,12 @@ def tag_products_page(request, id):
 
 
 def product_detail_view(request, id):
-    # Get the product and its details
-    product = Product.objects.get(id=id)
-    # Calculate the average rating and total number of reviews
+   
+    product = get_object_or_404(Product, id=id)
+   
     average_rating = Review.objects.filter(product=product).aggregate(Avg('rating'))['rating__avg'] or 0
     total_reviews = Review.objects.filter(product=product).count()
-    # Retrieve all reviews for this product
+   
     reviews = Review.objects.filter(product=product).select_related('user').order_by('-created_at')
     rating_percentage = average_rating * 20
 
@@ -120,6 +121,19 @@ def product_detail_view(request, id):
         rating_percentage=Coalesce(Avg('reviews__rating') * 20, Value(0,output_field=FloatField()))  
     )[:3] 
 
+    if request.method == 'POST':
+        rating = request.POST.get('rating')
+        comment = request.POST.get('comment')
+
+        if rating is not None and comment is not None:
+            rating = int(rating)  
+            if 0 <= rating <= 5:  
+                
+                review = Review(product=product, user=request.user, rating=rating, comment=comment)
+                review.save()
+                return redirect('product_detail', id=product.id)  
+            
+
     context = {
         'product': product,
         'average_rating': average_rating,
@@ -127,6 +141,7 @@ def product_detail_view(request, id):
         'reviews': reviews,
         'rating_percentage': rating_percentage,
         'related_products' : related_products,
+        
     }
     return render(request, 'product_detail.html', context)
 

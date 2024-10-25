@@ -32,9 +32,7 @@ class Product(models.Model):
     old_price = models.DecimalField(default=0, decimal_places=2, max_digits=6)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, default=1)
     description = models.CharField(max_length=250, default='', blank= True, null= True)
-    image1 = models.ImageField(upload_to='uploads/product/')
-    image2 = models.ImageField(upload_to='uploads/product/')
-    image3 = models.ImageField(upload_to='uploads/product/')
+    stock = models.IntegerField(default=0)
 
 
     def __str__(self):
@@ -45,17 +43,26 @@ class Product(models.Model):
         if reviews:
             return reviews.aggregate(models.Avg('rating'))['rating__avg']  # Calculate average rating
         return None  # Or return a default value like 0
+    
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='uploads/product/')
+
+    def __str__(self):
+        return f"Image for {self.product.name}"
+
+
 
 
 class Review(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    rating = models.IntegerField()  # Rating out of 5, for example
-    comment = models.TextField(blank=True, null=True)  # Optional review text
+    rating = models.IntegerField()  
+    comment = models.TextField(blank=True, null=True)  
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('product', 'user')  # Ensure one review per user per product
+        unique_together = ('product', 'user')  
 
     def __str__(self):
         return f"{self.user.username} - {self.product.name} Review"

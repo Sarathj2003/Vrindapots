@@ -109,12 +109,22 @@
                         ₹{{ product.old_price }}
                     </div><!-- End .product-price -->
                     
+                    <div class="details-filter-row details-row-size" >
+                        <span style="color: {% if product.stock > 5 %}green{% elif product.stock > 0 %}orange{% else %}red{% endif %};">
+                            {% if product.stock == 0 %}
+                                Out of Stock
+                            {% elif product.stock < 5 %}
+                                Only a few left: {{ product.stock }} available
+                            {% else %}
+                                Available: {{ product.stock }} in stock
+                            {% endif %}
+                        </span>
+                    </div><!-- End .details-filter-row -->
 
-                    <div class="product-content" style="margin-top: 10px;">
+                    <div class="product-content" style="margin-top: -20px;" >
                         <p>{{ product.description }} </p>
                     </div><!-- End .product-content -->
 
-                    
 
                     <div class="details-filter-row details-row-size" >
                         <label for="qty">Qty:</label>
@@ -141,6 +151,7 @@
 
         <div class="row">
             <div class="col-md-4">
+
                 <div class="card" style="width: 40rem;">
                     <div class="card-body">
                         <h5 class="card-title" style="margin-bottom: 10px;">Customer Reviews</h5>
@@ -153,6 +164,33 @@
                         <span class="ratings-text">( {{ total_reviews }} Reviews )</span>
                     </div>
                 </div>
+
+                <div class="card" style="width: 40rem;">
+                    <div class="card-body">
+                        <h5 class="card-title" style="margin-bottom: 10px;">Add Review and Rating</h5>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <label for="rating">Rating:</label>
+                        <select name="rating" id="rating" required>
+                            <option value="">Select </option>
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                        <br>
+                        <label for="comment">Review:</label>
+                        <textarea style="width: 300px;" name="comment" id="comment" rows="4" placeholder="Write your review here..." required></textarea>
+                        <br>
+                        <button type="submit" class="btn btn-primary">Submit Review</button>
+                        </form>
+                    </div>
+                </div>
+
+                
+
             </div>
             <div class="col-md-1">
             </div>
