@@ -13,7 +13,7 @@ from django.db.models import Prefetch
 def home_page(request):
     banner = Banner.objects.first()
 
-    Exclusive_Offer_products = Product.objects.filter(tag__name='Exclusive Offers').annotate(
+    Exclusive_Offer_products = Product.objects.filter(tag__name='Exclusive Offers',category__is_deleted=False).annotate(
         discount=ExpressionWrapper(
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
             output_field=FloatField()
@@ -22,7 +22,7 @@ def home_page(request):
     Prefetch('images', queryset=ProductImage.objects.filter(is_main=True), to_attr='main_image')
     )[:3]
 
-    Best_Seller_products = Product.objects.filter(tag__name='Best Sellers').annotate(
+    Best_Seller_products = Product.objects.filter(tag__name='Best Sellers',category__is_deleted=False).annotate(
         discount=ExpressionWrapper(
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
             output_field=FloatField()
@@ -31,7 +31,7 @@ def home_page(request):
     Prefetch('images', queryset=ProductImage.objects.filter(is_main=True), to_attr='main_image')
     )[:3]
 
-    New_Arrivals_products = Product.objects.filter(tag__name='New Arrivals').annotate(
+    New_Arrivals_products = Product.objects.filter(tag__name='New Arrivals',category__is_deleted=False).annotate(
         discount=ExpressionWrapper(
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
             output_field=FloatField()
@@ -40,7 +40,7 @@ def home_page(request):
     Prefetch('images', queryset=ProductImage.objects.filter(is_main=True), to_attr='main_image')
     )[:3]
 
-    Seasonal_Specials_products = Product.objects.filter(tag__name='Seasonal Specials').annotate(
+    Seasonal_Specials_products = Product.objects.filter(tag__name='Seasonal Specials',category__is_deleted=False).annotate(
         discount=ExpressionWrapper(
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
             output_field=FloatField()
@@ -60,7 +60,7 @@ def home_page(request):
 
 def all_products_page(request):
     banner = Banner.objects.first()
-    all_products = Product.objects.all().annotate(
+    all_products = Product.objects.ilter(category__is_deleted=False).annotate(
         discount=ExpressionWrapper(
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
             output_field=FloatField()
