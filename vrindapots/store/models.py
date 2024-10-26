@@ -6,6 +6,7 @@ import datetime
 # Categories of products
 class Category(models.Model):
     name = models.CharField(max_length=50)
+    description = models.CharField(max_length=250, default='', blank= True, null= True)
     def __str__(self):
         return self.name
     class Meta:

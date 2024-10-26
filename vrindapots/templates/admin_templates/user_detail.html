@@ -1,0 +1,32 @@
+{% extends 'admin_templates/admin_base.html' %}
+{% load static %}
+
+
+{% block content %}
+        
+<div class="container mt-5">
+    <a href="{% url 'admin_home' %}">Back to Admin Dashboard</a>
+    <h1 class="text-center mb-4">User  Detail</h1>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Username: {{ user.username }}</h5>
+            <p class="card-text">Email: {{ user.email }}</p>
+            <p class="card-text">Status: {{ user.is_active|yesno:"Active,Blocked" }}</p>
+            <h5 class="mt-4">Profile Details</h5>
+            <p class="card-text">Full Name: {{ profile.full_name }}</p>
+            <p class="card-text">Address: {{ profile.address }}</p>
+            <p class="card-text">Pincode: {{ profile.pincode }}</p>
+            <p class="card-text">Phone Number: {{ profile.phone_number }}</p>
+            <p class="card-text">State: {{ profile.state }}</p>
+            <form method="POST">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-warning">
+                    {% if user.is_active %}Block User{% else %}Unblock User{% endif %}
+                </button>
+                <a href="{% url 'user_list' %}" class="btn btn-secondary">Back to User List</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
