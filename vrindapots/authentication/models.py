@@ -13,7 +13,13 @@ class Profile(models.Model):
     # Pincode field with a 6-digit numeric validator
     pincode = models.CharField(
         max_length=6,
-        validators=[RegexValidator(regex='^\d{6}$', message='Pincode must be exactly 6 digits', code='invalid_pincode')]
+        validators=[RegexValidator(regex='^\d{6}$', message='Pincode must be exactly 6 digits', code='invalid_pincode')],
+        null=True
+    )
+    phone_number = models.CharField(
+        max_length=15,
+        validators=[RegexValidator(regex='^\d{10}$', message='Phone number must be exactly 10 digits', code='invalid_phone_number')],
+        null=True
     )
     
     # State choices for Indian states

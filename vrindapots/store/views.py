@@ -1,10 +1,11 @@
 from django.shortcuts import render,redirect
 from django.shortcuts import get_object_or_404
-from .models import Category,Product,Tag,Banner,Review
+from .models import Category,Product,Tag,Banner,Review,ProductImage
 from django.db.models import F, ExpressionWrapper, FloatField, Avg, Count, Q, Value
 from django.views.decorators.cache import cache_control
 from django.contrib.auth.decorators import login_required
 from django.db.models.functions import Coalesce
+from django.db.models import Prefetch
 # Create your views here.
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -17,25 +18,36 @@ def home_page(request):
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
             output_field=FloatField()
         )
-    )
+    ).prefetch_related(
+    Prefetch('images', queryset=ProductImage.objects.filter(is_main=True), to_attr='main_image')
+    )[:3]
+
     Best_Seller_products = Product.objects.filter(tag__name='Best Sellers').annotate(
         discount=ExpressionWrapper(
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
             output_field=FloatField()
         )
-    )
+    ).prefetch_related(
+    Prefetch('images', queryset=ProductImage.objects.filter(is_main=True), to_attr='main_image')
+    )[:3]
+
     New_Arrivals_products = Product.objects.filter(tag__name='New Arrivals').annotate(
         discount=ExpressionWrapper(
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
             output_field=FloatField()
         )
-    )
+    ).prefetch_related(
+    Prefetch('images', queryset=ProductImage.objects.filter(is_main=True), to_attr='main_image')
+    )[:3]
+
     Seasonal_Specials_products = Product.objects.filter(tag__name='Seasonal Specials').annotate(
         discount=ExpressionWrapper(
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
             output_field=FloatField()
         )
-    )
+    ).prefetch_related(
+    Prefetch('images', queryset=ProductImage.objects.filter(is_main=True), to_attr='main_image')
+    )[:3]
     
     return render(request, 'home.html', {
         'banner': banner,
@@ -53,9 +65,11 @@ def all_products_page(request):
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
             output_field=FloatField()
         ),
-        total_reviews=Count('reviews'),  # Count of reviews for each product
-        average_rating=Coalesce(Avg('reviews__rating'), Value(0, output_field=FloatField())),  # Average rating for each product
-        rating_percentage=Coalesce(Avg('reviews__rating') * 20, Value(0, output_field=FloatField()))  # Percentage rating for each product
+        total_reviews=Count('reviews'), 
+        average_rating=Coalesce(Avg('reviews__rating'), Value(0, output_field=FloatField())),  
+        rating_percentage=Coalesce(Avg('reviews__rating') * 20, Value(0, output_field=FloatField()))  
+    ).prefetch_related(
+    Prefetch('images', queryset=ProductImage.objects.filter(is_main=True), to_attr='main_image')
     )
     return render(request, 'all_products.html', {
         'banner': banner,
@@ -70,9 +84,11 @@ def category_products_page(request, id):
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
             output_field=FloatField()
         ),
-        total_reviews=Count('reviews'),  # Count of reviews for each product
-        average_rating=Coalesce(Avg('reviews__rating'), Value(0, output_field=FloatField())),  # Average rating for each product
-        rating_percentage=Coalesce(Avg('reviews__rating') * 20, Value(0, output_field=FloatField()))  # Percentage rating for each product
+        total_reviews=Count('reviews'),  
+        average_rating=Coalesce(Avg('reviews__rating'), Value(0, output_field=FloatField())),  
+        rating_percentage=Coalesce(Avg('reviews__rating') * 20, Value(0, output_field=FloatField()))  
+    ).prefetch_related(
+    Prefetch('images', queryset=ProductImage.objects.filter(is_main=True), to_attr='main_image')
     )
     return render(request, 'category_products.html', {
         'banner': banner,
@@ -88,9 +104,11 @@ def tag_products_page(request, id):
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
             output_field=FloatField()
         ),
-        total_reviews=Count('reviews'),  # Count of reviews for each product
-        average_rating=Coalesce(Avg('reviews__rating'), Value(0, output_field=FloatField())),  # Average rating for each product
-        rating_percentage=Coalesce(Avg('reviews__rating') * 20, Value(0, output_field=FloatField()))  # Percentage rating for each product
+        total_reviews=Count('reviews'),  
+        average_rating=Coalesce(Avg('reviews__rating'), Value(0, output_field=FloatField())),  
+        rating_percentage=Coalesce(Avg('reviews__rating') * 20, Value(0, output_field=FloatField()))  
+    ).prefetch_related(
+    Prefetch('images', queryset=ProductImage.objects.filter(is_main=True), to_attr='main_image')
     )
     return render(request, 'tag_products.html', {
         'banner': banner,
@@ -102,6 +120,7 @@ def tag_products_page(request, id):
 def product_detail_view(request, id):
    
     product = get_object_or_404(Product, id=id)
+    main_image = product.images.filter(is_main=True).first()
    
     average_rating = Review.objects.filter(product=product).aggregate(Avg('rating'))['rating__avg'] or 0
     total_reviews = Review.objects.filter(product=product).count()
@@ -136,6 +155,7 @@ def product_detail_view(request, id):
 
     context = {
         'product': product,
+        'main_image': main_image,
         'average_rating': average_rating,
         'total_reviews': total_reviews,
         'reviews': reviews,

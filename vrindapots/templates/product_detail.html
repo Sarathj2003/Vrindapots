@@ -35,11 +35,11 @@
                         </style>
                         
                         <div class="product-main-image" id="imageZoom" style="
-                            --url: url('{{ product.image1.url }}');
+                            --url: url('{{ main_image.image.url }}');
                             --zoom-x: 0%; --zoom-y: 0%;
                             --display: none;
                         ">
-                            <img id="mainImage" src="{{ product.image1.url }}" alt="">
+                            <img id="mainImage" src="{{ main_image.image.url }}" alt="">
                         </div>
                         
                         <script>
@@ -72,17 +72,13 @@
                         </script>
                         
                         <div id="product-zoom-gallery" class="product-image-gallery" style="height: 200px;">
-                            <a class="product-gallery-item " href="#" onclick="updateImage('{{ product.image1.url }}', '{{ product.image1.url }}'); return false;">
-                                <img src="{{ product.image1.url }}" alt="product side">
-                            </a>
-                    
-                            <a class="product-gallery-item" href="#" onclick="updateImage('{{ product.image2.url }}', '{{ product.image2.url }}'); return false;">
-                                <img src="{{ product.image2.url }}" alt="product cross">
-                            </a>
-                    
-                            <a class="product-gallery-item" href="#" onclick="updateImage('{{ product.image3.url }}', '{{ product.image3.url }}'); return false;">
-                                <img src="{{ product.image3.url }}" alt="product cross">
-                            </a>
+                            {% for image in product.images.all %}
+                                
+                                    <a class="product-gallery-item" href="#" onclick="updateImage('{{ image.image.url }}', '{{ image.image.url }}'); return false;">
+                                        <img src="{{ image.image.url }}" alt="Product Image">
+                                    </a>
+                                
+                            {% endfor %}
                         </div><!-- End .product-image-gallery -->
                     </div><!-- End .row -->
                     
@@ -292,6 +288,7 @@
                 {% endfor %}
 
             </div>
+            
         </div><!-- End .container -->
     </div>
     <!-- end container for listing all products -->

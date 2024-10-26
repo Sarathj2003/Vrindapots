@@ -124,24 +124,46 @@ def user_signup(request):
 @login_required(login_url='user_login')
 def profile_view(request):
     user = request.user
+    profile = user.profile  
 
     if request.method == 'POST':
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         phone_number = request.POST.get('phone_number')
         address = request.POST.get('address')
+        pincode = request.POST.get('pincode')
+        state = request.POST.get('state')
+
+        if not re.match(r'^\d{10}$', phone_number):
+            messages.error(request, 'Phone number must be exactly 10 digits and contain only numbers.')
+            return render(request, 'profile_update.html', {
+                'user': user,
+                'profile': profile,
+            })
+        
+        if not re.match(r'^\d{6}$', pincode):
+            messages.error(request, 'Pincode must be exactly 6 digits and contain only numbers.')
+            return render(request, 'profile_update.html', {
+                'user': user,
+                'profile': profile,
+            })
 
         user.first_name = first_name
         user.last_name = last_name
         user.save()
-
-        user.profile.address = address
-        user.phone_number = phone_number
-        user.profile.save()
+        profile.address = address
+        profile.phone_number = phone_number
+        profile.pincode = pincode  
+        profile.state = state      
+        profile.save()
 
         messages.success(request, 'Profile updated successfully!')
-        return redirect('home')
-    return render(request, 'profile_update.html')
+        return redirect('user_profile')
+
+    return render(request, 'profile_update.html', {
+        'user': user,
+        'profile': profile,  
+    })
 
 
 
@@ -166,7 +188,7 @@ def verify_otp(request):
             del request.session['password']
 
             messages.success(request, 'Your account has been activated successfully!')
-            return redirect('home')
+            return redirect('user_profile')
         else:
             messages.error(request, 'Invalid OTP. Please try again.')
             return redirect('verify_otp')
