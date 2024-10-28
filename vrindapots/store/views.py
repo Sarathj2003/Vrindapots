@@ -65,6 +65,8 @@ def home_page(request):
         'Seasonal_Specials_products': Seasonal_Specials_products,
     })
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def all_products_page(request):
     banner = Banner.objects.first()
 
@@ -83,6 +85,8 @@ def all_products_page(request):
         'all_products': all_products,
     })
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def category_products_page(request, id):
     banner = Banner.objects.first()
     
@@ -106,6 +110,8 @@ def category_products_page(request, id):
         'category_name': category_name,
     })
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def tag_products_page(request, id):
     banner = Banner.objects.first()
     
@@ -129,7 +135,8 @@ def tag_products_page(request, id):
         'tag_name': tag_name,
     })
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def product_detail_view(request, id):
     product = get_object_or_404(Product, id=id)
 

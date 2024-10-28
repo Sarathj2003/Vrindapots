@@ -20,7 +20,8 @@ from django.core.exceptions import ValidationError
 def user_login(request):
     # If the user is already authenticated, redirect them to the home page
     if request.user.is_authenticated:
-        return redirect('home')
+        if not request.user.is_staff:
+            return redirect('home')
 
     if request.method == 'POST':
         email = request.POST.get('email')
