@@ -7,7 +7,7 @@
 <div class="container mt-5">
     <a href="{% url 'admin_home' %}">Back to Admin Dashboard</a>
     <h1 class="mb-4">Category List</h1>
-        <a href="{% url 'category_add' %}" class="btn btn-primary mb-3">Add New Category</a>
+        
         <table class="table table-bordered table-striped">
             <thead class="thead-light">
                 <tr>
@@ -45,6 +45,7 @@
                 {% endfor %}
             </tbody>
         </table>
+        <a href="{% url 'category_add' %}" class="btn btn-primary mb-3">Add New Category</a>
 </div>
 
 {% endblock %}

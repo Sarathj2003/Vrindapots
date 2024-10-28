@@ -13,4 +13,12 @@ urlpatterns = [
     path('adminhome/categorylist/delete/<int:pk>/', views.category_delete, name='category_delete'),
     path('adminhome/categorylist/restore/<int:pk>/', views.category_restore, name='category_restore'),
     path('adminhome/categorylist/editcategory/<int:category_id>/', views.edit_category, name='edit_category'),
+
+    path('adminhome/productlist/', views.product_list, name='product_list'),
+    path('adminhome/productlist/add/', views.add_product, name='add_product'),
+    path('adminhome/productlist/addproductimages/<int:product_id>/', views.add_product_images, name='add_product_images'),
+    path('adminhome/productlist/edit/<int:product_id>/',views.edit_product, name='edit_product'),
+    path('adminhome/productlist/delete/<int:product_id>/', views.soft_delete_product, name='soft_delete_product'),
+    path('adminhome/productlist/restore/<int:product_id>/', views.restore_product, name='restore_product'),
+    path('adminhome/productlist/delete/<int:product_id>/', views.delete_product, name='delete_product'),
 ] 

@@ -1,0 +1,35 @@
+{% extends 'admin_templates/admin_base.html' %}
+{% load static %}
+
+
+{% block content %}
+        
+<div class="container mt-5" style="margin-bottom: 50px;">
+    <a href="{% url 'admin_home' %}">Back to Admin Dashboard</a>
+    <h1>Edit Product: {{ product.name }}</h1>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ product_form.as_p }}
+
+            <h3>Product Images (Max 4)</h3>
+            {% for i in image_count %}
+                <div class="form-group">
+                    <label for="image_{{ i }}">Image {{ i|add:1 }}</label><br>
+                    <input type="file" name="image_{{ i }}" id="image_{{ i }}">
+                    {% if i == 0 %}
+                        <div>
+                            <input type="checkbox" name="is_main" id="is_main" value="true">
+                            <label for="is_main">Set as Main Image</label>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <button type="submit" name="delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this product?');">Delete Product</button>
+            <a href="{% url 'product_list' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+
+</div>
+
+{% endblock %}

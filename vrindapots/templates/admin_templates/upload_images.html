@@ -1,0 +1,25 @@
+{% extends 'admin_templates/admin_base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5" style="margin-bottom: 50px;">
+    <a href="{% url 'admin_home' %}">Back to Admin Dashboard</a>
+    <h1>Add Images for {{ product.name }}</h1>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <h3>Upload Images (You selected {{ image_count }} images)</h3>
+    
+        {% for i in image_indices %}
+            <div class="form-group">
+                <label for="image_{{ i }}">Image {{ i|add:1 }}</label><br>
+                <input type="file" name="images" id="image_{{ i }}">
+            </div>
+        {% endfor %}
+        
+        <input type="hidden" name="image_count" value="{{ image_count }}">
+        <button type="submit" class="btn btn-primary">Add Images</button>
+        <a href="{% url 'product_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

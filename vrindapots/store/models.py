@@ -35,7 +35,7 @@ class Banner(models.Model):
 
 
 
-# All the products
+
 class Product(models.Model):
     name = models.CharField(max_length=100)
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE, default=1)
@@ -44,7 +44,15 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, default=1)
     description = models.CharField(max_length=250, default='', blank= True, null= True)
     stock = models.IntegerField(default=0)
+    is_deleted = models.BooleanField(default=False)
 
+    def soft_delete(self):
+        self.is_deleted = True
+        self.save()
+
+    def restore(self):
+        self.is_deleted = False
+        self.save()
 
     def __str__(self):
         return self.name
@@ -52,8 +60,8 @@ class Product(models.Model):
     def average_rating(self):
         reviews = self.reviews.all()
         if reviews:
-            return reviews.aggregate(models.Avg('rating'))['rating__avg']  # Calculate average rating
-        return None  # Or return a default value like 0
+            return reviews.aggregate(models.Avg('rating'))['rating__avg']  
+        return None  
     
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE)
