@@ -2,8 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth.models import User
 from authentication.models import Profile
-from store.models import Category,Product, ProductImage
-from .forms import CategoryForm, ProductForm, ProductImageForm, ImageCountForm
+from store.models import Category,Product
+from .forms import CategoryForm, ProductForm
 
 # Create your views here.
 
@@ -83,13 +83,11 @@ def product_list(request):
 
 def add_product(request):
     if request.method == 'POST':
-        form = ProductForm(request.POST)
+        form = ProductForm(request.POST, request.FILES)
         if form.is_valid():
-            product = form.save()
+            form.save()
             messages.success(request, 'Product added successfully!')
-
-            # Redirect to the add images page for the newly created product
-            return redirect('add_product_images', product_id=product.id)
+            return redirect('product_list')  # Redirect to the list of products or wherever you want
         else:
             messages.error(request, 'There was an error adding the product. Please correct the errors below.')
     else:
@@ -99,79 +97,23 @@ def add_product(request):
         'form': form,
     })
 
-def add_product_images(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-
-    if request.method == 'POST':
-        
-        if 'image_count' in request.POST:
-            image_count = int(request.POST['image_count'])
-            image_indices = list(range(image_count))
-            return render(request, 'admin_templates/upload_images.html', {
-                'product': product,
-                'image_count': image_count,
-                'image_indices': image_indices,
-            })
-        
-        else:
-
-            image_files = [request.FILES.get(f'image_{i}') for i in range(int(request.POST['image_count'])) if request.FILES.get(f'image_{i}')]
-
-            if not image_files:
-                messages.error(request, 'Please upload at least one image.')
-                return redirect('add_product_images', product_id=product.id)
-
-            # Save each image to the database
-            for image_file in image_files:
-                try:
-                    if image_file:
-                        ProductImage.objects.create(product=product, image=image_file)
-                except Exception as e:
-                    print("Error saving image:", e)
-                    messages.error(request, f"Failed to save an image: {e}")
-                    return redirect('add_product_images', product_id=product.id)
-
-            messages.success(request, 'Images uploaded successfully!')
-            return redirect('product_list')
-
-    form = ImageCountForm()
-    return render(request, 'admin_templates/select_image_count.html', {
-        'form': form,
-        'product': product,
-    })
-
 
 def edit_product(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-
+    product = get_object_or_404(Product, id=product_id)  # Retrieve the product instance
     if request.method == 'POST':
-        if 'delete' in request.POST:  
-            product.delete()  
-            messages.success(request, 'Product deleted successfully!')
-            return redirect('product_list') 
+        form = ProductForm(request.POST, request.FILES, instance=product)  # Bind the form to the product instance
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Product updated successfully!')
+            return redirect('product_list')  # Redirect to the list of products
         else:
-            product_form = ProductForm(request.POST, instance=product)
-            if product_form.is_valid():
-                product_form.save()
-                
-                for i in range(4):  
-                    image_form = ProductImageForm(request.POST, request.FILES, prefix=f'image_{i}')
-                    if image_form.is_valid():
-                        product_image = image_form.save(commit=False)
-                        product_image.product = product
-                        if i == 0:  
-                            product_image.is_main = True
-                        else:
-                            product_image.is_main = False
-                        product_image.save()
-                return redirect('product_list')  
+            messages.error(request, 'There was an error updating the product. Please correct the errors below.')
     else:
-        product_form = ProductForm(instance=product)  
+        form = ProductForm(instance=product)  # Pre-fill the form with the product's data
 
     return render(request, 'admin_templates/edit_product.html', {
-        'product_form': product_form,
-        'product': product,
-        'image_count': range(4)  
+        'form': form,
+        'product': product,  # Pass the product for reference (e.g., to show the name)
     })
 
 

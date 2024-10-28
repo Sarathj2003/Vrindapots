@@ -45,6 +45,9 @@ class Product(models.Model):
     description = models.CharField(max_length=250, default='', blank= True, null= True)
     stock = models.IntegerField(default=0)
     is_deleted = models.BooleanField(default=False)
+    image_1 = models.ImageField(upload_to='uploads/product/', blank=True, null=True)
+    image_2 = models.ImageField(upload_to='uploads/product/', blank=True, null=True)
+    image_3 = models.ImageField(upload_to='uploads/product/', blank=True, null=True)
 
     def soft_delete(self):
         self.is_deleted = True
@@ -63,13 +66,7 @@ class Product(models.Model):
             return reviews.aggregate(models.Avg('rating'))['rating__avg']  
         return None  
     
-class ProductImage(models.Model):
-    product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='uploads/product/')
-    is_main = models.BooleanField(default=False)
 
-    def __str__(self):
-        return f"Image for {self.product.name}"
 
 
 
