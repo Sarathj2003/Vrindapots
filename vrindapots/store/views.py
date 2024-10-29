@@ -87,7 +87,7 @@ def all_products_page(request):
 def category_products_page(request, id):
     banner = Banner.objects.first()
     category_name = Category.objects.filter(id=id).first()
-    category_products = Product.objects.filter(category__id=id, is_deleted=False).annotate(
+    category_products = Product.objects.filter(category__id=id,category__is_deleted=False ,is_deleted=False).annotate(
         discount=ExpressionWrapper(
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
             output_field=FloatField()
@@ -109,7 +109,7 @@ def category_products_page(request, id):
 def tag_products_page(request, id):
     banner = Banner.objects.first()
     tag_name = Tag.objects.filter(id=id).first()
-    tag_products = Product.objects.filter(tag__id=id, is_deleted=False).annotate(
+    tag_products = Product.objects.filter(tag__id=id,category__is_deleted=False ,is_deleted=False).annotate(
         discount=ExpressionWrapper(
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
             output_field=FloatField()
