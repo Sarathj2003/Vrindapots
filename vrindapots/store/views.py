@@ -66,7 +66,7 @@ def home_page(request):
 @login_required(login_url='user_login')
 def all_products_page(request):
     banner = Banner.objects.first()
-    all_products = Product.objects.filter(category__is_deleted=False).annotate(
+    all_products = Product.objects.filter(category__is_deleted=False,is_deleted = False).annotate(
         discount=ExpressionWrapper(
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
             output_field=FloatField()
