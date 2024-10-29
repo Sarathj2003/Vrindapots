@@ -10,7 +10,6 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
     address = models.TextField(null=True)
     
-    # Pincode field with a 6-digit numeric validator
     pincode = models.CharField(
         max_length=6,
         validators=[RegexValidator(regex='^\d{6}$', message='Pincode must be exactly 6 digits', code='invalid_pincode')],
@@ -21,8 +20,6 @@ class Profile(models.Model):
         validators=[RegexValidator(regex='^\d{10}$', message='Phone number must be exactly 10 digits', code='invalid_phone_number')],
         null=True
     )
-    
-    # State choices for Indian states
     STATE_CHOICES = [
         ('Andhra Pradesh', 'Andhra Pradesh'),
         ('Arunachal Pradesh', 'Arunachal Pradesh'),
@@ -58,9 +55,7 @@ class Profile(models.Model):
         ('Jammu and Kashmir', 'Jammu and Kashmir'),
         ('Ladakh', 'Ladakh'),
     ]
-    
     state = models.CharField(max_length=50, choices=STATE_CHOICES, null=True)
-
     def full_name(self):
         return f"{self.user.first_name} {self.user.last_name}".strip()
     

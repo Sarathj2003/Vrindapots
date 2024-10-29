@@ -175,8 +175,8 @@ AUTHENTICATION_BACKENDS = (
 )
 
 
-LOGIN_REDIRECT_URL = 'home'  # Redirect after login
-LOGOUT_REDIRECT_URL = 'user_login'  # Redirect after logout
+LOGIN_REDIRECT_URL = 'home'  
+LOGOUT_REDIRECT_URL = 'user_login'  
 
 MESSAGE_TAGS = {
     messages.DEBUG: 'alert-info',
@@ -190,8 +190,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'sarathjayakumar46@gmail.com'  # Your email address
-EMAIL_HOST_PASSWORD = 'yeqb nyec pcfb wyax'  # App password for the email account
+EMAIL_HOST_USER = 'sarathjayakumar46@gmail.com'  
+EMAIL_HOST_PASSWORD = 'yeqb nyec pcfb wyax'  
 
 
 

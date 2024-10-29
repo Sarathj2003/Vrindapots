@@ -10,21 +10,21 @@ from .forms import CategoryForm, ProductForm
 
 # Create your views here.
 
+
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def custom_admin_login(request):
     if request.user.is_authenticated:
         if request.user.is_staff:
             return redirect('admin_home')
-        
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
-        
         if user is not None:
-            if user.is_staff:  # Check if the user is an admin
+            if user.is_staff:  
                 login(request, user)
-                return redirect('admin_home')  # Redirect to the admin dashboard
+                return redirect('admin_home')  
             else:
                 messages.error(request, 'You do not have permission to access the admin panel.')
         else:
@@ -38,10 +38,14 @@ def custom_admin_logout(request):
     logout(request)
     return redirect('custom_admin_login')
 
+
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='custom_admin_login')
 def admin_home(request):
     return render(request,'admin_templates/admin_home.html')
+
+
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='custom_admin_login')
@@ -54,13 +58,11 @@ def user_list(request):
 def user_detail(request, user_id):
     user = get_object_or_404(User, id=user_id)
     profile = get_object_or_404(Profile, user=user) 
-
     if request.method == 'POST':
         user.is_active = not user.is_active
         user.save()
         messages.success(request, f'User  {user.username} has been {"unblocked" if user.is_active else "blocked"}.')
         return redirect('user_list')
-
     return render(request, 'admin_templates/user_detail.html', {'user': user, 'profile': profile})
 
 
@@ -69,6 +71,8 @@ def user_detail(request, user_id):
 def category_list(request):
     categories = Category.objects.all()  
     return render(request, 'admin_templates/category_list.html', {'categories': categories})
+
+
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='custom_admin_login')
@@ -91,6 +95,8 @@ def category_delete(request, pk):
     messages.success(request, 'Category soft deleted successfully!')
     return redirect('category_list') 
 
+
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='custom_admin_login')
 def category_restore(request, pk):
@@ -99,11 +105,12 @@ def category_restore(request, pk):
     messages.success(request, 'Category restored successfully!')
     return redirect('category_list')
 
+
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='custom_admin_login')
 def edit_category(request, category_id):
     category = get_object_or_404(Category, id=category_id)  
-
     if request.method == 'POST':
         if 'delete' in request.POST:  
             category.delete()  
@@ -117,7 +124,6 @@ def edit_category(request, category_id):
                 return redirect('category_list')  
     else:
         form = CategoryForm(instance=category)  
-
     return render(request, 'admin_templates/edit_category.html', {'form': form, 'category': category})
 
 
@@ -135,35 +141,37 @@ def add_product(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Product added successfully!')
-            return redirect('product_list')  # Redirect to the list of products or wherever you want
+            return redirect('product_list')  
         else:
             messages.error(request, 'There was an error adding the product. Please correct the errors below.')
     else:
         form = ProductForm()
-
     return render(request, 'admin_templates/add_product.html', {
         'form': form,
     })
 
+
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='custom_admin_login')
 def edit_product(request, product_id):
-    product = get_object_or_404(Product, id=product_id)  # Retrieve the product instance
+    product = get_object_or_404(Product, id=product_id)  
     if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES, instance=product)  # Bind the form to the product instance
+        form = ProductForm(request.POST, request.FILES, instance=product)  
         if form.is_valid():
             form.save()
             messages.success(request, 'Product updated successfully!')
-            return redirect('product_list')  # Redirect to the list of products
+            return redirect('product_list')  
         else:
             messages.error(request, 'There was an error updating the product. Please correct the errors below.')
     else:
-        form = ProductForm(instance=product)  # Pre-fill the form with the product's data
-
+        form = ProductForm(instance=product)  
     return render(request, 'admin_templates/edit_product.html', {
         'form': form,
-        'product': product,  # Pass the product for reference (e.g., to show the name)
+        'product': product, 
     })
+
+
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='custom_admin_login')
@@ -172,6 +180,8 @@ def soft_delete_product(request, product_id):
     product.soft_delete()  
     return redirect('product_list')
 
+
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='custom_admin_login')
 def restore_product(request, product_id):
@@ -179,14 +189,12 @@ def restore_product(request, product_id):
     product.restore()  
     return redirect('product_list')
 
+
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='custom_admin_login')
-def delete_product(request, product_id):
-    # Fetch the product using the primary key
+def delete_product(request, product_id): 
     product = get_object_or_404(Product, id=product_id)
-    
-    # Delete the product permanently
-    product.images.all().delete()  # Optionally delete related images
-    product.delete()  # This will call the default delete method
-
+    product.images.all().delete()  
+    product.delete()  
     return redirect('product_list')

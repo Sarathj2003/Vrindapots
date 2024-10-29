@@ -12,51 +12,46 @@ from django.db.models import Prefetch
 @login_required(login_url='user_login')
 def home_page(request):
     banner = Banner.objects.first()
-
-    # Fetch exclusive offer products
     Exclusive_Offer_products = Product.objects.filter(
         tag__name='Exclusive Offers',
-        category__is_deleted=False
+        category__is_deleted=False,
+        is_deleted = False
     ).annotate(
         discount=ExpressionWrapper(
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
             output_field=FloatField()
         )
-    )[:3]  # Limit to 3 products
-
-    # Fetch best seller products
+    )[:3] 
     Best_Seller_products = Product.objects.filter(
         tag__name='Best Sellers',
-        category__is_deleted=False
+        category__is_deleted=False,
+        is_deleted = False
     ).annotate(
         discount=ExpressionWrapper(
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
             output_field=FloatField()
         )
-    )[:3]  # Limit to 3 products
-
-    # Fetch new arrivals products
+    )[:3]  
     New_Arrivals_products = Product.objects.filter(
         tag__name='New Arrivals',
-        category__is_deleted=False
+        category__is_deleted=False,
+        is_deleted = False
     ).annotate(
         discount=ExpressionWrapper(
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
             output_field=FloatField()
         )
-    )[:3]  # Limit to 3 products
-
-    # Fetch seasonal specials products
+    )[:3] 
     Seasonal_Specials_products = Product.objects.filter(
         tag__name='Seasonal Specials',
-        category__is_deleted=False
+        category__is_deleted=False,
+        is_deleted = False
     ).annotate(
         discount=ExpressionWrapper(
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
             output_field=FloatField()
         )
-    )[:3]  # Limit to 3 products
-    
+    )[:3]  
     return render(request, 'home.html', {
         'banner': banner,
         'Exclusive_Offer_products': Exclusive_Offer_products,
@@ -65,11 +60,12 @@ def home_page(request):
         'Seasonal_Specials_products': Seasonal_Specials_products,
     })
 
+
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='user_login')
 def all_products_page(request):
     banner = Banner.objects.first()
-
     all_products = Product.objects.filter(category__is_deleted=False).annotate(
         discount=ExpressionWrapper(
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
@@ -79,21 +75,18 @@ def all_products_page(request):
         average_rating=Coalesce(Avg('reviews__rating'), Value(0, output_field=FloatField())),  
         rating_percentage=Coalesce(Avg('reviews__rating') * 20, Value(0, output_field=FloatField()))  
     )
-
     return render(request, 'all_products.html', {
         'banner': banner,
         'all_products': all_products,
     })
 
+
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='user_login')
 def category_products_page(request, id):
     banner = Banner.objects.first()
-    
-    # Fetch category name
     category_name = Category.objects.filter(id=id).first()
-    
-    # Fetch products in the specified category
     category_products = Product.objects.filter(category__id=id, is_deleted=False).annotate(
         discount=ExpressionWrapper(
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
@@ -103,22 +96,19 @@ def category_products_page(request, id):
         average_rating=Coalesce(Avg('reviews__rating'), Value(0, output_field=FloatField())),  
         rating_percentage=Coalesce(Avg('reviews__rating') * 20, Value(0, output_field=FloatField()))  
     )
-
     return render(request, 'category_products.html', {
         'banner': banner,
         'category_products': category_products,
         'category_name': category_name,
     })
 
+
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='user_login')
 def tag_products_page(request, id):
     banner = Banner.objects.first()
-    
-    # Fetch tag name
     tag_name = Tag.objects.filter(id=id).first()
-    
-    # Fetch products associated with the specified tag
     tag_products = Product.objects.filter(tag__id=id, is_deleted=False).annotate(
         discount=ExpressionWrapper(
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
@@ -128,28 +118,22 @@ def tag_products_page(request, id):
         average_rating=Coalesce(Avg('reviews__rating'), Value(0, output_field=FloatField())),  
         rating_percentage=Coalesce(Avg('reviews__rating') * 20, Value(0, output_field=FloatField()))  
     )
-
     return render(request, 'tag_products.html', {
         'banner': banner,
         'tag_products': tag_products,
         'tag_name': tag_name,
     })
 
+
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='user_login')
 def product_detail_view(request, id):
     product = get_object_or_404(Product, id=id)
-
-
-    # Calculate average rating and total reviews
     average_rating = Review.objects.filter(product=product).aggregate(Avg('rating'))['rating__avg'] or 0
     total_reviews = Review.objects.filter(product=product).count()
-    
-    # Fetch user reviews
     reviews = Review.objects.filter(product=product).select_related('user').order_by('-created_at')
     rating_percentage = average_rating * 20
-
-    # Fetch related products from the same category
     related_products = Product.objects.filter(
         Q(category=product.category) & ~Q(id=product.id)
     ).annotate(
@@ -161,19 +145,15 @@ def product_detail_view(request, id):
         average_rating=Coalesce(Avg('reviews__rating'), Value(0, output_field=FloatField())),  
         rating_percentage=Coalesce(Avg('reviews__rating') * 20, Value(0, output_field=FloatField()))  
     )[:3] 
-
-    # Handle review submission
     if request.method == 'POST':
         rating = request.POST.get('rating')
         comment = request.POST.get('comment')
-
         if rating is not None and comment is not None:
             rating = int(rating)  
             if 0 <= rating <= 5:  
                 review = Review(product=product, user=request.user, rating=rating, comment=comment)
                 review.save()
                 return redirect('product_detail', id=product.id)  
-
     context = {
         'product': product,
         'average_rating': average_rating,
