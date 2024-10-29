@@ -143,7 +143,9 @@ def add_product(request):
             messages.success(request, 'Product added successfully!')
             return redirect('product_list')  
         else:
-            messages.error(request, 'There was an error adding the product. Please correct the errors below.')
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
     else:
         form = ProductForm()
     return render(request, 'admin_templates/add_product.html', {
