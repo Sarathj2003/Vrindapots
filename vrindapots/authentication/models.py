@@ -7,8 +7,9 @@ from django.core.validators import RegexValidator
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='profile', null=True)
     address = models.TextField(null=True)
+    is_current = models.BooleanField(default=False)
     
     pincode = models.CharField(
         max_length=6,
