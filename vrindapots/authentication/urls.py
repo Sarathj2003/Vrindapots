@@ -13,4 +13,11 @@ urlpatterns = [
     path('forgot_password/', views.forgot_password, name='forgot_password'),
     path('verify_otp_for_password_reset/', views.verify_otp_for_password_reset, name='verify_otp_for_password_reset'),
     path('reset_password/', views.reset_password, name='reset_password'),
+
+    path('account/', views.account_page, name='account_page'),
+    path('set_current_address/<int:profile_id>/', views.set_current_address, name='set_current_address'),
+    path('add_new_address/', views.add_new_address, name='add_new_address'),
+    path('edit_address/<int:profile_id>/', views.edit_address, name='edit_address'),
+    path('delete_address/<int:profile_id>/', views.delete_address, name='delete_address'),
+
 ] 

@@ -1,7 +1,7 @@
 import random
 import re
 from django.core.mail import send_mail
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from django.views.decorators.cache import cache_control
@@ -9,6 +9,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.validators import validate_email as django_validate_email
 from django.core.exceptions import ValidationError
+from .models import Profile
 
 
 
@@ -93,6 +94,70 @@ def user_signup(request):
         )
         return redirect('verify_otp')
     return render(request, 'signup.html')
+
+def account_page(request):
+    user = request.user
+    profiles = Profile.objects.filter(user=user)
+
+    # Handle user details update
+    if request.method == 'POST' and 'update_user_details' in request.POST:
+        user.first_name = request.POST.get('firstname')
+        user.last_name = request.POST.get('lastname')
+        user.email = request.POST.get('email')
+        user.save()
+        return redirect('account_page')  # Refresh the page after save
+
+    return render(request, 'account_page.html', {'user': user, 'profiles': profiles})
+
+
+def set_current_address(request, profile_id):
+    profile = get_object_or_404(Profile, id=profile_id, user=request.user)
+    Profile.objects.filter(user=request.user, is_current=True).update(is_current=False)
+    profile.is_current = True
+    profile.save()
+    return redirect('account_page')
+
+def add_new_address(request):
+    if request.method == 'POST':
+        # Collect address data from the form
+        address = request.POST.get('address')
+        pincode = request.POST.get('pincode')
+        phone_number = request.POST.get('phone_number')
+        state = request.POST.get('state')
+        
+        # Save new address
+        Profile.objects.create(
+            user=request.user,
+            address=address,
+            pincode=pincode,
+            phone_number=phone_number,
+            state=state
+        )
+        return redirect('account_page')
+    return render(request, 'add_address.html')
+
+
+
+def edit_address(request, profile_id):
+    profile = get_object_or_404(Profile, id=profile_id, user=request.user)
+    if request.method == 'POST':
+        # Update the profile details from the form
+        profile.address = request.POST.get('address')
+        profile.pincode = request.POST.get('pincode')
+        profile.phone_number = request.POST.get('phone_number')
+        profile.state = request.POST.get('state')
+        profile.save()
+        return redirect('account_page')
+    
+    return render(request, 'edit_address.html', {'profile': profile})
+
+def delete_address(request, profile_id):
+    profile = get_object_or_404(Profile, id=profile_id, user=request.user)
+    if request.method == 'POST':
+        profile.delete()
+        return redirect('account_page')
+    messages.error(request, 'Invalid operation')
+    return redirect('account_page')
 
 
 

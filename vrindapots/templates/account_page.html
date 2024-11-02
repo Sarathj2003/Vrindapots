@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<main class="container "  >
+    <div class="login-page bg-image pt-8 pb-8 pt-md-12 pb-md-12 pt-lg-17 pb-lg-17" style="background-image: url('{% static 'assets/images/home_img_1.jpg' %}');background-size: cover;background-position: center;background-repeat: no-repeat;height: 1000px;">
+    <div class="container">
+        <div class="form-box" style="margin-top: -70px;">
+            <div class="form-tab">
+                <ul class="nav nav-pills nav-fill" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="signin-tab-2" data-toggle="tab" href="#signin-2" role="tab"
+                            aria-controls="signin-2" aria-selected="false">User Details</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="register-2" role="tabpanel"
+                        aria-labelledby="register-tab-2">
+                        <div class="card">
+                            <div class="card-body">
+                              <form action="{% url 'account_page' %}" method="POST">
+                                {% csrf_token %}
+                                
+                                <div class="form-group">
+                                  <label for="firstname">First Name</label>
+                                  <input type="text" class="form-control" id="firstname" name="firstname" value="{{ user.first_name }}" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                  <label for="lastname">Last Name</label>
+                                  <input type="text" class="form-control" id="lastname" name="lastname" value="{{ user.last_name }}" required>
+                                </div>
+                          
+                                <div class="form-group">
+                                  <label for="email">Email</label>
+                                  <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">Save</button>
+                              </form>
+                            </div>
+                          </div>
+                          
+                    </div><!-- .End .tab-pane -->
+                </div><!-- End .tab-content -->
+
+                <ul class="nav nav-pills nav-fill" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="signin-tab-2" data-toggle="tab" href="#signin-2" role="tab"
+                            aria-controls="signin-2" aria-selected="false">Address Details</a>
+                    </li>
+                </ul>
+                <div class="tab-content" style="margin-top: 10px;">
+                    {% for profile in profiles %}
+
+                    
+                    <div class="card "  style="margin-bottom: -20px;" >
+                      <div class="card-body d-flex justify-content-between align-items-start">
+                        
+                        <!-- Address Details -->
+                        <div class="address-card" style="width: 320px;">
+                          <p><strong>Address:</strong> {{ profile.address }}</p>
+                          <p><strong>Pincode:</strong> {{ profile.pincode }}</p>
+                          <p><strong>Phone:</strong> {{ profile.phone_number }}</p>
+                          <p><strong>State:</strong> {{ profile.state }}</p>
+                          
+                          <!-- Highlighting the current address -->
+                          {% if profile.is_current %}
+                          <p><strong>Current Address</strong></p>
+                          {% endif %}
+                        </div>
+                        
+                        
+
+                        <!-- Checkbox for setting current address -->
+                        <div class="ml-3" style="width: 100px;text-align: center;" >
+
+                          <form action="{% url 'set_current_address' profile.id %}" method="post" class="d-inline-block">
+                            {% csrf_token %}
+                            <input type="checkbox" onclick="this.form.submit()" {% if profile.is_current %} checked{% endif %}> Use
+                          </form>
+
+                          <br>
+                          <a href="{% url 'edit_address' profile.id %}" >Edit</a>
+                          <br>
+
+                          <form action="{% url 'delete_address' profile.id %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button class=" btn-link" type="submit" style="border:none; background:none; color:red;">
+                              Delete
+                            </button>
+                          </form>
+
+                        </div>
+                      </div>
+                      
+                
+                    </div>
+                    <hr class="mt-2 mb-1" >
+                    {% endfor %}
+                    
+                    <!-- Add New Address Button -->
+                    <div class="add-new-address mt-3">
+                      <a href="{% url 'add_new_address' %}" class="btn btn-primary">Add Address +</a>
+                    </div>
+                  </div>
+                  
+            </div><!-- End .form-tab -->
+        </div><!-- End .form-box -->
+    </div><!-- End .container -->
+    </div><!-- End .login-page section-bg -->
+</main>
+
+{% endblock %}
