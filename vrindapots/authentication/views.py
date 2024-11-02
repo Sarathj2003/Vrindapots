@@ -98,16 +98,26 @@ def user_signup(request):
 def account_page(request):
     user = request.user
     profiles = Profile.objects.filter(user=user)
-
     # Handle user details update
     if request.method == 'POST' and 'update_user_details' in request.POST:
         user.first_name = request.POST.get('firstname')
         user.last_name = request.POST.get('lastname')
         user.email = request.POST.get('email')
+        
         user.save()
         return redirect('account_page')  # Refresh the page after save
-
     return render(request, 'account_page.html', {'user': user, 'profiles': profiles})
+
+def edit_user_details(request, user_id):
+    user = request.user
+    if request.method == 'POST':
+        user.first_name = request.POST.get('first_name')
+        user.last_name = request.POST.get('last_name')
+        user.save()
+        return redirect('account_page')  # Redirect back to the account page after saving
+
+    return render(request, 'edit_user_details.html', {'user': user})
+
 
 
 def set_current_address(request, profile_id):
