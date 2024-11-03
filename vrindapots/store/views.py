@@ -11,7 +11,18 @@ from django.db.models import Prefetch
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='user_login')
 def home_page(request):
+    sort_by = request.GET.get('sort_by')
+    sort_options = {
+        'popularity': '-popularity',          
+        'price_low_high': 'new_price',            
+        'price_high_low': '-new_price',           
+        'ratings': '-average_rating',         
+        'a_to_z': 'name',                     
+        'z_to_a': '-name',                    
+    }
+    sort_order = sort_options.get(sort_by, 'average_rating')
     banner = Banner.objects.first()
+
     Exclusive_Offer_products = Product.objects.filter(
         tag__name='Exclusive Offers',
         category__is_deleted=False,
@@ -20,8 +31,12 @@ def home_page(request):
         discount=ExpressionWrapper(
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
             output_field=FloatField()
-        )
-    )[:3] 
+        ),
+        total_reviews=Count('reviews'), 
+        average_rating=Coalesce(Avg('reviews__rating'), Value(0, output_field=FloatField())),  
+        rating_percentage=Coalesce(Avg('reviews__rating') * 20, Value(0, output_field=FloatField()))
+    ).order_by(sort_order)[:3] 
+
     Best_Seller_products = Product.objects.filter(
         tag__name='Best Sellers',
         category__is_deleted=False,
@@ -30,8 +45,12 @@ def home_page(request):
         discount=ExpressionWrapper(
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
             output_field=FloatField()
-        )
-    )[:3]  
+        ),
+        total_reviews=Count('reviews'), 
+        average_rating=Coalesce(Avg('reviews__rating'), Value(0, output_field=FloatField())),  
+        rating_percentage=Coalesce(Avg('reviews__rating') * 20, Value(0, output_field=FloatField()))
+    ).order_by(sort_order)[:3]  
+
     New_Arrivals_products = Product.objects.filter(
         tag__name='New Arrivals',
         category__is_deleted=False,
@@ -40,8 +59,12 @@ def home_page(request):
         discount=ExpressionWrapper(
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
             output_field=FloatField()
-        )
-    )[:3] 
+        ),
+        total_reviews=Count('reviews'), 
+        average_rating=Coalesce(Avg('reviews__rating'), Value(0, output_field=FloatField())),  
+        rating_percentage=Coalesce(Avg('reviews__rating') * 20, Value(0, output_field=FloatField()))
+    ).order_by(sort_order)[:3] 
+
     Seasonal_Specials_products = Product.objects.filter(
         tag__name='Seasonal Specials',
         category__is_deleted=False,
@@ -50,14 +73,19 @@ def home_page(request):
         discount=ExpressionWrapper(
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
             output_field=FloatField()
-        )
-    )[:3]  
+        ),
+        total_reviews=Count('reviews'), 
+        average_rating=Coalesce(Avg('reviews__rating'), Value(0, output_field=FloatField())),  
+        rating_percentage=Coalesce(Avg('reviews__rating') * 20, Value(0, output_field=FloatField()))
+    ).order_by(sort_order)[:3]  
+
     return render(request, 'home.html', {
         'banner': banner,
         'Exclusive_Offer_products': Exclusive_Offer_products,
         'Best_Seller_products': Best_Seller_products,
         'New_Arrivals_products': New_Arrivals_products,
         'Seasonal_Specials_products': Seasonal_Specials_products,
+        'show_button': True,
     })
 
 
@@ -65,6 +93,17 @@ def home_page(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='user_login')
 def all_products_page(request):
+    sort_by = request.GET.get('sort_by')
+    sort_options = {
+        'popularity': '-popularity',          
+        'price_low_high': 'new_price',            
+        'price_high_low': '-new_price',           
+        'ratings': '-average_rating',         
+        'a_to_z': 'name',                     
+        'z_to_a': '-name',                    
+    }
+    sort_order = sort_options.get(sort_by, 'average_rating')
+
     banner = Banner.objects.first()
     all_products = Product.objects.filter(category__is_deleted=False,is_deleted = False).annotate(
         discount=ExpressionWrapper(
@@ -74,10 +113,12 @@ def all_products_page(request):
         total_reviews=Count('reviews'), 
         average_rating=Coalesce(Avg('reviews__rating'), Value(0, output_field=FloatField())),  
         rating_percentage=Coalesce(Avg('reviews__rating') * 20, Value(0, output_field=FloatField()))  
-    )
+    ).order_by(sort_order)
+
     return render(request, 'all_products.html', {
         'banner': banner,
         'all_products': all_products,
+        'show_button': True,
     })
 
 
@@ -85,6 +126,17 @@ def all_products_page(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='user_login')
 def category_products_page(request, id):
+    sort_by = request.GET.get('sort_by')
+    sort_options = {
+        'popularity': '-popularity',          
+        'price_low_high': 'new_price',            
+        'price_high_low': '-new_price',           
+        'ratings': '-average_rating',         
+        'a_to_z': 'name',                     
+        'z_to_a': '-name',                    
+    }
+    sort_order = sort_options.get(sort_by, 'average_rating')
+
     banner = Banner.objects.first()
     category_name = Category.objects.filter(id=id).first()
     category_products = Product.objects.filter(category__id=id,category__is_deleted=False ,is_deleted=False).annotate(
@@ -95,11 +147,12 @@ def category_products_page(request, id):
         total_reviews=Count('reviews'),  
         average_rating=Coalesce(Avg('reviews__rating'), Value(0, output_field=FloatField())),  
         rating_percentage=Coalesce(Avg('reviews__rating') * 20, Value(0, output_field=FloatField()))  
-    )
+    ).order_by(sort_order)
     return render(request, 'category_products.html', {
         'banner': banner,
         'category_products': category_products,
         'category_name': category_name,
+        'show_button': True,
     })
 
 
@@ -107,6 +160,16 @@ def category_products_page(request, id):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='user_login')
 def tag_products_page(request, id):
+    sort_by = request.GET.get('sort_by')
+    sort_options = {
+        'popularity': '-popularity',          
+        'price_low_high': 'new_price',            
+        'price_high_low': '-new_price',           
+        'ratings': '-average_rating',         
+        'a_to_z': 'name',                     
+        'z_to_a': '-name',                    
+    }
+    sort_order = sort_options.get(sort_by, 'average_rating')
     banner = Banner.objects.first()
     tag_name = Tag.objects.filter(id=id).first()
     tag_products = Product.objects.filter(tag__id=id,category__is_deleted=False ,is_deleted=False).annotate(
@@ -117,11 +180,12 @@ def tag_products_page(request, id):
         total_reviews=Count('reviews'),  
         average_rating=Coalesce(Avg('reviews__rating'), Value(0, output_field=FloatField())),  
         rating_percentage=Coalesce(Avg('reviews__rating') * 20, Value(0, output_field=FloatField()))  
-    )
+    ).order_by(sort_order)
     return render(request, 'tag_products.html', {
         'banner': banner,
         'tag_products': tag_products,
         'tag_name': tag_name,
+        'show_button': True,
     })
 
 
