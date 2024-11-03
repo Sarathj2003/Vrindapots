@@ -135,6 +135,13 @@ def add_new_address(request):
         phone_number = request.POST.get('phone_number')
         state = request.POST.get('state')
         
+        if not re.match(r'^\d{10}$', phone_number):
+            messages.error(request, 'Phone number must be exactly 10 digits and contain only numbers.')
+            return render(request, 'add_address.html')
+        
+        if not re.match(r'^\d{6}$', pincode):
+            messages.error(request, 'Pincode must be exactly 6 digits and contain only numbers.')
+            return render(request, 'add_address.html')
         # Save new address
         Profile.objects.create(
             user=request.user,
@@ -143,6 +150,7 @@ def add_new_address(request):
             phone_number=phone_number,
             state=state
         )
+        messages.success(request, 'New address added successfully!')
         return redirect('account_page')
     return render(request, 'add_address.html')
 
@@ -151,11 +159,25 @@ def add_new_address(request):
 def edit_address(request, profile_id):
     profile = get_object_or_404(Profile, id=profile_id, user=request.user)
     if request.method == 'POST':
+
+        phone_number = request.POST.get('phone_number')
+        address = request.POST.get('address')
+        pincode = request.POST.get('pincode')
+        state = request.POST.get('state')        
+        if not re.match(r'^\d{10}$', phone_number):
+            messages.error(request, 'Phone number must be exactly 10 digits and contain only numbers.')
+            return render(request, 'edit_address.html',{'profile': profile})
+        
+        if not re.match(r'^\d{6}$', pincode):
+            messages.error(request, 'Pincode must be exactly 6 digits and contain only numbers.')
+            return render(request, 'edit_address.html',{'profile': profile})
+
+
         # Update the profile details from the form
-        profile.address = request.POST.get('address')
-        profile.pincode = request.POST.get('pincode')
-        profile.phone_number = request.POST.get('phone_number')
-        profile.state = request.POST.get('state')
+        profile.address = address
+        profile.pincode = pincode
+        profile.phone_number = phone_number
+        profile.state = state
         profile.save()
         return redirect('account_page')
     

@@ -51,15 +51,17 @@
                         
                         <!-- Address Details -->
                         <div class="address-card" style="width: 320px;">
-                          <p><strong>Address:</strong> {{ profile.address }}</p>
-                          <p><strong>Pincode:</strong> {{ profile.pincode }}</p>
-                          <p><strong>Phone:</strong> {{ profile.phone_number }}</p>
-                          <p><strong>State:</strong> {{ profile.state }}</p>
-                          
-                          <!-- Highlighting the current address -->
-                          {% if profile.is_current %}
-                          <p><strong>Current Address</strong></p>
-                          {% endif %}
+                            {% if profile.is_current %}
+                            <p><strong style="color: rgb(19, 184, 19);">Selected Address</strong></p>
+                            {% endif %}
+                        
+                            <p><strong>Address:</strong> {{ profile.address }}</p>
+                            <p><strong>Pincode:</strong> {{ profile.pincode }}</p>
+                            <p><strong>Phone:</strong> {{ profile.phone_number }}</p>
+                            <p><strong>State:</strong> {{ profile.state }}</p>
+                        
+                            <!-- Highlighting the current address -->
+                        
                         </div>
                         
                         
