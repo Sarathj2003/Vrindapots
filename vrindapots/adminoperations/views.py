@@ -57,13 +57,15 @@ def user_list(request):
 @login_required(login_url='custom_admin_login')
 def user_detail(request, user_id):
     user = get_object_or_404(User, id=user_id)
-    profile = get_object_or_404(Profile, user=user) 
+    profiles = Profile.objects.filter(user=user)  
+
     if request.method == 'POST':
         user.is_active = not user.is_active
         user.save()
-        messages.success(request, f'User  {user.username} has been {"unblocked" if user.is_active else "blocked"}.')
+        messages.success(request, f'User {user.username} has been {"unblocked" if user.is_active else "blocked"}.')
         return redirect('user_list')
-    return render(request, 'admin_templates/user_detail.html', {'user': user, 'profile': profile})
+
+    return render(request, 'admin_templates/user_detail.html', {'user': user, 'profiles': profiles})
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)

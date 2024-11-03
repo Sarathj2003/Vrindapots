@@ -6,18 +6,30 @@
         
 <div class="container mt-5">
     <a href="{% url 'admin_home' %}">Back to Admin Dashboard</a>
-    <h1 class="text-center mb-4">User  Detail</h1>
+    <h1 class="text-center mb-4">User Detail</h1>
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">Username: {{ user.username }}</h5>
             <p class="card-text">Email: {{ user.email }}</p>
             <p class="card-text">Status: {{ user.is_active|yesno:"Active,Blocked" }}</p>
             <h5 class="mt-4">Profile Details</h5>
-            <p class="card-text">Full Name: {{ profile.full_name }}</p>
-            <p class="card-text">Address: {{ profile.address }}</p>
-            <p class="card-text">Pincode: {{ profile.pincode }}</p>
-            <p class="card-text">Phone Number: {{ profile.phone_number }}</p>
-            <p class="card-text">State: {{ profile.state }}</p>
+
+            {% for profile in profiles %}
+                <div class="address-card{% if profile.is_current %} current{% endif %}">
+                    <p><strong>Address {{ forloop.counter }}:</strong> {{ profile.address }}</p>
+                    <p>Pincode: {{ profile.pincode }}</p>
+                    <p>Phone Number: {{ profile.phone_number }}</p>
+                    <p>State: {{ profile.state }}</p>
+                
+                    {% if profile.is_current %}
+                    <p><strong style="color: rgb(19, 184, 19);">Selected Address</strong></p>
+                    {% endif %}
+                </div>
+                <hr>
+            {% empty %}
+                <p>No addresses found for this user.</p>
+            {% endfor %}
+
             <form method="POST">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-warning">
