@@ -95,6 +95,8 @@ def user_signup(request):
         return redirect('verify_otp')
     return render(request, 'signup.html')
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def account_page(request):
     user = request.user
     profiles = Profile.objects.filter(user=user)
@@ -105,9 +107,11 @@ def account_page(request):
         user.email = request.POST.get('email')
         
         user.save()
-        return redirect('account_page')  # Refresh the page after save
+        return redirect('account_page')  
     return render(request, 'account_page.html', {'user': user, 'profiles': profiles})
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def edit_user_details(request, user_id):
     user = request.user
     if request.method == 'POST':
@@ -119,7 +123,8 @@ def edit_user_details(request, user_id):
     return render(request, 'edit_user_details.html', {'user': user})
 
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def set_current_address(request, profile_id):
     profile = get_object_or_404(Profile, id=profile_id, user=request.user)
     Profile.objects.filter(user=request.user, is_current=True).update(is_current=False)
@@ -127,9 +132,11 @@ def set_current_address(request, profile_id):
     profile.save()
     return redirect('account_page')
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def add_new_address(request):
     if request.method == 'POST':
-        # Collect address data from the form
+        
         address = request.POST.get('address')
         pincode = request.POST.get('pincode')
         phone_number = request.POST.get('phone_number')
@@ -142,7 +149,7 @@ def add_new_address(request):
         if not re.match(r'^\d{6}$', pincode):
             messages.error(request, 'Pincode must be exactly 6 digits and contain only numbers.')
             return render(request, 'add_address.html')
-        # Save new address
+        
         Profile.objects.create(
             user=request.user,
             address=address,
@@ -155,7 +162,8 @@ def add_new_address(request):
     return render(request, 'add_address.html')
 
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def edit_address(request, profile_id):
     profile = get_object_or_404(Profile, id=profile_id, user=request.user)
     if request.method == 'POST':
@@ -171,9 +179,7 @@ def edit_address(request, profile_id):
         if not re.match(r'^\d{6}$', pincode):
             messages.error(request, 'Pincode must be exactly 6 digits and contain only numbers.')
             return render(request, 'edit_address.html',{'profile': profile})
-
-
-        # Update the profile details from the form
+        
         profile.address = address
         profile.pincode = pincode
         profile.phone_number = phone_number
@@ -183,6 +189,8 @@ def edit_address(request, profile_id):
     
     return render(request, 'edit_address.html', {'profile': profile})
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def delete_address(request, profile_id):
     profile = get_object_or_404(Profile, id=profile_id, user=request.user)
     if request.method == 'POST':
