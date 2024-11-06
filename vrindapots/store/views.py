@@ -1,11 +1,12 @@
 from django.shortcuts import render,redirect
 from django.shortcuts import get_object_or_404
-from .models import Category,Product,Tag,Banner,Review
+from .models import Category,Product,Tag,Banner,Review,Wishlist
 from django.db.models import F, ExpressionWrapper, FloatField, Avg, Count, Q, Value
 from django.views.decorators.cache import cache_control
 from django.contrib.auth.decorators import login_required
 from django.db.models.functions import Coalesce
 from django.db.models import Prefetch
+from django.contrib import messages
 # Create your views here.
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -227,6 +228,25 @@ def product_detail_view(request, id):
         'related_products': related_products,
     }
     return render(request, 'product_detail.html', context)
+
+def add_to_wishlist(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    wishlist_item, created = Wishlist.objects.get_or_create(user=request.user)
+    if created:
+        messages.success(request, 'Product added to wishlist.')
+    else:
+        messages.error(request, 'Product is already in your wishlist.')
+    return redirect('wishlist')
+
+def remove_from_wishlist(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    Wishlist.objects.filter(user=request.user, product=product).delete()
+    return redirect('wishlist')  
+
+def wishlist(request):
+    wishlist_items = Wishlist.objects.filter(user=request.user)
+    return render(request, 'wishlist.html', {'wishlist_items': wishlist_items})
+
 
 
 
