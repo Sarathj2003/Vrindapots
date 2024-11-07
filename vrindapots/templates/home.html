@@ -61,8 +61,12 @@
                             </a>
 
                             <div class="product-action-vertical">
-                                <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to
-                                        wishlist</span></a>
+
+                                
+                                    <a href="{% url 'add_to_wishlist' product.id %}" class="btn-product-icon btn-wishlist btn-expandable"><span>Add to Wishlist</span></a>
+                                
+
+
                                 <a href="{% url 'product_detail' product.id %}" class="btn-product-icon btn-quickview"
                                     title="Quick view"><span>Quick view</span></a>
                             </div><!-- End .product-action-vertical -->
@@ -141,8 +145,7 @@
                             </a>
 
                             <div class="product-action-vertical">
-                                <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to
-                                        wishlist</span></a>
+                                <a href="{% url 'add_to_wishlist' product.id %}" class="btn-product-icon btn-wishlist btn-expandable"><span>Add to Wishlist</span></a>
                                 <a href="{% url 'product_detail' product.id %}" class="btn-product-icon btn-quickview"
                                     title="Quick view"><span>Quick view</span></a>
                             </div><!-- End .product-action-vertical -->
@@ -220,8 +223,7 @@
                             </a>
 
                             <div class="product-action-vertical">
-                                <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to
-                                        wishlist</span></a>
+                                <a href="{% url 'add_to_wishlist' product.id %}" class="btn-product-icon btn-wishlist btn-expandable"><span>Add to Wishlist</span></a>
                                 <a href="{% url 'product_detail' product.id %}" class="btn-product-icon btn-quickview"
                                     title="Quick view"><span>Quick view</span></a>
                             </div><!-- End .product-action-vertical -->
@@ -299,8 +301,7 @@
                             </a>
 
                             <div class="product-action-vertical">
-                                <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to
-                                        wishlist</span></a>
+                                <a href="{% url 'add_to_wishlist' product.id %}" class="btn-product-icon btn-wishlist btn-expandable"><span>Add to Wishlist</span></a>
                                 <a href="{% url 'product_detail' product.id %}" class="btn-product-icon btn-quickview"
                                     title="Quick view"><span>Quick view</span></a>
                             </div><!-- End .product-action-vertical -->

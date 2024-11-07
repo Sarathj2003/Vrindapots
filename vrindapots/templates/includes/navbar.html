@@ -67,9 +67,11 @@
             </div><!-- End .header-left -->
 
             <div class="header-right">
-                <a href="#" class="wishlist-link">
+                <a href="{% url 'wishlist'  %}" class="wishlist-link">
                     <i class="icon-heart-o"></i>
-                    <span class="wishlist-count">3</span>
+                    {% if not wishlist_count == 0 %}
+                    <span class="wishlist-count">{{ wishlist_count }}</span>
+                    {% endif %}
                     <span class="wishlist-txt">My Wishlist</span>
                 </a>
 
@@ -110,7 +112,7 @@
                             <ul>
                                 <li><a href="{% url 'account_page' %}">Account</a></li>
                                 <li><a href="">My Orders</a></li>
-                                <li><a href="#">My Wishlist</a></li>
+                                <li><a href="{% url 'wishlist'  %}">My Wishlist</a></li>
                                 <li><a href="#">My Cart</a></li>
                                 <li><a href="#">My Wallet</a></li>
                             </ul>

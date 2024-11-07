@@ -139,7 +139,7 @@
                         <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
 
                         <div class="details-action-wrapper">
-                            <a href="#" class="btn-product btn-wishlist" title="Wishlist"><span>Add to Wishlist</span></a>
+                            <a href="{% url 'add_to_wishlist' product.id %}" class="btn-product btn-wishlist" title="Wishlist"><span>Add to Wishlist</span></a>
                             
                         </div><!-- End .details-action-wrapper -->
                     </div><!-- End .product-details-action -->
@@ -254,7 +254,7 @@
                             </a>
 
                             <div class="product-action-vertical">
-                                <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to
+                                <a href="{% url 'add_to_wishlist' product.id %}" class="btn-product-icon btn-wishlist btn-expandable"><span>add to
                                         wishlist</span></a>
                                 <a href="{% url 'product_detail' product.id %}" class="btn-product-icon btn-quickview"
                                     title="Quick view"><span>Quick view</span></a>

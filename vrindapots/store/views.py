@@ -200,7 +200,10 @@ def product_detail_view(request, id):
     reviews = Review.objects.filter(product=product).select_related('user').order_by('-created_at')
     rating_percentage = average_rating * 20
     related_products = Product.objects.filter(
-        Q(category=product.category) & ~Q(id=product.id)
+    Q(category=product.category) & 
+    ~Q(id=product.id) & 
+    Q(category__is_deleted=False) &     
+    Q(is_deleted=False)
     ).annotate(
         discount=ExpressionWrapper(
             (F('old_price') - F('new_price')) * 100 / F('old_price'),
@@ -231,12 +234,13 @@ def product_detail_view(request, id):
 
 def add_to_wishlist(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    wishlist_item, created = Wishlist.objects.get_or_create(user=request.user)
+    wishlist_item, created = Wishlist.objects.get_or_create(user=request.user, product=product)
     if created:
         messages.success(request, 'Product added to wishlist.')
     else:
         messages.error(request, 'Product is already in your wishlist.')
-    return redirect('wishlist')
+    return redirect(request.META.get('HTTP_REFERER', 'wishlist'))
+    
 
 def remove_from_wishlist(request, product_id):
     product = get_object_or_404(Product, id=product_id)
