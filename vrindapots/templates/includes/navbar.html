@@ -76,8 +76,7 @@
                 </a>
 
                 <div class="dropdown cart-dropdown">
-                    <a href="#" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true"
-                        aria-expanded="false" data-display="static">
+                    <a href="{% url 'cart_detail'  %}" class="dropdown-toggle">
                         <i class="icon-shopping-cart"></i>
                         <span class="cart-count">2</span>
                         <span class="cart-txt">My Cart</span>
@@ -113,7 +112,7 @@
                                 <li><a href="{% url 'account_page' %}">Account</a></li>
                                 <li><a href="">My Orders</a></li>
                                 <li><a href="{% url 'wishlist'  %}">My Wishlist</a></li>
-                                <li><a href="#">My Cart</a></li>
+                                <li><a href="{% url 'cart_detail'  %}">My Cart</a></li>
                                 <li><a href="#">My Wallet</a></li>
                             </ul>
                         </li>

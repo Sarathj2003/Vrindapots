@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from django.shortcuts import get_object_or_404
-from .models import Category,Product,Tag,Banner,Review,Wishlist
+from .models import Category,Product,Tag,Banner,Review,Wishlist,Cart,CartItem
 from django.db.models import F, ExpressionWrapper, FloatField, Avg, Count, Q, Value
 from django.views.decorators.cache import cache_control
 from django.contrib.auth.decorators import login_required
@@ -251,6 +251,54 @@ def wishlist(request):
     wishlist_items = Wishlist.objects.filter(user=request.user)
     return render(request, 'wishlist.html', {'wishlist_items': wishlist_items})
 
+def cart_detail(request):
+    cart, _ = Cart.objects.get_or_create(user=request.user)
+    return render(request, 'cart_detail.html', {'cart': cart})
 
 
+
+from django.shortcuts import redirect
+from django.contrib import messages
+
+def add_to_cart(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    
+    # Get the desired quantity from the request (default to 1 if not provided)
+    quantity = int(request.POST.get("quantity", 1))
+
+    # Check stock availability before creating or getting the cart item
+    if product.stock < quantity:
+        messages.error(request, "Not enough stock available.")
+        return redirect(request.META.get('HTTP_REFERER', 'cart_detail'))
+
+    # Proceed only if there's enough stock
+    cart, _ = Cart.objects.get_or_create(user=request.user)
+    cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+
+    if created:
+        # If the item is new, set the quantity directly
+        cart_item.quantity = quantity
+    else:
+        # If the item already exists, add the new quantity to the existing one
+        if product.stock < cart_item.quantity + quantity:
+            messages.error(request, "Not enough stock available.")
+            return redirect(request.META.get('HTTP_REFERER', 'cart_detail'))
+        cart_item.quantity += quantity  # Add the requested quantity
+
+    # Save the cart item and show a success message
+    cart_item.save()
+    messages.success(request, f"Added {quantity} of {product.name} to your cart.")
+    
+    return redirect(request.META.get('HTTP_REFERER', 'cart_detail'))
+
+
+
+
+def remove_from_cart(request, product_id):
+    cart = get_object_or_404(Cart, user=request.user)
+    cart_item = get_object_or_404(CartItem, cart=cart, product_id=product_id)
+    cart_item.delete()
+    messages.success(request, "Removed item from your cart.")
+    return redirect('cart_detail')
+    
 
