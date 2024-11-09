@@ -98,6 +98,7 @@ TEMPLATES = [
                 #custom context processors
                 'store.context_processors.categories_processor',
                 'store.context_processors.wishlist_processor',
+                'store.context_processors.cart_item_count',
             ],
         },
     },

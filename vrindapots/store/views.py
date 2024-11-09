@@ -253,12 +253,18 @@ def wishlist(request):
 
 def cart_detail(request):
     cart, _ = Cart.objects.get_or_create(user=request.user)
-    return render(request, 'cart_detail.html', {'cart': cart})
+    cart_items = CartItem.objects.filter(cart=cart).order_by('id')
+    total_cost = 0
+    for item in cart_items:
+        item.subtotal = item.product.new_price * item.quantity  # Calculate subtotal for each item
+        total_cost += item.subtotal
+    return render(request, 'cart_detail.html', {
+        'cart': cart,
+        'cart_items': cart_items,
+        'total_cost': total_cost
+    })
 
 
-
-from django.shortcuts import redirect
-from django.contrib import messages
 
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
@@ -292,13 +298,34 @@ def add_to_cart(request, product_id):
     return redirect(request.META.get('HTTP_REFERER', 'cart_detail'))
 
 
-
-
 def remove_from_cart(request, product_id):
     cart = get_object_or_404(Cart, user=request.user)
     cart_item = get_object_or_404(CartItem, cart=cart, product_id=product_id)
     cart_item.delete()
     messages.success(request, "Removed item from your cart.")
     return redirect('cart_detail')
+
+def update_cart_item_quantity(request, item_id):
+    cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
+    product = cart_item.product
+    try:
+        # Get the new quantity from POST data
+        new_quantity = int(request.POST.get("quantity", cart_item.quantity))
+
+        # Ensure new quantity is within stock limits and above 0
+        if new_quantity > product.stock:
+            messages.error(request, f"Only {product.stock} units available in stock.")
+        elif new_quantity < 1:
+            messages.error(request, "Quantity must be at least 1.")
+        else:
+            # Update quantity if all conditions are met
+            cart_item.quantity = new_quantity
+            cart_item.save()
+            messages.success(request, f"Quantity updated to {new_quantity}.")
+    except ValueError:
+        messages.error(request, "Invalid quantity entered.")
+
+    # Redirect back to the cart page
+    return redirect(request.META.get('HTTP_REFERER', 'cart_detail'))
     
 

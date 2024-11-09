@@ -41,7 +41,7 @@
 
                         <tbody>
                             
-                            {% for item in cart.items.all %}
+                            {% for item in cart_items  %}
                             <tr>
                                 <td class="product-col">
                                     <div class="product">
@@ -60,9 +60,12 @@
                                     <span class="product-price" data-price="{{ item.product.new_price }}">₹{{ item.product.new_price }}</span>
                                 </td>
                                 <td class="quantity-col">
-                                    <div class="cart-product-quantity">
-                                        <input type="number" class="form-control quantity-input" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" step="1" data-decimals="0" required>
-                                    </div>
+                                    <form method="post" action="{% url 'update_cart_item_quantity' item.id %}">
+                                        {% csrf_token %}
+                                        <div class="cart-product-quantity">
+                                            <input type="number" class="form-control quantity-input" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" step="1" data-decimals="0" required onchange="this.form.submit();">
+                                        </div>
+                                    </form>
                                 </td>
                                
                                 
@@ -88,53 +91,20 @@
 
                         <table class="table table-summary">
                             <tbody>
-                                <tr class="summary-subtotal">
-                                    <td>Subtotal:</td>
-                                    <td>$160.00</td>
+                                <tr class="summary-subtotal" >
+                                    <h6 style="margin-top: 10px;">Subtotal</h6>
                                 </tr><!-- End .summary-subtotal -->
-                                <tr class="summary-shipping">
-                                    <td>Shipping:</td>
-                                    <td>&nbsp;</td>
+                                
+                                {% for item in cart_items %}
+                                <tr>
+                                    <td>{{ item.product.name }} x {{ item.quantity }}</td>
+                                    <td>₹ {{ item.subtotal }}</td> <!-- Show subtotal for each item -->
                                 </tr>
-
-                                <tr class="summary-shipping-row">
-                                    <td>
-                                        <div class="custom-control custom-radio">
-                                            <input type="radio" id="free-shipping" name="shipping" class="custom-control-input">
-                                            <label class="custom-control-label" for="free-shipping">Free Shipping</label>
-                                        </div><!-- End .custom-control -->
-                                    </td>
-                                    <td>$0.00</td>
-                                </tr><!-- End .summary-shipping-row -->
-
-                                <tr class="summary-shipping-row">
-                                    <td>
-                                        <div class="custom-control custom-radio">
-                                            <input type="radio" id="standart-shipping" name="shipping" class="custom-control-input">
-                                            <label class="custom-control-label" for="standart-shipping">Standart:</label>
-                                        </div><!-- End .custom-control -->
-                                    </td>
-                                    <td>$10.00</td>
-                                </tr><!-- End .summary-shipping-row -->
-
-                                <tr class="summary-shipping-row">
-                                    <td>
-                                        <div class="custom-control custom-radio">
-                                            <input type="radio" id="express-shipping" name="shipping" class="custom-control-input">
-                                            <label class="custom-control-label" for="express-shipping">Express:</label>
-                                        </div><!-- End .custom-control -->
-                                    </td>
-                                    <td>$20.00</td>
-                                </tr><!-- End .summary-shipping-row -->
-
-                                <tr class="summary-shipping-estimate">
-                                    <td>Estimate for Your Country<br> <a href="dashboard.html">Change address</a></td>
-                                    <td>&nbsp;</td>
-                                </tr><!-- End .summary-shipping-estimate -->
+                                {% endfor %}
 
                                 <tr class="summary-total">
                                     <td>Total:</td>
-                                    <td>$160.00</td>
+                                    <td>₹ {{ total_cost }}</td>
                                 </tr><!-- End .summary-total -->
                             </tbody>
                         </table><!-- End .table table-summary -->
