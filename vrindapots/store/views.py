@@ -251,13 +251,29 @@ def wishlist(request):
     wishlist_items = Wishlist.objects.filter(user=request.user)
     return render(request, 'wishlist.html', {'wishlist_items': wishlist_items})
 
+from django.contrib import messages
+
 def cart_detail(request):
     cart, _ = Cart.objects.get_or_create(user=request.user)
     cart_items = CartItem.objects.filter(cart=cart).order_by('id')
     total_cost = 0
+    cart_updated = False  # Flag to check if any item's quantity was updated
+    
     for item in cart_items:
-        item.subtotal = item.product.new_price * item.quantity  # Calculate subtotal for each item
+        # Check if the quantity in cart exceeds available stock
+        if item.quantity > item.product.stock:
+            # Update the quantity to the available stock
+            item.quantity = item.product.stock
+            item.save()
+            cart_updated = True  # Mark that cart has been updated
+            
+            # Show a warning message to the user
+            messages.warning(request, f"The quantity of '{item.product.name}' has been adjusted to {item.product.stock} due to limited stock.")
+        
+        # Calculate subtotal for each item
+        item.subtotal = item.product.new_price * item.quantity
         total_cost += item.subtotal
+    
     return render(request, 'cart_detail.html', {
         'cart': cart,
         'cart_items': cart_items,
@@ -266,12 +282,15 @@ def cart_detail(request):
 
 
 
+
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     
     # Get the desired quantity from the request (default to 1 if not provided)
     quantity = int(request.POST.get("quantity", 1))
-
+    if quantity > product.stock:
+        messages.error(request, f"Only {product.stock} units available in stock.")
+        return redirect(request.META.get('HTTP_REFERER', 'cart_detail'))
     # Check stock availability before creating or getting the cart item
     if product.stock < quantity:
         messages.error(request, "Not enough stock available.")
@@ -308,22 +327,20 @@ def remove_from_cart(request, product_id):
 def update_cart_item_quantity(request, item_id):
     cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
     product = cart_item.product
-    try:
+    
         # Get the new quantity from POST data
-        new_quantity = int(request.POST.get("quantity", cart_item.quantity))
+    new_quantity = int(request.POST.get("quantity", cart_item.quantity))
 
         # Ensure new quantity is within stock limits and above 0
-        if new_quantity > product.stock:
-            messages.error(request, f"Only {product.stock} units available in stock.")
-        elif new_quantity < 1:
-            messages.error(request, "Quantity must be at least 1.")
-        else:
-            # Update quantity if all conditions are met
-            cart_item.quantity = new_quantity
-            cart_item.save()
-            messages.success(request, f"Quantity updated to {new_quantity}.")
-    except ValueError:
-        messages.error(request, "Invalid quantity entered.")
+    if new_quantity > product.stock:
+        messages.error(request, f"Only {product.stock} units available in stock.")
+    elif new_quantity < 1:
+        messages.error(request, "Quantity must be at least 1.")
+    else:            # Update quantity if all conditions are met
+        cart_item.quantity = new_quantity
+        cart_item.save()
+        messages.success(request, f"Quantity updated to {new_quantity}.")
+    
 
     # Redirect back to the cart page
     return redirect(request.META.get('HTTP_REFERER', 'cart_detail'))

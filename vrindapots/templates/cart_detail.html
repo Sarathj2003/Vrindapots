@@ -63,7 +63,7 @@
                                     <form method="post" action="{% url 'update_cart_item_quantity' item.id %}">
                                         {% csrf_token %}
                                         <div class="cart-product-quantity">
-                                            <input type="number" class="form-control quantity-input" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" step="1" data-decimals="0" required onchange="this.form.submit();">
+                                            <input type="number" class="form-control quantity-input" name="quantity" value="{{ item.quantity }}" min="1" max="" step="1" data-decimals="0" required onchange="this.form.submit();">
                                         </div>
                                     </form>
                                 </td>
@@ -94,7 +94,7 @@
                                 <tr class="summary-subtotal" >
                                     <h6 style="margin-top: 10px;">Subtotal</h6>
                                 </tr><!-- End .summary-subtotal -->
-                                
+                                {% if cart_items %}
                                 {% for item in cart_items %}
                                 <tr>
                                     <td>{{ item.product.name }} x {{ item.quantity }}</td>
@@ -106,10 +106,14 @@
                                     <td>Total:</td>
                                     <td>₹ {{ total_cost }}</td>
                                 </tr><!-- End .summary-total -->
+                                {% else %}
+                                    <p>Your cart is empty.</p>
+                                {% endif %}
                             </tbody>
                         </table><!-- End .table table-summary -->
-
+                        {% if cart_items %}
                         <a href="checkout.html" class="btn btn-outline-primary-2 btn-order btn-block">PROCEED TO CHECKOUT</a>
+                        {% endif %}
                     </div><!-- End .summary -->
 
                     <a href="category.html" class="btn btn-outline-dark-2 btn-block mb-3"><span>CONTINUE SHOPPING</span><i class="icon-refresh"></i></a>
