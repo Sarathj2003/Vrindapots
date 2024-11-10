@@ -123,7 +123,11 @@ def edit_user_details(request, user_id):
         user.first_name = request.POST.get('first_name')
         user.last_name = request.POST.get('last_name')
         user.save()
-        return redirect('account_page')  # Redirect back to the account page after saving
+        previous_page = request.session.get('previous_page', None)
+        if previous_page:
+            return redirect(previous_page)  # Redirect to the page from where the user came
+        else:
+            return redirect('account_page')    # Redirect back to the account page after saving
 
     return render(request, 'edit_user_details.html', {'user': user})
 
@@ -135,7 +139,11 @@ def set_current_address(request, profile_id):
     Profile.objects.filter(user=request.user, is_current=True).update(is_current=False)
     profile.is_current = True
     profile.save()
-    return redirect('account_page')
+    previous_page = request.session.get('previous_page', None)
+    if previous_page:
+        return redirect(previous_page)  # Redirect to the page from where the user came
+    else:
+        return redirect('account_page')
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='user_login')
