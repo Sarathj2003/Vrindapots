@@ -255,7 +255,7 @@ from django.contrib import messages
 
 def cart_detail(request):
     cart, _ = Cart.objects.get_or_create(user=request.user)
-    cart_items = CartItem.objects.filter(cart=cart).order_by('id')
+    cart_items = CartItem.objects.filter(cart=cart, product__stock__gt=0).order_by('id')
     total_cost = 0
     cart_updated = False  # Flag to check if any item's quantity was updated
     
@@ -288,8 +288,14 @@ def add_to_cart(request, product_id):
     
     # Get the desired quantity from the request (default to 1 if not provided)
     quantity = int(request.POST.get("quantity", 1))
+    if product.stock == 0:
+        messages.error(request, "No stock available")
+        return redirect(request.META.get('HTTP_REFERER', 'cart_detail'))
     if quantity > product.stock:
         messages.error(request, f"Only {product.stock} units available in stock.")
+        return redirect(request.META.get('HTTP_REFERER', 'cart_detail'))
+    if quantity < 1:
+        messages.error(request, "Quantity must be at least 1.")
         return redirect(request.META.get('HTTP_REFERER', 'cart_detail'))
     # Check stock availability before creating or getting the cart item
     if product.stock < quantity:
