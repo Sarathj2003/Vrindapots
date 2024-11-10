@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<main class="main">
+
+    
+
+    
+    <div class="container">
+        <hr class="mt-2 mb-1">
+    </div><!-- End .container -->
+
+    <!-- product section -->
+
+    <!-- new container for listing Exclusive Offer products -->
+    <div class="bg-lighter ">
+        <div class="container">
+            <div class="heading heading-flex mb-1">
+                <div class="heading-left text-center">
+                    <h2 class="title text-center">Checkout</h2><!-- End .title -->
+                </div><!-- End .heading-left -->
+
+
+            </div><!-- End .heading -->
+            <div class="checkout-discount">
+                <form action="#">
+                    <input type="text" class="form-control" required id="checkout-discount-input">
+                    <label for="checkout-discount-input" class="text-truncate">Have a coupon? <span>Click here to enter your code</span></label>
+                </form>
+            </div><!-- End .checkout-discount -->
+
+            <div class="row">
+                <div class="col-lg-9">
+                    <h2 class="checkout-title mb-4">Billing Details</h2>
+                
+                    <!-- Billing Card -->
+                    <div class="card shadow-sm p-4 mb-4">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label class="font-weight-bold">First Name:</label>
+                                <p class="lead text-muted">{{ request.user.first_name }}</p>
+                            </div><!-- End .col-sm-6 -->
+                
+                            <div class="col-sm-6">
+                                <label class="font-weight-bold">Last Name:</label>
+                                <p class="lead text-muted">{{ request.user.last_name }}</p>
+                            </div><!-- End .col-sm-6 -->
+                        </div><!-- End .row -->
+                
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <label class="font-weight-bold">Address:</label>
+                                <p class="lead text-muted">{{ profile.address }}</p>
+                            </div><!-- End .col-sm-12 -->
+                        </div><!-- End .row -->
+                
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label class="font-weight-bold">State:</label>
+                                <p class="lead text-muted">{{ profile.state }}</p>
+                            </div><!-- End .col-sm-6 -->
+                
+                            <div class="col-sm-6">
+                                <label class="font-weight-bold">Postcode / ZIP:</label>
+                                <p class="lead text-muted">{{ profile.pincode }}</p>
+                            </div><!-- End .col-sm-6 -->
+                        </div><!-- End .row -->
+                
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label class="font-weight-bold">Phone:</label>
+                                <p class="lead text-muted">{{ profile.phone_number }}</p>
+                            </div><!-- End .col-sm-6 -->
+                
+                            <div class="col-sm-6">
+                                <label class="font-weight-bold">Email Address:</label>
+                                <p class="lead text-muted">{{ request.user.email }}</p>
+                            </div><!-- End .col-sm-6 -->
+                        </div><!-- End .row -->
+                        <div class="text-center">
+                            <a href="{% url 'account_page' %}?from_checkout=true" class="btn btn-primary btn-lg mt-3">
+                                Update Details
+                            </a>
+                        </div><!-- End .text-center -->
+                    </div><!-- End .card -->
+                    
+                
+                </div><!-- End .col-lg-9 -->
+                
+                
+                
+                <aside class="col-lg-3">
+                    <div class="summary">
+                        <h3 class="summary-title">Your Order</h3><!-- End .summary-title -->
+
+                        <table class="table table-summary">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for item in cart_items %}
+                                <tr>
+                                    <td><a href="#">{{ item.product.name }} x {{ item.quantity }}</a></td>
+                                    <td>₹{{ item.product.new_price }} x {{ item.quantity }} = ₹{{ item.subtotal }}</td>
+                                </tr>
+                                {% endfor %}
+                                
+                                <tr class="summary-subtotal">
+                                    <td>Subtotal:</td>
+                                    <td>₹{{ total_cost }}</td>
+                                </tr><!-- End .summary-subtotal -->
+                                <tr>
+                                    <td>Shipping:</td>
+                                    <td>Free shipping</td>
+                                </tr>
+                                <tr class="summary-total">
+                                    <td>Total:</td>
+                                    <td>₹{{ total_cost }}</td>
+                                </tr><!-- End .summary-total -->
+                            </tbody>
+                        </table><!-- End .table table-summary -->
+
+                        <div class="accordion-summary" id="accordion-payment">
+                            <div class="card">
+                                <div class="card-header" id="heading-1">
+                                    <h2 class="card-title">
+                                        <a role="button" data-toggle="collapse" href="#collapse-1" aria-expanded="true" aria-controls="collapse-1">
+                                            Direct bank transfer
+                                        </a>
+                                    </h2>
+                                </div><!-- End .card-header -->
+                                <div id="collapse-1" class="collapse show" aria-labelledby="heading-1" data-parent="#accordion-payment">
+                                    <div class="card-body">
+                                        Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order will not be shipped until the funds have cleared in our account.
+                                    </div><!-- End .card-body -->
+                                </div><!-- End .collapse -->
+                            </div><!-- End .card -->
+
+                            <div class="card">
+                                <div class="card-header" id="heading-2">
+                                    <h2 class="card-title">
+                                        <a class="collapsed" role="button" data-toggle="collapse" href="#collapse-2" aria-expanded="false" aria-controls="collapse-2">
+                                            Check payments
+                                        </a>
+                                    </h2>
+                                </div><!-- End .card-header -->
+                                <div id="collapse-2" class="collapse" aria-labelledby="heading-2" data-parent="#accordion-payment">
+                                    <div class="card-body">
+                                        Ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. 
+                                    </div><!-- End .card-body -->
+                                </div><!-- End .collapse -->
+                            </div><!-- End .card -->
+
+                            <div class="card">
+                                <div class="card-header" id="heading-3">
+                                    <h2 class="card-title">
+                                        <a class="collapsed" role="button" data-toggle="collapse" href="#collapse-3" aria-expanded="false" aria-controls="collapse-3">
+                                            Cash on delivery
+                                        </a>
+                                    </h2>
+                                </div><!-- End .card-header -->
+                                <div id="collapse-3" class="collapse" aria-labelledby="heading-3" data-parent="#accordion-payment">
+                                    <div class="card-body">Quisque volutpat mattis eros. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. 
+                                    </div><!-- End .card-body -->
+                                </div><!-- End .collapse -->
+                            </div><!-- End .card -->
+
+                            <div class="card">
+                                <div class="card-header" id="heading-4">
+                                    <h2 class="card-title">
+                                        <a class="collapsed" role="button" data-toggle="collapse" href="#collapse-4" aria-expanded="false" aria-controls="collapse-4">
+                                            PayPal <small class="float-right paypal-link">What is PayPal?</small>
+                                        </a>
+                                    </h2>
+                                </div><!-- End .card-header -->
+                                <div id="collapse-4" class="collapse" aria-labelledby="heading-4" data-parent="#accordion-payment">
+                                    <div class="card-body">
+                                        Nullam malesuada erat ut turpis. Suspendisse urna nibh, viverra non, semper suscipit, posuere a, pede. Donec nec justo eget felis facilisis fermentum.
+                                    </div><!-- End .card-body -->
+                                </div><!-- End .collapse -->
+                            </div><!-- End .card -->
+
+                            <div class="card">
+                                <div class="card-header" id="heading-5">
+                                    <h2 class="card-title">
+                                        <a class="collapsed" role="button" data-toggle="collapse" href="#collapse-5" aria-expanded="false" aria-controls="collapse-5">
+                                            Credit Card (Stripe)
+                                            <img src="assets/images/payments-summary.png" alt="payments cards">
+                                        </a>
+                                    </h2>
+                                </div><!-- End .card-header -->
+                                <div id="collapse-5" class="collapse" aria-labelledby="heading-5" data-parent="#accordion-payment">
+                                    <div class="card-body"> Donec nec justo eget felis facilisis fermentum.Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Lorem ipsum dolor sit ame.
+                                    </div><!-- End .card-body -->
+                                </div><!-- End .collapse -->
+                            </div><!-- End .card -->
+                        </div><!-- End .accordion -->
+
+                        <button type="submit" class="btn btn-outline-primary-2 btn-order btn-block">
+                            <span class="btn-text">Place Order</span>
+                            <span class="btn-hover-text">Proceed to Checkout</span>
+                        </button>
+                    </div><!-- End .summary -->
+                </aside><!-- End .col-lg-3 -->
+            </div><!-- End .row -->
+
+
+        </div><!-- End .container -->
+    </div>
+    <!-- end container for listing all products -->
+
+    <!-- product section end-->
+
+
+
+    <div class="container">
+        <hr class="mt-3 mb-4">
+    </div><!-- End .container -->
+
+
+
+    <div class="container">
+        <hr class="mt-3 mt-xl-1 mb-0">
+    </div><!-- End .container -->
+
+    <div class="cta pt-4 pt-lg-6 pb-5 pb-lg-7 mb-0">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-sm-10 col-md-8 col-lg-6">
+                    <div class="cta-heading text-center">
+                        <h3 class="cta-title">Sign Up for updates from Molla</h3><!-- End .cta-title -->
+                        <p class="cta-desc">and receive <span class="font-weight-normal">$20 coupon</span> for first shopping</p><!-- End .cta-desc -->
+                    </div><!-- End .text-center -->
+                
+                    <form action="#">
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Enter your Email Address" aria-label="Email Adress" required>
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="submit" title="Sing up"><i class="icon-long-arrow-right"></i></button>
+                            </div><!-- .End .input-group-append -->
+                        </div><!-- .End .input-group -->
+                    </form>
+                </div><!-- End .col-sm-10 col-md-8 col-lg-6 -->
+            </div><!-- End .row -->
+        </div><!-- End .container -->
+    </div><!-- End .cta -->
+
+</main><!-- End .main -->
+
+{% endblock %}

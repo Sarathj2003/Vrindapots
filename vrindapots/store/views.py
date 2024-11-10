@@ -1,6 +1,7 @@
 from django.shortcuts import render,redirect
 from django.shortcuts import get_object_or_404
 from .models import Category,Product,Tag,Banner,Review,Wishlist,Cart,CartItem
+from authentication.models import Profile,User
 from django.db.models import F, ExpressionWrapper, FloatField, Avg, Count, Q, Value
 from django.views.decorators.cache import cache_control
 from django.contrib.auth.decorators import login_required
@@ -352,3 +353,26 @@ def update_cart_item_quantity(request, item_id):
     return redirect(request.META.get('HTTP_REFERER', 'cart_detail'))
     
 
+def checkout(request):
+    # Get the logged-in user's profile with `is_current=True`
+    profile = get_object_or_404(Profile, user=request.user, is_current=True)
+    
+    # Calculate the full name of the user
+    full_name = f"{request.user.first_name} {request.user.last_name}".strip()
+    
+    # Assuming cart and total price are also needed for checkout page
+    cart, _ = Cart.objects.get_or_create(user=request.user)
+    cart_items = CartItem.objects.filter(cart=cart, quantity__gt=0).order_by('id')
+
+    total_cost = 0
+    for item in cart_items:
+        item.subtotal = item.product.new_price * item.quantity
+        total_cost += item.subtotal
+    request.session['previous_page'] = request.get_full_path()
+    # Pass the data to the template
+    return render(request, 'checkout_page.html', {
+        'full_name': full_name,
+        'profile': profile,
+        'cart_items': cart_items,
+        'total_cost': total_cost
+    })

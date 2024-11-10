@@ -94,9 +94,17 @@
                     {% endfor %}
                     
                     <!-- Add New Address Button -->
+                     
                     <div class="add-new-address mt-3">
                       <a href="{% url 'add_new_address' %}" class="btn btn-primary">Add Address +</a>
                     </div>
+                    {% if from_checkout %}
+                    <div class="text-right">
+                        <a href="{% url 'checkout_page' %}" class="btn btn-secondary btn-lg mt-3">
+                            Back to Checkout
+                        </a>
+                    </div><!-- End .text-center -->
+                    {% endif %}
                   </div>
                   
             </div><!-- End .form-tab -->

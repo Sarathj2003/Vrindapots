@@ -99,7 +99,8 @@ def user_signup(request):
 @login_required(login_url='user_login')
 def account_page(request):
     user = request.user
-    profiles = Profile.objects.filter(user=user)
+    from_checkout = request.GET.get('from_checkout', False)
+    profiles = Profile.objects.filter(user=user).order_by('id')
     # Handle user details update
     if request.method == 'POST' and 'update_user_details' in request.POST:
         user.first_name = request.POST.get('firstname')
@@ -107,8 +108,12 @@ def account_page(request):
         user.email = request.POST.get('email')
         
         user.save()
-        return redirect('account_page')  
-    return render(request, 'account_page.html', {'user': user, 'profiles': profiles})
+        previous_page = request.session.get('previous_page', None)
+        if previous_page:
+            return redirect(previous_page)  # Redirect to the page from where the user came
+        else:
+            return redirect('account_page')  
+    return render(request, 'account_page.html', {'user': user, 'profiles': profiles, 'from_checkout': from_checkout})
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='user_login')
@@ -326,3 +331,4 @@ def reset_password(request):
         del request.session['reset_email']
         return redirect('user_login')
     return render(request, 'reset_password.html')
+
