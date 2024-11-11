@@ -236,6 +236,9 @@ def product_detail_view(request, id):
     }
     return render(request, 'product_detail.html', context)
 
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def add_to_wishlist(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     wishlist_item, created = Wishlist.objects.get_or_create(user=request.user, product=product)
@@ -245,55 +248,50 @@ def add_to_wishlist(request, product_id):
         messages.error(request, 'Product is already in your wishlist.')
     return redirect(request.META.get('HTTP_REFERER', 'wishlist'))
     
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def remove_from_wishlist(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     Wishlist.objects.filter(user=request.user, product=product).delete()
     return redirect('wishlist')  
 
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def wishlist(request):
     wishlist_items = Wishlist.objects.filter(user=request.user)
     return render(request, 'wishlist.html', {'wishlist_items': wishlist_items})
 
-from django.contrib import messages
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def cart_detail(request):
     cart, _ = Cart.objects.get_or_create(user=request.user)
     cart_items = CartItem.objects.filter(cart=cart, product__stock__gt=0).order_by('id')
-    total_cost = Decimal(0)  # Keep as Decimal for consistency
-    cart_updated = False  # Flag to check if any item's quantity was updated
-    
+    total_cost = Decimal(0)  
+    cart_updated = False  
     for item in cart_items:
-        # Check if the quantity in cart exceeds available stock
         if item.quantity > item.product.stock:
-            # Update the quantity to the available stock
             item.quantity = item.product.stock
             item.save()
-            cart_updated = True  # Mark that cart has been updated
-            
-            # Show a warning message to the user
+            cart_updated = True  
             messages.warning(request, f"The quantity of '{item.product.name}' has been adjusted to {item.product.stock} due to limited stock.")
-        
-        # Calculate subtotal for each item as Decimal
-        item.subtotal = item.product.new_price * item.quantity  # Keep as Decimal
-        total_cost += item.subtotal  # Add as Decimal
-    
-    # Store total_cost as a float in the session to avoid JSON serialization issues
+        item.subtotal = item.product.new_price * item.quantity  
+        total_cost += item.subtotal  
     request.session['total'] = float(total_cost)
 
     return render(request, 'cart_detail.html', {
         'cart': cart,
         'cart_items': cart_items,
-        'total_cost': total_cost  # Displayed as Decimal in the template
+        'total_cost': total_cost  
     })
 
 
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    
-    # Get the desired quantity from the request (default to 1 if not provided)
     quantity = int(request.POST.get("quantity", 1))
     if product.stock == 0:
         messages.error(request, "No stock available")
@@ -304,32 +302,25 @@ def add_to_cart(request, product_id):
     if quantity < 1:
         messages.error(request, "Quantity must be at least 1.")
         return redirect(request.META.get('HTTP_REFERER', 'cart_detail'))
-    # Check stock availability before creating or getting the cart item
+   
     if product.stock < quantity:
         messages.error(request, "Not enough stock available.")
         return redirect(request.META.get('HTTP_REFERER', 'cart_detail'))
-
-    # Proceed only if there's enough stock
     cart, _ = Cart.objects.get_or_create(user=request.user)
     cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
-
     if created:
-        # If the item is new, set the quantity directly
         cart_item.quantity = quantity
     else:
-        # If the item already exists, add the new quantity to the existing one
         if product.stock < cart_item.quantity + quantity:
             messages.error(request, "Not enough stock available.")
             return redirect(request.META.get('HTTP_REFERER', 'cart_detail'))
-        cart_item.quantity += quantity  # Add the requested quantity
-
-    # Save the cart item and show a success message
+        cart_item.quantity += quantity  
     cart_item.save()
     messages.success(request, f"Added {quantity} of {product.name} to your cart.")
-    
     return redirect(request.META.get('HTTP_REFERER', 'cart_detail'))
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def remove_from_cart(request, product_id):
     cart = get_object_or_404(Cart, user=request.user)
     cart_item = get_object_or_404(CartItem, cart=cart, product_id=product_id)
@@ -337,45 +328,36 @@ def remove_from_cart(request, product_id):
     messages.success(request, "Removed item from your cart.")
     return redirect('cart_detail')
 
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def update_cart_item_quantity(request, item_id):
     cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
-    product = cart_item.product
-    
-        # Get the new quantity from POST data
+    product = cart_item.product 
     new_quantity = int(request.POST.get("quantity", cart_item.quantity))
-
-        # Ensure new quantity is within stock limits and above 0
     if new_quantity > product.stock:
         messages.error(request, f"Only {product.stock} units available in stock.")
     elif new_quantity < 1:
         messages.error(request, "Quantity must be at least 1.")
-    else:            # Update quantity if all conditions are met
+    else:            
         cart_item.quantity = new_quantity
         cart_item.save()
         messages.success(request, f"Quantity updated to {new_quantity}.")
-    
-
-    # Redirect back to the cart page
     return redirect(request.META.get('HTTP_REFERER', 'cart_detail'))
     
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def checkout(request):
-    # Get the logged-in user's profile with `is_current=True`
     profile = get_object_or_404(Profile, user=request.user, is_current=True)
-    
-    # Calculate the full name of the user
     full_name = f"{request.user.first_name} {request.user.last_name}".strip()
-    
-    # Assuming cart and total price are also needed for checkout page
     cart, _ = Cart.objects.get_or_create(user=request.user)
     cart_items = CartItem.objects.filter(cart=cart, quantity__gt=0).order_by('id')
-
     total_cost = 0
     for item in cart_items:
         item.subtotal = item.product.new_price * item.quantity
         total_cost += item.subtotal
     request.session['previous_page'] = request.get_full_path()
-    # Pass the data to the template
+    
     return render(request, 'checkout_page.html', {
         'full_name': full_name,
         'profile': profile,
@@ -384,89 +366,63 @@ def checkout(request):
     })
 
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 @transaction.atomic
 def place_order(request):
-    # Check if it's a POST request
     if request.method == "POST":
-        # Retrieve the user's current profile with `is_current=True`
         profile = get_object_or_404(Profile, user=request.user, is_current=True)
-        
-        # Retrieve the user's cart and cart items
         cart, _ = Cart.objects.get_or_create(user=request.user)
         cart_items = CartItem.objects.filter(cart=cart, quantity__gt=0)
-
         if not cart_items:
             messages.error(request, "Your cart is empty.")
             return redirect("cart")
-
-        # Calculate the total cost to ensure data consistency
         total_cost = sum(item.product.new_price * item.quantity for item in cart_items)
-
-        # Extract shipping details from the user's profile
         shipping_address = profile.address
         shipping_pincode = profile.pincode
         shipping_phone_number = profile.phone_number
         shipping_state = profile.state
-
-        # Create the Order with copied address fields from the profile
         order = Order.objects.create(
             user=request.user,
             status="Pending",
             total_price=total_cost,
-            payment_method="COD",  # Cash on Delivery
+            payment_method="COD", 
             shipping_address=shipping_address,
             shipping_pincode=shipping_pincode,
             shipping_phone_number=shipping_phone_number,
             shipping_state=shipping_state,
-            is_paid=False  # Since this is COD
+            is_paid=False  
         )
-
-        # Create OrderItems and update product stock
         for item in cart_items:
-            # Add each cart item to the Order as an OrderItem
             OrderItem.objects.create(
                 order=order,
                 product=item.product,
                 quantity=item.quantity,
                 price=item.product.new_price
             )
-
-            # Update the product's stock
             item.product.stock -= item.quantity
             item.product.save()
-
-        # Clear the cart after the order is placed
         cart_items.delete()
-
-        # Redirect to a confirmation page or order summary
         messages.success(request, "Order placed successfully!")
         return redirect('home')
-
     else:
-        # Redirect back if not a POST request
         return redirect("checkout_page")
 
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def my_orders(request):
-    # Retrieve all orders placed by the logged-in user
     orders = Order.objects.filter(user=request.user).order_by('-order_date')
-    
     return render(request, 'my_orders.html', {'orders': orders})
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def order_detail(request, order_id):
-    # Fetch the order by ID and check if it belongs to the current user
     order = get_object_or_404(Order, id=order_id, user=request.user)
-    
-    # Get all the items in the order
     order_items = OrderItem.objects.filter(order=order)
-    
-    # Calculate subtotal (individual item price * quantity)
     for item in order_items:
         item.subtotal = item.quantity * item.price
-    
-    # Total cost
     total_cost = order.total_price
-
     return render(request, 'order_detail.html', {
         'order': order,
         'order_items': order_items,
@@ -474,21 +430,15 @@ def order_detail(request, order_id):
     })
 
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def cancel_order(request, order_id):
-    # Fetch the order by ID and check if it belongs to the current user
     order = get_object_or_404(Order, id=order_id, user=request.user)
-    
-    # Check if the order is already cancelled
     if order.status != 'Cancelled':
-        # Update order status to 'Cancelled'
         order.status = 'Cancelled'
         order.save()
-
-        # Optionally, handle the reversal of stock (if needed)
-        for item in order.order_items.all():  # Use 'items' if related_name is set
+        for item in order.order_items.all():  
             item.product.stock += item.quantity
             item.product.save()
         messages.success(request, "Order cancelled!")
-
-    # Redirect back to orders page after cancellation
     return redirect('my_orders')

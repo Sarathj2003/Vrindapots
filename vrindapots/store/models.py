@@ -132,9 +132,8 @@ class Order(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
     payment_method = models.CharField(max_length=50, choices=PAYMENT_CHOICES, default='COD')
-    is_paid = models.BooleanField(default=False)  # Payment status
+    is_paid = models.BooleanField(default=False)  
 
-    # Fields to store the user's current address at the time of ordering
     shipping_address = models.TextField(null=True, blank=True)
     shipping_pincode = models.CharField(max_length=6, null=True, blank=True)
     shipping_phone_number = models.CharField(max_length=15, null=True, blank=True)
@@ -151,19 +150,18 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
-    product = models.ForeignKey('Product', on_delete=models.PROTECT)  # Assuming Product model exists
+    product = models.ForeignKey('Product', on_delete=models.PROTECT)  
     quantity = models.PositiveIntegerField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)  # Price at the time of purchase
+    price = models.DecimalField(max_digits=10, decimal_places=2)  
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, editable=False)
 
     def __str__(self):
         return f"{self.product.name} - {self.quantity} pcs"
 
     def save(self, *args, **kwargs):
-        # Calculate subtotal (quantity * price)
+        
         self.subtotal = self.quantity * self.price
         super().save(*args, **kwargs)
-        # Update the total price of the order after saving
         self.order.calculate_total_price()
 
 

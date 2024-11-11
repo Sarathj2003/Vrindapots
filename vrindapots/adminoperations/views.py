@@ -202,16 +202,16 @@ def delete_product(request, product_id):
     product.delete()  
     return redirect('product_list')
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='custom_admin_login')
 def admin_order_list(request):
     orders = Order.objects.all().order_by('-order_date')  
     return render(request, 'admin_templates/order_list.html', {'orders': orders})
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='custom_admin_login')
 def admin_order_details(request, order_id):
-    # Fetch the specific order by ID
     order = get_object_or_404(Order, id=order_id)
-    
-    # Fetch related items for this order
     order_items = []
     for item in order.order_items.all():
         item.subtotal = item.product.new_price * item.quantity
@@ -222,10 +222,10 @@ def admin_order_details(request, order_id):
         'order_items': order_items
     })
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='custom_admin_login')
 def admin_order_cancel(request, order_id):
     with transaction.atomic():
-        # Cancel the order and update the stock as shown above
         order = get_object_or_404(Order, id=order_id)
         if order.status == 'Pending':
             for item in order.order_items.all():
@@ -234,7 +234,6 @@ def admin_order_cancel(request, order_id):
                 product.save()
             order.status = 'Cancelled'
             order.save()
-
             messages.success(request, f"Order #{order.id} has been cancelled and stock updated.")
         else:
             messages.error(request, f"Order #{order.id} cannot be cancelled.")
