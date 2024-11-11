@@ -24,4 +24,8 @@ urlpatterns = [
     path('adminhome/productlist/delete/<int:product_id>/', views.soft_delete_product, name='soft_delete_product'),
     path('adminhome/productlist/restore/<int:product_id>/', views.restore_product, name='restore_product'),
     path('adminhome/productlist/delete/<int:product_id>/', views.delete_product, name='delete_product'),
+
+    path('adminhome/orders/', views.admin_order_list, name='admin_order_list'),
+    path('adminhome/orders/<int:order_id>/', views.admin_order_details, name='admin_order_details'),
+    path('adminhome/orders/cancel/<int:order_id>/', views.admin_order_cancel, name='admin_order_cancel'),
 ] 

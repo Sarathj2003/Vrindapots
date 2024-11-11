@@ -5,8 +5,9 @@ from django.views.decorators.cache import cache_control
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from authentication.models import Profile
-from store.models import Category,Product
+from store.models import Category,Product, Order,OrderItem
 from .forms import CategoryForm, ProductForm
+from django.db import transaction
 
 # Create your views here.
 
@@ -200,3 +201,42 @@ def delete_product(request, product_id):
     product.images.all().delete()  
     product.delete()  
     return redirect('product_list')
+
+
+def admin_order_list(request):
+    orders = Order.objects.all().order_by('-order_date')  
+    return render(request, 'admin_templates/order_list.html', {'orders': orders})
+
+def admin_order_details(request, order_id):
+    # Fetch the specific order by ID
+    order = get_object_or_404(Order, id=order_id)
+    
+    # Fetch related items for this order
+    order_items = []
+    for item in order.order_items.all():
+        item.subtotal = item.product.new_price * item.quantity
+        order_items.append(item)
+    
+    return render(request, 'admin_templates/admin_order_details.html', {
+        'order': order,
+        'order_items': order_items
+    })
+
+
+def admin_order_cancel(request, order_id):
+    with transaction.atomic():
+        # Cancel the order and update the stock as shown above
+        order = get_object_or_404(Order, id=order_id)
+        if order.status == 'Pending':
+            for item in order.order_items.all():
+                product = item.product
+                product.stock += item.quantity
+                product.save()
+            order.status = 'Cancelled'
+            order.save()
+
+            messages.success(request, f"Order #{order.id} has been cancelled and stock updated.")
+        else:
+            messages.error(request, f"Order #{order.id} cannot be cancelled.")
+
+    return redirect('admin_order_details', order_id=order.id)
