@@ -446,7 +446,11 @@ def place_order(request):
         # Redirect back if not a POST request
         return redirect("checkout_page")
 
-
+def my_orders(request):
+    # Retrieve all orders placed by the logged-in user
+    orders = Order.objects.filter(user=request.user).order_by('-order_date')
+    
+    return render(request, 'my_orders.html', {'orders': orders})
 
 
 
