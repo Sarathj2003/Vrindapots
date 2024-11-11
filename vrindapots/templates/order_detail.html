@@ -17,34 +17,43 @@
     <!-- new container for listing Exclusive Offer products -->
     <div class="bg-lighter ">
         <div class="container">
-            <h4>Your Orders</h4>
-            <div class="container">
-                <hr class="mt-2 mb-1">
-            </div><!-- End .container -->
-            <div class="order-list">
-                {% if orders %}
-                    <div class="order-summary">
-                        {% for order in orders %}
-                        <a href="{% url 'order_detail' order.id %}">
-                            <div class="order-card">
-                                <h5>Order #{{ order.id }}</h5>
-                                <p><strong>Order Date:</strong> {{ order.order_date }}</p>
-                                <p><strong>Total Price:</strong> ₹{{ order.total_price }}</p>
-                                <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
-                                <p><strong>Status:</strong> {{ order.status }}</p>
+            <h4>Order #{{ order.id }} Details</h4>
         
-                                <!-- Additional order details can be placed here -->
+            <!-- Order Information -->
+            <p><strong>Order Date:</strong> {{ order.order_date }}</p>
+            <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
+            <p><strong>Status:</strong> {{ order.status }}</p>
+            <p><strong>Total Price:</strong> ${{ total_cost }}</p>
+        
+            <div class="order-items">
+                <h5>Order Items:</h5>
+                {% for item in order_items %}
+                    <div class="order-item">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <!-- Product Image -->
+                                <img src="{{ item.product.image_1.url }}" alt="{{ item.product.name }}" class="img-fluid">
                             </div>
-                            <div class="container">
-                                <hr class="mt-2 mb-1">
-                            </div><!-- End .container -->
-                        </a>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <p>You have no orders yet.</p>
-                {% endif %}
+                            <div class="col-md-6">
+                                <p><strong>Product:</strong> {{ item.product.name }}</p>
+                                <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+                                <p><strong>Price:</strong> ${{ item.price }}</p>
+                                <p><strong>Subtotal:</strong> ${{ item.subtotal }}</p>
+                            </div>
+                        </div>
+                        <hr>
+                {% endfor %}
             </div>
+        
+            <!-- Cancel Order Button (if applicable) -->
+            {% if order.status != 'Cancelled' %}
+                <form method="POST" action="{% url 'cancel_order' order.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Cancel Order</button>
+                </form>
+            {% else %}
+                <p>Your order has been cancelled.</p>
+            {% endif %}
         </div>
         
     </div>

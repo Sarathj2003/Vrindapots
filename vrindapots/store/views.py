@@ -453,5 +453,42 @@ def my_orders(request):
     return render(request, 'my_orders.html', {'orders': orders})
 
 
+def order_detail(request, order_id):
+    # Fetch the order by ID and check if it belongs to the current user
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    
+    # Get all the items in the order
+    order_items = OrderItem.objects.filter(order=order)
+    
+    # Calculate subtotal (individual item price * quantity)
+    for item in order_items:
+        item.subtotal = item.quantity * item.price
+    
+    # Total cost
+    total_cost = order.total_price
 
-        
+    return render(request, 'order_detail.html', {
+        'order': order,
+        'order_items': order_items,
+        'total_cost': total_cost
+    })
+
+
+def cancel_order(request, order_id):
+    # Fetch the order by ID and check if it belongs to the current user
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    
+    # Check if the order is already cancelled
+    if order.status != 'Cancelled':
+        # Update order status to 'Cancelled'
+        order.status = 'Cancelled'
+        order.save()
+
+        # Optionally, handle the reversal of stock (if needed)
+        for item in order.order_items.all():  # Use 'items' if related_name is set
+            item.product.stock += item.quantity
+            item.product.save()
+        messages.success(request, "Order cancelled!")
+
+    # Redirect back to orders page after cancellation
+    return redirect('my_orders')
