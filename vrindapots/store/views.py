@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from django.shortcuts import get_object_or_404
-from .models import Category,Product,Tag,Banner,Review,Wishlist,Cart,CartItem,Order,OrderItem
+from .models import Category,Product,Tag,Banner,Review,Wishlist,Cart,CartItem,OrderItem,Order
 from authentication.models import Profile,User
 from django.db.models import F, ExpressionWrapper, FloatField, Avg, Count, Q, Value
 from django.views.decorators.cache import cache_control
@@ -10,6 +10,7 @@ from django.db.models import Prefetch
 from django.contrib import messages
 from django.http import Http404
 from decimal import Decimal
+from django.db import transaction
 # Create your views here.
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -383,70 +384,70 @@ def checkout(request):
     })
 
 
-
+@transaction.atomic
 def place_order(request):
-    if request.method == 'POST':
-        # Get the payment method from POST or default to 'COD'
-        payment_method = request.POST.get('payment_method', 'COD')  # Default to 'COD' if not selected
+    # Check if it's a POST request
+    if request.method == "POST":
+        # Retrieve the user's current profile with `is_current=True`
+        profile = get_object_or_404(Profile, user=request.user, is_current=True)
+        
+        # Retrieve the user's cart and cart items
+        cart, _ = Cart.objects.get_or_create(user=request.user)
+        cart_items = CartItem.objects.filter(cart=cart, quantity__gt=0)
 
-        profile = request.user.profile.filter(is_current=True).first()
-        
-        if not profile:
-            # Handle case where no current profile exists
-            return redirect('user_profile')
-        
-        # Ensure the user has a profile
-        
-        total_cost = request.session.get('total', 0.00)
-        if total_cost <= 0:
-            # Handle the case where the total cost is invalid (e.g., redirect to cart or show error)
-            messages.error(request, "Invalid cart total.")
-            return redirect('cart_detail')
-        
-        # Ensure the user has a cart with items
-        cart = request.user.cart
-        if not cart.items.exists():
-            # Handle the case where the cart is empty
+        if not cart_items:
             messages.error(request, "Your cart is empty.")
-            return redirect('cart_detail')
-        
-        # Create the order
+            return redirect("cart")
+
+        # Calculate the total cost to ensure data consistency
+        total_cost = sum(item.product.new_price * item.quantity for item in cart_items)
+
+        # Extract shipping details from the user's profile
+        shipping_address = profile.address
+        shipping_pincode = profile.pincode
+        shipping_phone_number = profile.phone_number
+        shipping_state = profile.state
+
+        # Create the Order with copied address fields from the profile
         order = Order.objects.create(
             user=request.user,
-            profile=profile,  # Assuming Profile model is linked to User
-            total=request.session.get('total', 0.00),  # Get the total from session or cart
-            payment_method=payment_method,  # Set the selected payment method
-            status='Pending',  # Default status
+            status="Pending",
+            total_price=total_cost,
+            payment_method="COD",  # Cash on Delivery
+            shipping_address=shipping_address,
+            shipping_pincode=shipping_pincode,
+            shipping_phone_number=shipping_phone_number,
+            shipping_state=shipping_state,
+            is_paid=False  # Since this is COD
         )
 
-        # Handle the order items (same as before)
-        cart = request.user.cart  # Ensure this is correct. This assumes the user has a cart object.
-        for item in cart.items.all():
+        # Create OrderItems and update product stock
+        for item in cart_items:
+            # Add each cart item to the Order as an OrderItem
             OrderItem.objects.create(
                 order=order,
                 product=item.product,
                 quantity=item.quantity,
-                price=item.product.new_price,  # Assuming `new_price` is the correct price field
-                subtotal=item.product.new_price * item.quantity  # Calculate subtotal for the order item
+                price=item.product.new_price
             )
 
-        # Clear the cart after order placement
-        cart.items.all().delete()  # Delete the items in the cart
-        cart.delete()  # Optionally delete the cart object as well
+            # Update the product's stock
+            item.product.stock -= item.quantity
+            item.product.save()
 
-        # Redirect to a confirmation page or order detail page
-        return redirect('order_detail', order_id=order.id)
+        # Clear the cart after the order is placed
+        cart_items.delete()
 
-    return redirect('checkout_page')  # Redirect back to checkout if it's not a POST request
+        # Redirect to a confirmation page or order summary
+        messages.success(request, "Order placed successfully!")
+        return redirect('home')
+
+    else:
+        # Redirect back if not a POST request
+        return redirect("checkout_page")
+
+
+
+
 
         
-def order_detail(request, order_id):
-    order = get_object_or_404(Order, id=order_id, user=request.user)
-    
-    # Calculate the total price of all order items
-    total = sum(item.subtotal for item in order.order_items.all())
-    
-    return render(request, 'order_detail.html', {
-        'order': order,
-        'total': total,
-    })

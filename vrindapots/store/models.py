@@ -115,6 +115,7 @@ class CartItem(models.Model):
 class Order(models.Model):
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
+        ('Processing', 'Processing'),
         ('Shipped', 'Shipped'),
         ('Delivered', 'Delivered'),
         ('Cancelled', 'Cancelled'),
@@ -125,36 +126,53 @@ class Order(models.Model):
         ('PayPal', 'PayPal'),
         ('Credit Card', 'Credit Card (Stripe)'),
     ]
-    
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
-    profile = models.ForeignKey('authentication.Profile', on_delete=models.SET_NULL, null=True, blank=True, related_name='orders')
     order_date = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
-    total = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
-    payment_method = models.CharField(max_length=50, choices=PAYMENT_CHOICES, default='COD')  
-    
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+    payment_method = models.CharField(max_length=50, choices=PAYMENT_CHOICES, default='COD')
+    is_paid = models.BooleanField(default=False)  # Payment status
+
+    # Fields to store the user's current address at the time of ordering
+    shipping_address = models.TextField(null=True, blank=True)
+    shipping_pincode = models.CharField(max_length=6, null=True, blank=True)
+    shipping_phone_number = models.CharField(max_length=15, null=True, blank=True)
+    shipping_state = models.CharField(max_length=50, null=True, blank=True)
+
     def __str__(self):
         return f"Order {self.id} by {self.user.username}"
 
+    def calculate_total_price(self):
+        
+        self.total_price = sum(item.subtotal for item in self.order_items.all())
+        self.save()
+
+
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
-    product = models.ForeignKey('Product', on_delete=models.PROTECT)
+    product = models.ForeignKey('Product', on_delete=models.PROTECT)  # Assuming Product model exists
     quantity = models.PositiveIntegerField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    subtotal = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.DecimalField(max_digits=10, decimal_places=2)  # Price at the time of purchase
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2, editable=False)
 
     def __str__(self):
         return f"{self.product.name} - {self.quantity} pcs"
 
     def save(self, *args, **kwargs):
-        # Calculate subtotal for each order item (quantity * price)
+        # Calculate subtotal (quantity * price)
         self.subtotal = self.quantity * self.price
-        
-        # Reduce the product stock
-        if self.product.stock >= self.quantity:
-            self.product.stock -= self.quantity
-            self.product.save()  # Save the product with the updated stock
-        else:
-            raise ValueError(f"Not enough stock for {self.product.name}")
-
         super().save(*args, **kwargs)
+        # Update the total price of the order after saving
+        self.order.calculate_total_price()
+
+
+class Payment(models.Model):
+    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='payment')
+    payment_date = models.DateTimeField(auto_now_add=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    transaction_id = models.CharField(max_length=100, unique=True, null=True, blank=True)
+    payment_method = models.CharField(max_length=50, choices=Order.PAYMENT_CHOICES)
+
+    def __str__(self):
+        return f"Payment for Order {self.order.id} - {self.amount} {self.payment_method}"
