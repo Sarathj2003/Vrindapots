@@ -13,6 +13,10 @@ from decimal import Decimal
 from django.db import transaction
 # Create your views here.
 
+
+
+
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='user_login')
 def home_page(request):
@@ -267,15 +271,23 @@ def wishlist(request):
 @login_required(login_url='user_login')
 def cart_detail(request):
     cart, _ = Cart.objects.get_or_create(user=request.user)
-    cart_items = CartItem.objects.filter(cart=cart, product__stock__gt=0).order_by('id')
+    cart_items = CartItem.objects.filter(cart=cart).order_by('id')
     total_cost = Decimal(0)  
-    cart_updated = False  
+    # cart_updated = False  
+    print(cart_items)
     for item in cart_items:
-        if item.quantity > item.product.stock:
-            item.quantity = item.product.stock
-            item.save()
-            cart_updated = True  
-            messages.warning(request, f"The quantity of '{item.product.name}' has been adjusted to {item.product.stock} due to limited stock.")
+        # if item.quantity > item.product.stock:
+        #     if item.product.stock == 0:
+        #         messages.warning(request, f"'{item.product.name}' is out of stock! Please remove the item from your cart to proceed.")
+        #     else:
+        #         messages.warning(request, f"Only {item.product.stock} units of '{item.product.name}' available! Please update your cart to proceed.")
+            
+            
+            # item.quantity = item.product.stock
+            # item.save()
+            # cart_updated = True  
+            # messages.warning(request, f"The quantity of '{item.product.name}' has been adjusted to {item.product.stock} due to limited stock.")
+                
         item.subtotal = item.product.new_price * item.quantity  
         total_cost += item.subtotal  
     request.session['total'] = float(total_cost)
@@ -335,9 +347,10 @@ def update_cart_item_quantity(request, item_id):
     cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
     product = cart_item.product 
     new_quantity = int(request.POST.get("quantity", cart_item.quantity))
-    if new_quantity > product.stock:
-        messages.error(request, f"Only {product.stock} units available in stock.")
-    elif new_quantity < 1:
+    # if new_quantity > product.stock:
+    #     messages.error(request, f"Only {product.stock} units available in stock.")
+
+    if new_quantity < 1:
         messages.error(request, "Quantity must be at least 1.")
     else:            
         cart_item.quantity = new_quantity
@@ -349,9 +362,19 @@ def update_cart_item_quantity(request, item_id):
 @login_required(login_url='user_login')
 def checkout(request):
     profile = get_object_or_404(Profile, user=request.user, is_current=True)
+    profiles = Profile.objects.filter(user=request.user).order_by('id')
     full_name = f"{request.user.first_name} {request.user.last_name}".strip()
     cart, _ = Cart.objects.get_or_create(user=request.user)
     cart_items = CartItem.objects.filter(cart=cart, quantity__gt=0).order_by('id')
+    
+    for item in cart_items:
+        if item.quantity > item.product.stock:
+            if item.product.stock == 0:
+                messages.warning(request, f"'{item.product.name}' is out of stock! Please remove the item from your cart to proceed.")
+            else:
+                messages.warning(request, f"Only {item.product.stock} units of '{item.product.name}' available! Please update your cart to proceed.")
+            return redirect('cart_detail')
+
     total_cost = 0
     for item in cart_items:
         item.subtotal = item.product.new_price * item.quantity
@@ -362,7 +385,8 @@ def checkout(request):
         'full_name': full_name,
         'profile': profile,
         'cart_items': cart_items,
-        'total_cost': total_cost
+        'total_cost': total_cost,
+        'profiles': profiles,
     })
 
 

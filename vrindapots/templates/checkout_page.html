@@ -24,19 +24,14 @@
 
 
             </div><!-- End .heading -->
-            <div class="checkout-discount">
-                <form action="#">
-                    <input type="text" class="form-control" required id="checkout-discount-input">
-                    <label for="checkout-discount-input" class="text-truncate">Have a coupon? <span>Click here to enter your code</span></label>
-                </form>
-            </div><!-- End .checkout-discount -->
+            
 
             <div class="row">
                 <div class="col-lg-9">
-                    <h2 class="checkout-title mb-4">Billing Details</h2>
+                    <h2 class="checkout-title ">Billing Details</h2>
                 
                     <!-- Billing Card -->
-                    <div class="card shadow-sm p-4 mb-4">
+                    <div class="card shadow-sm p-4 mb-1">
                         <div class="row">
                             <div class="col-sm-6">
                                 <label class="font-weight-bold">First Name:</label>
@@ -79,13 +74,60 @@
                                 <p class="lead text-muted">{{ request.user.email }}</p>
                             </div><!-- End .col-sm-6 -->
                         </div><!-- End .row -->
-                        <div class="text-center">
-                            <a href="{% url 'account_page' %}?from_checkout=true" class="btn btn-primary btn-lg mt-3">
-                                Update Details
-                            </a>
-                        </div><!-- End .text-center -->
+                        
                     </div><!-- End .card -->
-                    
+                    <h2 class="checkout-title ">Change address</h2>
+                    <div class="card shadow-sm p-4 mb-1">
+                        <div class="tab-content" style="margin-top: 10px;">
+                            {% for profile in profiles %}
+        
+                            
+                            <div class="card "  style="margin-bottom: -20px;" >
+                              <div class="card-body d-flex justify-content-between align-items-start">
+                                
+                                <!-- Address Details -->
+                                <div class="address-card" style="width: 320px;">
+                                    {% if profile.is_current %}
+                                    <p><strong style="color: rgb(19, 184, 19);">Selected Address</strong></p>
+                                    {% endif %}
+                                
+                                    <p><strong>Address:</strong> {{ profile.address }}</p>
+                                    <p><strong>Pincode:</strong> {{ profile.pincode }}</p>
+                                    <p><strong>Phone:</strong> {{ profile.phone_number }}</p>
+                                    <p><strong>State:</strong> {{ profile.state }}</p>
+                                
+                                    <!-- Highlighting the current address -->
+                                
+                                </div>
+                                
+                                
+        
+                                <!-- Checkbox for setting current address -->
+                                <div class="ml-3" style="width: 100px;text-align: center;" >
+        
+                                  <form action="{% url 'set_current_address' profile.id %}" method="post" class="d-inline-block">
+                                    {% csrf_token %}
+                                    <input type="checkbox" onclick="this.form.submit()" {% if profile.is_current %} checked{% endif %}> Use
+                                  </form>
+        
+                                  
+        
+                                  
+        
+                                </div>
+                              </div>
+                              
+                        
+                            </div>
+                            <hr class="mt-2 mb-1" >
+                            {% endfor %}
+                            
+                            <!-- Add New Address Button -->
+                             
+                            
+                            
+                          </div>
+                    </div>
                 
                 </div><!-- End .col-lg-9 -->
                 
@@ -205,6 +247,12 @@
                             </button>
                         </form>
                     </div><!-- End .summary -->
+                    <div class="checkout-discount">
+                        <form action="#">
+                            <input type="text" class="form-control" required id="checkout-discount-input">
+                            <label for="checkout-discount-input" class="text-truncate">Have a coupon? <span>Click here to enter your code</span></label>
+                        </form>
+                    </div><!-- End .checkout-discount -->
                 </aside><!-- End .col-lg-3 -->
             </div><!-- End .row -->
 

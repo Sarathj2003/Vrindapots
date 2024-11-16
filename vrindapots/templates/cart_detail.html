@@ -32,6 +32,7 @@
                         <thead>
                             <tr>
                                 <th>Product</th>
+                                <th>Product status</th>
                                 <th>Price </th>
                                 <th>Quantity</th>
                                 
@@ -56,6 +57,15 @@
                                         </h3><!-- End .product-title -->
                                     </div><!-- End .product -->
                                 </td>
+
+                                <td>
+                                    {% if item.product.stock == 0 %}
+                                    <p style="color: red;">Out of stock</p>
+                                    {% else %}
+                                    <p style="color: green;">{{item.product.stock}} units left</p>
+                                    {% endif %}
+                                </td>
+
                                 <td class="price-col">
                                     <span class="product-price" data-price="{{ item.product.new_price }}">₹{{ item.product.new_price }}</span>
                                 </td>

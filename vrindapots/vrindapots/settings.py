@@ -96,9 +96,9 @@ TEMPLATES = [
 
                 
                 #custom context processors
-                'store.context_processors.categories_processor',
-                'store.context_processors.wishlist_processor',
-                'store.context_processors.cart_item_count',
+                'store.context_processors.navbar_processor',
+                # 'store.context_processors.wishlist_processor',
+                # 'store.context_processors.cart_item_count',
             ],
         },
     },
@@ -194,6 +194,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'sarathjayakumar46@gmail.com'  
 EMAIL_HOST_PASSWORD = 'yeqb nyec pcfb wyax'  
+
 
 
 

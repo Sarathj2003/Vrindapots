@@ -1,5 +1,6 @@
 import random
 import re
+from django.http import HttpResponse, HttpResponseNotFound
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
@@ -13,15 +14,20 @@ from .models import Profile
 
 
 
+
 # Create your views here.
+
+
 
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def user_login(request):
+    
     if request.user.is_authenticated:
-        if not request.user.is_staff:
+        if request.user.is_staff:
             return redirect('home')
+    
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')

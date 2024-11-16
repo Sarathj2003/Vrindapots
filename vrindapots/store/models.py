@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from authentication.models import Profile
 from django.utils import timezone
 from decimal import Decimal
+import random
 # Create your models here.
 
 # Categories of products
@@ -126,24 +127,31 @@ class Order(models.Model):
         ('PayPal', 'PayPal'),
         ('Credit Card', 'Credit Card (Stripe)'),
     ]
-
+    
+    # Order fields (same as before)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
     order_date = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
     payment_method = models.CharField(max_length=50, choices=PAYMENT_CHOICES, default='COD')
-    is_paid = models.BooleanField(default=False)  
-
+    is_paid = models.BooleanField(default=False)
+    
     shipping_address = models.TextField(null=True, blank=True)
     shipping_pincode = models.CharField(max_length=6, null=True, blank=True)
     shipping_phone_number = models.CharField(max_length=15, null=True, blank=True)
     shipping_state = models.CharField(max_length=50, null=True, blank=True)
 
+    # Custom ID generation method
+    def save(self, *args, **kwargs):
+        if not self.id:
+            # This is where you generate the custom 8-digit ID
+            self.id = str(random.randint(10000000, 99999999))
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"Order {self.id} by {self.user.username}"
 
     def calculate_total_price(self):
-        
         self.total_price = sum(item.subtotal for item in self.order_items.all())
         self.save()
 

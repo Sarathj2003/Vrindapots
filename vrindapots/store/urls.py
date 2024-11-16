@@ -27,4 +27,5 @@ urlpatterns = [
     path('order/cancel/<int:order_id>/', views.cancel_order, name='cancel_order'),
  
     
+    
 ] 
