@@ -213,14 +213,32 @@ def admin_order_list(request):
 def admin_order_details(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     order_items = []
+
     for item in order.order_items.all():
         item.subtotal = item.product.new_price * item.quantity
         order_items.append(item)
-    
+
+    if request.method == "POST":
+        new_status = request.POST.get("status")
+        if new_status and new_status != order.status:
+            order.status = new_status
+            order.save()
+            messages.success(request, "Order status updated successfully!")
+        else:
+            messages.error(request, "Invalid status selected.")
+        return redirect("admin_order_details", order_id=order.id)
+
+    # Exclude the current status from the dropdown
+    status_choices = [
+        (choice[0], choice[1]) for choice in Order.STATUS_CHOICES if choice[0] != order.status and choice[0] != 'Cancelled'
+    ]
+
     return render(request, 'admin_templates/admin_order_details.html', {
         'order': order,
-        'order_items': order_items
+        'order_items': order_items,
+        'status_choices': status_choices,
     })
+
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='custom_admin_login')
@@ -239,3 +257,7 @@ def admin_order_cancel(request, order_id):
             messages.error(request, f"Order #{order.id} cannot be cancelled.")
 
     return redirect('admin_order_details', order_id=order.id)
+
+
+
+    

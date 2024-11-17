@@ -4,6 +4,7 @@ from authentication.models import Profile
 from django.utils import timezone
 from decimal import Decimal
 import random
+from datetime import timedelta
 # Create your models here.
 
 # Categories of products
@@ -140,13 +141,18 @@ class Order(models.Model):
     shipping_pincode = models.CharField(max_length=6, null=True, blank=True)
     shipping_phone_number = models.CharField(max_length=15, null=True, blank=True)
     shipping_state = models.CharField(max_length=50, null=True, blank=True)
+    delivery_date = models.DateTimeField(null=True, blank=True)
 
     # Custom ID generation method
     def save(self, *args, **kwargs):
         if not self.id:
-            # This is where you generate the custom 8-digit ID
             self.id = str(random.randint(10000000, 99999999))
+        
         super().save(*args, **kwargs)
+
+        if not self.delivery_date and self.order_date:
+            self.delivery_date = self.order_date + timedelta(days=7)
+            super().save(update_fields=['delivery_date'])
 
     def __str__(self):
         return f"Order {self.id} by {self.user.username}"

@@ -28,10 +28,21 @@
                         <a href="{% url 'order_detail' order.id %}">
                             <div class="order-card">
                                 <h5>Order #{{ order.id }}</h5>
-                                <p><strong>Order Date:</strong> {{ order.order_date }}</p>
+                                <p><strong>Order Date:</strong> {{ order.order_date|date:"F j, Y" }}</p>
                                 <p><strong>Total Price:</strong> ₹{{ order.total_price }}</p>
                                 <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
-                                <p><strong>Status:</strong> {{ order.status }}</p>
+                                <p><strong>Status:</strong>
+                                    {% if order.status == 'Pending' %}
+                                        <span style="color: green;">Delivery on {{ order.delivery_date|date:"F j, Y" }}</span>
+                                    {% elif order.status == 'Cancelled' %}
+                                        <span style="color: red;">{{ order.status }}</span>
+                                    {% elif order.status == 'Delivered' %}
+                                        <span style="color: green;">{{ order.status }} on {{ order.delivery_date|date:"F j, Y" }}</span>
+                                    {% else %}
+                                        {{ order.status }}
+                                    {% endif %} 
+                                     
+                                </p>
         
                                 <!-- Additional order details can be placed here -->
                             </div>

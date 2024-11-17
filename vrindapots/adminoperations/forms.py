@@ -1,5 +1,5 @@
 from django import forms
-from store.models import Category,Product
+from store.models import Category,Product,Order
 from django.core.exceptions import ValidationError
 
 class CategoryForm(forms.ModelForm):
@@ -36,4 +36,16 @@ class ProductForm(forms.ModelForm):
         return cleaned_data
 
     
+class OrderStatusForm(forms.ModelForm):
+    class Meta:
+        model = Order
+        fields = ['status']  # Include only the status field or others as needed.
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        current_status = self.instance.status
+        # Exclude the current status from the choices
+        self.fields['status'].choices = [
+            (key, value) for key, value in self.fields['status'].choices
+            if key != current_status
+        ]

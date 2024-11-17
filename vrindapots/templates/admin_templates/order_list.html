@@ -25,10 +25,20 @@
                 <tr>
                     <td>{{ order.id }}</td>
                     <td>{{ order.user.get_full_name }}</td>  <!-- You can use `get_full_name` or any custom field if you prefer -->
-                    <td>{{ order.order_date }}</td>
+                    <td>{{ order.order_date|date:"F j, Y" }}</td>
                     <td>₹{{ order.total_price }}</td>
                     <td>{{ order.payment_method }}</td>
-                    <td>{{ order.status }}</td>
+                    <td>
+                        {% if order.status == 'Pending' %}
+                            <span style="color: rgb(0, 0, 0);">{{ order.status }}</span>
+                        {% elif order.status == 'Cancelled' %}
+                            <span style="color: red;">{{ order.status }}</span>
+                        {% elif order.status == 'Delivered' %}
+                            <span style="color: green;">{{ order.status }}</span>
+                        {% else %}
+                            {{ order.status }}
+                        {% endif %} 
+                    </td>
                     <td>
                         <a href="{% url 'admin_order_details' order.id %}" class="btn btn-primary">View Details</a>
                     </td>

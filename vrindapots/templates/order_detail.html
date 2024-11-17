@@ -22,8 +22,18 @@
             <!-- Order Information -->
             <p><strong>Order Date:</strong> {{ order.order_date }}</p>
             <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
-            <p><strong>Status:</strong> {{ order.status }}</p>
-            <p><strong>Total Price:</strong> ${{ total_cost }}</p>
+            <p><strong>Status:</strong> 
+            {% if order.status == 'Pending' %}
+                <span style="color: green;">Delivery on {{ order.delivery_date|date:"F j, Y" }}</span>
+            {% elif order.status == 'Cancelled' %}
+                <span style="color: red;">{{ order.status }}</span>
+            {% elif order.status == 'Delivered' %}
+                <span style="color: green;">{{ order.status }} on {{ order.delivery_date|date:"F j, Y" }}</span>
+            {% else %}
+                {{ order.status }}
+            {% endif %}
+            </p>
+            <p><strong>Total Price:</strong> ₹{{ total_cost }}</p>
         
             <div class="order-items">
                 <h5>Order Items:</h5>
@@ -37,8 +47,8 @@
                             <div class="col-md-6">
                                 <p><strong>Product:</strong> {{ item.product.name }}</p>
                                 <p><strong>Quantity:</strong> {{ item.quantity }}</p>
-                                <p><strong>Price:</strong> ${{ item.price }}</p>
-                                <p><strong>Subtotal:</strong> ${{ item.subtotal }}</p>
+                                <p><strong>Price:</strong> ₹{{ item.price }}</p>
+                                <p><strong>Subtotal:</strong> ₹{{ item.subtotal }}</p>
                             </div>
                         </div>
                         <hr>
@@ -46,13 +56,15 @@
             </div>
         
             <!-- Cancel Order Button (if applicable) -->
-            {% if order.status != 'Cancelled' %}
+            {% if order.status != 'Cancelled' and order.status != 'Delivered'%}
                 <form method="POST" action="{% url 'cancel_order' order.id %}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger">Cancel Order</button>
                 </form>
-            {% else %}
+            {% elif order.status == 'Cancelled' %}
                 <p>Your order has been cancelled.</p>
+            {% else %}
+                <p>Your order has been Delivered.</p>
             {% endif %}
         </div>
         

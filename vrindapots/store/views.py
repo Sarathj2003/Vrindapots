@@ -427,6 +427,7 @@ def place_order(request):
             item.product.stock -= item.quantity
             item.product.save()
         cart_items.delete()
+        delivery_date = order.delivery_date
         messages.success(request, "Order placed successfully!")
         return redirect('home')
     else:

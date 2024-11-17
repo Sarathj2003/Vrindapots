@@ -9,10 +9,20 @@
     <h4>Order Details - #{{ order.id }}</h4>
 
     <div class="order-info">
-        <p><strong>Order Date:</strong> {{ order.order_date }}</p>
+        <p><strong>Order Date:</strong> {{ order.order_date|date:"F j, Y" }}</p>
         <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
-        <p><strong>Total Price:</strong> ${{ order.total_price }}</p>
-        <p><strong>Status:</strong> {{ order.status }}</p>
+        <p><strong>Total Price:</strong> ₹{{ order.total_price }}</p>
+        <p><strong>Status:</strong> 
+            {% if order.status == 'Pending' %}
+                <span style="color: green;">Delivery on {{ order.delivery_date|date:"F j, Y" }}</span>
+            {% elif order.status == 'Cancelled' %}
+                <span style="color: red;">{{ order.status }}</span>
+            {% elif order.status == 'Delivered' %}
+                <span style="color: green;">{{ order.status }} on {{ order.delivery_date|date:"F j, Y" }}</span>
+            {% else %}
+                {{ order.status }}
+            {% endif %}
+        </p>
         <p><strong>Shipping Address:</strong> {{ order.shipping_address }}</p>
     </div>
 
@@ -22,8 +32,9 @@
             <tr>
                 <th>Product</th>
                 <th>Quantity</th>
-                <th>Subtotal</th>
                 <th>Price</th>
+                <th>Subtotal</th>
+                
             </tr>
         </thead>
         <tbody>
@@ -34,18 +45,34 @@
                         {{ item.product.name }}
                     </td>
                     <td>{{ item.quantity }}</td>
-                    <td>${{ item.product.new_price }}</td>
-                    <td>${{ item.subtotal }}</td>
+                    <td>₹{{ item.product.new_price }}</td>
+                    <td>₹{{ item.subtotal }}</td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
 
     <!-- Add action buttons based on the order status -->
-    {% if order.status == 'Pending' %}
+    {% if order.status != 'Cancelled' and order.status != 'Delivered' %}
+    <h5>Change order status</h5>
+    <form method="POST">
+        {% csrf_token %}
+        
+        <select name="status" id="status">
+            <option value="" disabled selected> Change </option>
+            {% for status, display in status_choices %}
+                <option value="{{ status }}">{{ display }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <button type="submit" class="btn btn-success" style="margin-top: 10px;">Update Status</button>
+    </form>
+    {% endif %}
+
+    {% if  order.status != 'Delivered' %}
         <form method="POST" action="{% url 'admin_order_cancel' order.id %}">
             {% csrf_token %}
-            <button type="submit" class="btn btn-danger">Cancel Order</button>
+            <button type="submit" class="btn btn-danger" style="margin-top: 10px;">Cancel Order</button>
         </form>
     {% endif %}
 </div>
