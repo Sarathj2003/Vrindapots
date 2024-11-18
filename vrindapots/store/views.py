@@ -379,7 +379,7 @@ def checkout(request):
                 messages.warning(request, f"'{item.product.name}' is out of stock! Please remove the item from your cart to proceed.")
             else:
                 messages.warning(request, f"Only {item.product.stock} units of '{item.product.name}' available! Please update your cart to proceed.")
-            return redirect('cart_detail')
+            return redirect('checkout_page')
 
     total_cost = 0
     for item in cart_items:
@@ -392,8 +392,10 @@ def checkout(request):
     if coupon_code:
         try:
             coupon = Coupon.objects.get(code=coupon_code, is_active=True, start_date__lte=timezone.now(), end_date__gte=timezone.now())
-            
-            # Apply coupon without minimum order amount check
+            usage_count = CouponUsage.objects.filter(coupon=coupon, user=request.user).count()
+            if coupon.per_user_limit is not None and usage_count >= coupon.per_user_limit:
+                messages.error(request, "You have already used this coupon.")
+                return redirect('cart_detail')
             if coupon.discount_type == 'percentage':
                 discount = (total_cost * coupon.discount_value) / 100
             else:
@@ -493,6 +495,13 @@ def place_order(request):
             coupon=coupon,
             discount_amount=discount  
             )
+        
+        if coupon:
+            CouponUsage.objects.create(
+                coupon=coupon,
+                user=request.user,
+                order=order
+            )
         try:
             del request.session['applied_coupon']
             del request.session['discount']
@@ -588,10 +597,13 @@ def order_detail(request, order_id):
     order_items = OrderItem.objects.filter(order=order)
     for item in order_items:
         item.subtotal = item.quantity * item.price
-    total_cost = order.total_price
+    final_price = order.total_price
+    
     discount_amount = order.discount_amount
-    final_price = total_cost 
-    total_cost = total_cost +discount_amount
+    total_cost=0
+    for item in order_items:
+        total_cost += item.price * item.quantity
+    
     return render(request, 'order_detail.html', {
         'order': order,
         'order_items': order_items,
