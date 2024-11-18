@@ -158,7 +158,7 @@ class Order(models.Model):
     shipping_phone_number = models.CharField(max_length=15, null=True, blank=True)
     shipping_state = models.CharField(max_length=50, null=True, blank=True)
     delivery_date = models.DateTimeField(null=True, blank=True)
-    
+
     coupon_applied = models.BooleanField(default=False)
     coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null=True, blank=True)
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
@@ -178,9 +178,7 @@ class Order(models.Model):
     def __str__(self):
         return f"Order {self.id} by {self.user.username}"
 
-    def calculate_total_price(self):
-        self.total_price = sum(item.subtotal for item in self.order_items.all())
-        self.save()
+    
 
     def apply_coupon(self):
         """Applies the coupon and calculates the discount."""
@@ -212,7 +210,7 @@ class OrderItem(models.Model):
         
         self.subtotal = self.quantity * self.price
         super().save(*args, **kwargs)
-        self.order.calculate_total_price()
+        
 
 
 class Payment(models.Model):

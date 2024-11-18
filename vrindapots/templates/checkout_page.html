@@ -210,12 +210,12 @@
                                 <div class="card">
                                     <div class="card-header" id="heading-1">
                                         <h2 class="card-title">
-                                            <a role="button" data-toggle="collapse" href="#collapse-1" aria-expanded="true" aria-controls="collapse-1">
+                                            <a class="collapsed" role="button" data-toggle="collapse" href="#collapse-1" aria-expanded="true" aria-controls="collapse-1">
                                                 Direct bank transfer
                                             </a>
                                         </h2>
                                     </div>
-                                    <div id="collapse-1" class="collapse show" aria-labelledby="heading-1" data-parent="#accordion-payment">
+                                    <div id="collapse-1" class="collapse " aria-labelledby="heading-1" data-parent="#accordion-payment">
                                         <div class="card-body">
                                             Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order will not be shipped until the funds have cleared in our account.
                                         </div>
@@ -226,12 +226,12 @@
                                 <div class="card">
                                     <div class="card-header" id="heading-3">
                                         <h2 class="card-title">
-                                            <a class="collapsed" role="button" data-toggle="collapse" href="#collapse-3" aria-expanded="false" aria-controls="collapse-3">
+                                            <a  role="button" data-toggle="collapse" href="#collapse-3" aria-expanded="false" aria-controls="collapse-3">
                                                 Cash on delivery
                                             </a>
                                         </h2>
                                     </div>
-                                    <div id="collapse-3" class="collapse" aria-labelledby="heading-3" data-parent="#accordion-payment">
+                                    <div id="collapse-3" class="collapse show" aria-labelledby="heading-3" data-parent="#accordion-payment">
                                         <div class="card-body">
                                             You can choose Cash on Delivery (COD) to pay for your plants at the time they arrive. This way, you only pay when your order is delivered to your doorstep!
                                         </div>
@@ -272,7 +272,7 @@
                             </div>
                         
                             <!-- Hidden field for payment method -->
-                            <input type="hidden" name="payment_method" value="COD"> <!-- Default value -->
+                            <input type="hidden" name="payment_method" id="payment_method" value="COD"> <!-- Default value -->
                         
                             <!-- Place Order Button -->
                             <button type="submit" class="btn btn-outline-primary-2 btn-order btn-block">
@@ -334,4 +334,25 @@
 
 </main><!-- End .main -->
 
+<script>
+    
+    document.querySelectorAll('.card-header a').forEach(function (el) {
+        el.addEventListener('click', function () {
+            let selectedMethod = this.innerText.trim();
+            let paymentMethod = '';
+            
+            if (selectedMethod === 'Direct bank transfer') {
+                paymentMethod = 'Bank Transfer';
+            } else if (selectedMethod === 'Cash on delivery') {
+                paymentMethod = 'COD';
+            } else if (selectedMethod === 'PayPal') {
+                paymentMethod = 'PayPal';
+            } else if (selectedMethod === 'Credit Card (Stripe)') {
+                paymentMethod = 'Credit Card';
+            }
+
+            document.getElementById('payment_method').value = paymentMethod;
+        });
+    });
+</script>
 {% endblock %}

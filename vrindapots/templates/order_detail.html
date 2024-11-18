@@ -34,6 +34,14 @@
             {% endif %}
             </p>
             <p><strong>Total Price:</strong> ₹{{ total_cost }}</p>
+            <p><strong>Coupon discount:</strong> 
+                {% if discount_amount == 0 %}
+                    None
+                {% else %}
+                    -₹{{ discount_amount }}
+                {% endif %}
+            </p>
+            <p><strong>Final Price:</strong> ₹{{ final_price }}</p>
         
             <div class="order-items">
                 <h5>Order Items:</h5>
