@@ -400,7 +400,14 @@ def place_order(request):
         cart_items = CartItem.objects.filter(cart=cart, quantity__gt=0)
         if not cart_items:
             messages.error(request, "Your cart is empty.")
-            return redirect("cart")
+            return redirect('cart_detail')
+        for item in cart_items:
+            if item.quantity > item.product.stock:
+                if item.product.stock == 0:
+                    messages.warning(request, f"'{item.product.name}' is out of stock! Please remove the item from your cart to proceed.")
+                else:
+                    messages.warning(request, f"Only {item.product.stock} units of '{item.product.name}' available! Please update your cart to proceed.")
+                return redirect('cart_detail')
         total_cost = sum(item.product.new_price * item.quantity for item in cart_items)
         shipping_address = profile.address
         shipping_pincode = profile.pincode
@@ -428,8 +435,7 @@ def place_order(request):
             item.product.save()
         cart_items.delete()
         delivery_date = order.delivery_date
-        messages.success(request, "Order placed successfully!")
-        return redirect('home')
+        return redirect('order_success', order_id=order.id)
     else:
         return redirect("checkout_page")
 
@@ -467,3 +473,12 @@ def cancel_order(request, order_id):
             item.product.save()
         messages.success(request, "Order cancelled!")
     return redirect('my_orders')
+
+
+def order_success(request,order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    order_items = order.order_items.all()
+    return render(request, 'order_success_page.html',{
+        'order': order,
+        'order_items': order_items
+    })
