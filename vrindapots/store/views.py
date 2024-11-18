@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from django.shortcuts import get_object_or_404
-from .models import Category,Product,Tag,Banner,Review,Wishlist,Cart,CartItem,OrderItem,Order
+from .models import Category,Product,Tag,Banner,Review,Wishlist,Cart,CartItem,OrderItem,Order,Coupon,CouponUsage
 from authentication.models import Profile,User
 from django.db.models import F, ExpressionWrapper, FloatField, Avg, Count, Q, Value
 from django.views.decorators.cache import cache_control
@@ -11,6 +11,8 @@ from django.contrib import messages
 from django.http import Http404
 from decimal import Decimal
 from django.db import transaction
+from django.utils import timezone
+import math
 # Create your views here.
 
 
@@ -379,14 +381,57 @@ def checkout(request):
     for item in cart_items:
         item.subtotal = item.product.new_price * item.quantity
         total_cost += item.subtotal
+
+    subtotal_cost=total_cost
+
+    coupon_code = request.POST.get('coupon_code', None)
+    if coupon_code:
+        try:
+            coupon = Coupon.objects.get(code=coupon_code, is_active=True, start_date__lte=timezone.now(), end_date__gte=timezone.now())
+            
+            # Apply coupon without minimum order amount check
+            if coupon.discount_type == 'percentage':
+                discount = (total_cost * coupon.discount_value) / 100
+            else:
+                discount = coupon.discount_value
+            
+            total_cost -= discount
+            
+            
+            # Store applied coupon and discount as floats in the session
+            request.session['coupon_discount_type'] = coupon.discount_type
+            request.session['discount_value'] = float(coupon.discount_value)
+            request.session['applied_coupon'] = coupon_code  # Store applied coupon code
+            request.session['discount'] = float(discount)  # Convert discount to float and store it
+            request.session['total_cost'] = float(total_cost)  # Convert total cost to float and store it
+            messages.success(request, f"Coupon '{coupon_code}' applied successfully!")
+        except Coupon.DoesNotExist:
+            messages.error(request, "Invalid or expired coupon code.")
+        
+    # Handle coupon removal
+    remove_coupon = request.POST.get('remove_coupon', None)
+    if remove_coupon and 'applied_coupon' in request.session:
+        # Revert discount properly
+        discount = request.session.get('discount', 0)
+        if isinstance(discount, float):  # If discount is float, convert it
+            discount = Decimal(discount)
+        total_cost += discount  # Revert the discount
+        del request.session['applied_coupon']  # Remove the coupon from session
+        del request.session['discount']  # Remove the discount from session
+        messages.success(request, "Coupon removed successfully!")
+        return redirect('checkout_page')
+
+
     request.session['previous_page'] = request.get_full_path()
     
     return render(request, 'checkout_page.html', {
         'full_name': full_name,
         'profile': profile,
         'cart_items': cart_items,
-        'total_cost': total_cost,
+        'total_cost': math.ceil(total_cost),
+        'subtotal_cost': subtotal_cost,
         'profiles': profiles,
+        'applied_coupon': request.session.get('applied_coupon', None),
     })
 
 
@@ -408,7 +453,13 @@ def place_order(request):
                 else:
                     messages.warning(request, f"Only {item.product.stock} units of '{item.product.name}' available! Please update your cart to proceed.")
                 return redirect('cart_detail')
-        total_cost = sum(item.product.new_price * item.quantity for item in cart_items)
+        
+        
+        total_cost = Decimal(0)
+        for item in cart_items:
+            total_cost += item.product.new_price * item.quantity
+
+
         shipping_address = profile.address
         shipping_pincode = profile.pincode
         shipping_phone_number = profile.phone_number

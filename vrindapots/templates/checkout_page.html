@@ -27,7 +27,7 @@
             
 
             <div class="row">
-                <div class="col-lg-9">
+                <div class="col-lg-8">
                     <h2 class="checkout-title ">Billing Details</h2>
                 
                     <!-- Billing Card -->
@@ -133,7 +133,7 @@
                 
                 
                 
-                <aside class="col-lg-3">
+                <aside class="col-lg-4">
                     <div class="summary">
                         <h3 class="summary-title">Your Order</h3><!-- End .summary-title -->
 
@@ -155,8 +155,42 @@
                                 
                                 <tr class="summary-subtotal">
                                     <td>Subtotal:</td>
-                                    <td>₹{{ total_cost }}</td>
-                                </tr><!-- End .summary-subtotal -->
+                                    <td>₹{{ subtotal_cost }}</td>
+                                </tr>
+                                {% if applied_coupon %}
+                                    <tr class="">
+                                        <td>Coupon applied:</td>
+                                        <td>{{ applied_coupon }}</td>
+                                    </tr>
+                                    <tr class="">
+                                        <td>Discount:</td>
+                                        <td>
+                                            {% if request.session.coupon_discount_type == 'percentage' %}
+                                                -{{ request.session.discount_value }}% <!-- Display percentage -->
+                                            {% else %}
+                                                -₹{{ request.session.discount }} <!-- Display amount -->
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr class="summary-subtotal">
+                                        <td>Final Price:</td>
+                                        <td>₹{{ total_cost }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <form method="POST">
+                                                {% csrf_token %}
+                                                <button type="submit" name="remove_coupon" value="true" class="btn btn-danger" style="height: 30px;padding: 1px;">Remove Coupon</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td>No coupon applied.</td>
+                                        <td></td>
+                                    </tr>
+                                {% endif %}
+
                                 <tr>
                                     <td>Shipping:</td>
                                     <td>Free shipping</td>
@@ -248,9 +282,10 @@
                         </form>
                     </div><!-- End .summary -->
                     <div class="checkout-discount">
-                        <form action="#">
-                            <input type="text" class="form-control" required id="checkout-discount-input">
-                            <label for="checkout-discount-input" class="text-truncate">Have a coupon? <span>Click here to enter your code</span></label>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input type="text" class="form-control" required id="coupon_code" name="coupon_code" placeholder="Have a coupon? Click here to enter your code">
+                            <!-- <label for="checkout-discount-input" class="text-truncate">Have a coupon? <span>Click here to enter your code</span></label> -->
                         </form>
                     </div><!-- End .checkout-discount -->
                 </aside><!-- End .col-lg-3 -->

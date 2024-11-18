@@ -113,6 +113,22 @@ class CartItem(models.Model):
     def __str__(self):
         return f"{self.quantity} x {self.product.name}"
 
+class Coupon(models.Model):
+    code = models.CharField(max_length=50, unique=True)  # Unique coupon code
+    discount_type = models.CharField(
+        max_length=10,
+        choices=[('percentage', 'Percentage'), ('flat', 'Flat')],
+        default='percentage'
+    )
+    discount_value = models.DecimalField(max_digits=10, decimal_places=2)  # E.g., 10% or ₹100
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    usage_limit = models.PositiveIntegerField(null=True, blank=True)  # Limit for total use
+    per_user_limit = models.PositiveIntegerField(null=True, blank=True)  # Limit per user
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.code
 
 class Order(models.Model):
     STATUS_CHOICES = [
@@ -142,6 +158,11 @@ class Order(models.Model):
     shipping_phone_number = models.CharField(max_length=15, null=True, blank=True)
     shipping_state = models.CharField(max_length=50, null=True, blank=True)
     delivery_date = models.DateTimeField(null=True, blank=True)
+    
+    coupon_applied = models.BooleanField(default=False)
+    coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null=True, blank=True)
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    
 
     # Custom ID generation method
     def save(self, *args, **kwargs):
@@ -160,6 +181,21 @@ class Order(models.Model):
     def calculate_total_price(self):
         self.total_price = sum(item.subtotal for item in self.order_items.all())
         self.save()
+
+    def apply_coupon(self):
+        """Applies the coupon and calculates the discount."""
+        if self.coupon:
+            if self.coupon.discount_type == 'percentage':
+                self.discount_amount = (self.total_price * self.coupon.discount_value) / 100
+            elif self.coupon.discount_type == 'flat':
+                self.discount_amount = self.coupon.discount_value
+
+            self.final_price = max(self.total_price - self.discount_amount, Decimal('0.00'))
+        else:
+            self.discount_amount = Decimal('0.00')
+            self.final_price = self.total_price
+
+        self.save(update_fields=['discount_amount', 'final_price'])
 
 
 class OrderItem(models.Model):
@@ -188,3 +224,16 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"Payment for Order {self.order.id} - {self.amount} {self.payment_method}"
+
+
+
+    
+
+class CouponUsage(models.Model):
+    coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    used_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.coupon.code} used by {self.user.username}"
