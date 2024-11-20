@@ -11,6 +11,7 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
+                    <th>Id</th>
                     <th>Name</th>
                     <th>Status</th>
                     <th>Stock</th>
@@ -20,6 +21,7 @@
             <tbody>
                 {% for product in products %}
                 <tr>
+                    <td>{{ product.id }}</td>
                     <td>{{ product.name }}</td>
                     <td>
                         {% if product.is_deleted %}

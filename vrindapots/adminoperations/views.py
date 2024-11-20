@@ -5,8 +5,8 @@ from django.views.decorators.cache import cache_control
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from authentication.models import Profile
-from store.models import Category,Product, Order,OrderItem
-from .forms import CategoryForm, ProductForm
+from store.models import Category,Product, Order,OrderItem,Coupon
+from .forms import CategoryForm, ProductForm, CouponForm
 from django.db import transaction
 
 # Create your views here.
@@ -51,7 +51,7 @@ def admin_home(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='custom_admin_login')
 def user_list(request):
-    users = User.objects.all()
+    users = User.objects.exclude(is_staff=True).order_by('id')
     return render(request, 'admin_templates/user_list.html', {'users': users})
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -133,7 +133,7 @@ def edit_category(request, category_id):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='custom_admin_login')
 def product_list(request):
-    products = Product.objects.all()  
+    products = Product.objects.all().order_by('id')  
     return render(request, 'admin_templates/product_list.html', {'products': products})
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -228,7 +228,7 @@ def admin_order_details(request, order_id):
             messages.error(request, "Invalid status selected.")
         return redirect("admin_order_details", order_id=order.id)
 
-    # Exclude the current status from the dropdown
+    
     status_choices = [
         (choice[0], choice[1]) for choice in Order.STATUS_CHOICES if choice[0] != order.status and choice[0] != 'Cancelled'
     ]
@@ -259,5 +259,50 @@ def admin_order_cancel(request, order_id):
     return redirect('admin_order_details', order_id=order.id)
 
 
+def coupon_list_page(request):
+    coupons = Coupon.objects.all().order_by('id')
 
+    return render(request,'admin_templates/coupon_list.html',{
+        'coupons': coupons,
+    })
+
+
+def add_coupon(request):
+    if request.method == "POST":
+        form = CouponForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Coupon added successfully!")
+            return redirect('coupon_list_page') 
+        else:
+            messages.error(request, "There was an error adding the coupon. Please check the form.")
+    else:
+        form = CouponForm()
     
+    
+    return render(request, 'admin_templates/add_coupon.html', {
+        'form': form
+    })
+
+
+def edit_coupon(request, coupon_id):
+    coupon = get_object_or_404(Coupon, id=coupon_id)
+
+    if request.method == 'POST':
+        form = CouponForm(request.POST, instance=coupon)
+        if form.is_valid():
+            form.save() 
+            messages.success(request, 'Coupon updated successfully!')
+            return redirect('coupon_list_page')  
+        else:
+            messages.error(request, 'Error updating coupon. Please check the form and try again.')
+    else:
+        form = CouponForm(instance=coupon)  
+
+    return render(request, 'admin_templates/edit_coupon.html', {'form': form, 'coupon': coupon})
+
+def delete_coupon(request, coupon_id):
+    coupon = get_object_or_404(Coupon, id=coupon_id)
+    coupon.delete()
+    messages.success(request, "Coupon deleted successfully.")
+    return redirect('coupon_list_page') 

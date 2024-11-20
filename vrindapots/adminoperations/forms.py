@@ -1,6 +1,8 @@
+import re
 from django import forms
-from store.models import Category,Product,Order
+from store.models import Category,Product,Order,Coupon
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 class CategoryForm(forms.ModelForm):
     class Meta:
@@ -39,13 +41,59 @@ class ProductForm(forms.ModelForm):
 class OrderStatusForm(forms.ModelForm):
     class Meta:
         model = Order
-        fields = ['status']  # Include only the status field or others as needed.
+        fields = ['status']  
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         current_status = self.instance.status
-        # Exclude the current status from the choices
+        
         self.fields['status'].choices = [
             (key, value) for key, value in self.fields['status'].choices
             if key != current_status
         ]
+
+class CouponForm(forms.ModelForm):
+    class Meta:
+        model = Coupon
+        fields = ['code', 'discount_type', 'discount_value', 'start_date', 'end_date', 'per_user_limit', 'is_active']
+        widgets = {
+            'start_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'end_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        }
+
+    def clean_code(self):
+        code = self.cleaned_data.get('code')
+        if len(code) < 3 or len(code) > 6:
+            raise ValidationError('Coupon code must be between 3 to 6 characters.')
+        if not re.match(r'^[a-zA-Z0-9]*$', code):
+            raise ValidationError('Coupon code must only contain alphabets and numbers.')
+        return code
+
+    def clean_discount_value(self):
+        discount_value = self.cleaned_data.get('discount_value')
+        if discount_value < 0:
+            raise ValidationError('Discount value cannot be negative.')
+        discount_type = self.cleaned_data.get('discount_type')
+        if discount_type == 'percentage' and (discount_value <= 0 or discount_value > 100):
+            raise ValidationError('For percentage discount, value must be between 1 and 100.')
+        return discount_value
+
+    def clean_start_date(self):
+        start_date = self.cleaned_data.get('start_date')
+        if start_date < timezone.now():
+            raise ValidationError('Start date cannot be in the past.')
+        return start_date
+
+    def clean_end_date(self):
+        end_date = self.cleaned_data.get('end_date')
+        if end_date < timezone.now():
+            raise ValidationError('End date cannot be in the past.')
+        if end_date < self.cleaned_data.get('start_date'):
+            raise ValidationError('End date cannot be before the start date.')
+        return end_date
+
+    def clean_per_user_limit(self):
+        per_user_limit = self.cleaned_data.get('per_user_limit')
+        if per_user_limit < 1:
+            raise ValidationError('Per user limit must be at least 1.')
+        return per_user_limit

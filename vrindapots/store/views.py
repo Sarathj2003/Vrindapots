@@ -274,21 +274,9 @@ def wishlist(request):
 def cart_detail(request):
     cart, _ = Cart.objects.get_or_create(user=request.user)
     cart_items = CartItem.objects.filter(cart=cart).order_by('id')
-    total_cost = Decimal(0)  
-    # cart_updated = False  
+    total_cost = Decimal(0)    
     print(cart_items)
     for item in cart_items:
-        # if item.quantity > item.product.stock:
-        #     if item.product.stock == 0:
-        #         messages.warning(request, f"'{item.product.name}' is out of stock! Please remove the item from your cart to proceed.")
-        #     else:
-        #         messages.warning(request, f"Only {item.product.stock} units of '{item.product.name}' available! Please update your cart to proceed.")
-            
-            
-            # item.quantity = item.product.stock
-            # item.save()
-            # cart_updated = True  
-            # messages.warning(request, f"The quantity of '{item.product.name}' has been adjusted to {item.product.stock} due to limited stock.")
                 
         item.subtotal = item.product.new_price * item.quantity  
         total_cost += item.subtotal  
@@ -349,8 +337,7 @@ def update_cart_item_quantity(request, item_id):
     cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
     product = cart_item.product 
     new_quantity = int(request.POST.get("quantity", cart_item.quantity))
-    # if new_quantity > product.stock:
-    #     messages.error(request, f"Only {product.stock} units available in stock.")
+    
 
     if new_quantity < 1:
         messages.error(request, "Quantity must be at least 1.")
@@ -403,28 +390,24 @@ def checkout(request):
             
             total_cost -= discount
             
-            
-            
-            # Store applied coupon and discount as floats in the session
             request.session['coupon_discount_type'] = coupon.discount_type
             request.session['discount_value'] = float(coupon.discount_value)
-            request.session['applied_coupon'] = coupon_code  # Store applied coupon code
-            request.session['discount'] = float(discount)  # Convert discount to float and store it
-            request.session['total_cost'] = math.ceil(total_cost)  # Convert total cost to float and store it
+            request.session['applied_coupon'] = coupon_code 
+            request.session['discount'] = float(discount)  
+            request.session['total_cost'] = math.ceil(total_cost)  
             messages.success(request, f"Coupon '{coupon_code}' applied successfully!")
         except Coupon.DoesNotExist:
             messages.error(request, "Invalid or expired coupon code.")
         
-    # Handle coupon removal
+    
     remove_coupon = request.POST.get('remove_coupon', None)
     if remove_coupon and 'applied_coupon' in request.session:
-        # Revert discount properly
         discount = request.session.get('discount', 0)
-        if isinstance(discount, float):  # If discount is float, convert it
+        if isinstance(discount, float):  
             discount = Decimal(discount)
-        total_cost += discount  # Revert the discount
-        del request.session['applied_coupon']  # Remove the coupon from session
-        del request.session['discount']  # Remove the discount from session
+        total_cost += discount  
+        del request.session['applied_coupon']  
+        del request.session['discount']  
         del request.session['total_cost']
         messages.success(request, "Coupon removed successfully!")
         return redirect('checkout_page')
@@ -443,7 +426,8 @@ def checkout(request):
     })
 
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def place_order(request):
     if request.method == "POST":
         payment_method = request.POST.get('payment_method', 'COD')
@@ -528,60 +512,7 @@ def place_order(request):
 
 
 
-# @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-# @login_required(login_url='user_login')
-# @transaction.atomic
-# def place_order(request):
-#     if request.method == "POST":
-#         profile = get_object_or_404(Profile, user=request.user, is_current=True)
-#         cart, _ = Cart.objects.get_or_create(user=request.user)
-#         cart_items = CartItem.objects.filter(cart=cart, quantity__gt=0)
-#         if not cart_items:
-#             messages.error(request, "Your cart is empty.")
-#             return redirect('cart_detail')
-#         for item in cart_items:
-#             if item.quantity > item.product.stock:
-#                 if item.product.stock == 0:
-#                     messages.warning(request, f"'{item.product.name}' is out of stock! Please remove the item from your cart to proceed.")
-#                 else:
-#                     messages.warning(request, f"Only {item.product.stock} units of '{item.product.name}' available! Please update your cart to proceed.")
-#                 return redirect('cart_detail')
-        
-        
-#         total_cost = Decimal(0)
-#         for item in cart_items:
-#             total_cost += item.product.new_price * item.quantity
 
-
-#         shipping_address = profile.address
-#         shipping_pincode = profile.pincode
-#         shipping_phone_number = profile.phone_number
-#         shipping_state = profile.state
-#         order = Order.objects.create(
-#             user=request.user,
-#             status="Pending",
-#             total_price=total_cost,
-#             payment_method="COD", 
-#             shipping_address=shipping_address,
-#             shipping_pincode=shipping_pincode,
-#             shipping_phone_number=shipping_phone_number,
-#             shipping_state=shipping_state,
-#             is_paid=False  
-#         )
-#         for item in cart_items:
-#             OrderItem.objects.create(
-#                 order=order,
-#                 product=item.product,
-#                 quantity=item.quantity,
-#                 price=item.product.new_price
-#             )
-#             item.product.stock -= item.quantity
-#             item.product.save()
-#         cart_items.delete()
-#         delivery_date = order.delivery_date
-#         return redirect('order_success', order_id=order.id)
-#     else:
-#         return redirect("checkout_page")
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)

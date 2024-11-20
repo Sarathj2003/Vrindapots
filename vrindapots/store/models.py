@@ -5,6 +5,7 @@ from django.utils import timezone
 from decimal import Decimal
 import random
 from datetime import timedelta
+from datetime import datetime
 # Create your models here.
 
 # Categories of products
@@ -114,18 +115,21 @@ class CartItem(models.Model):
         return f"{self.quantity} x {self.product.name}"
 
 class Coupon(models.Model):
-    code = models.CharField(max_length=50, unique=True)  # Unique coupon code
+    code = models.CharField(max_length=50, unique=True)  
     discount_type = models.CharField(
         max_length=10,
         choices=[('percentage', 'Percentage'), ('flat', 'Flat')],
         default='percentage'
     )
-    discount_value = models.DecimalField(max_digits=10, decimal_places=2)  # E.g., 10% or ₹100
+    discount_value = models.DecimalField(max_digits=10, decimal_places=2)  
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
-    usage_limit = models.PositiveIntegerField(null=True, blank=True)  # Limit for total use
-    per_user_limit = models.PositiveIntegerField(null=True, blank=True)  # Limit per user
+    per_user_limit = models.PositiveIntegerField(null=True, blank=True) 
     is_active = models.BooleanField(default=True)
+
+    @property
+    def is_currently_active(self):
+        return self.is_active and self.end_date > datetime.now()
 
     def __str__(self):
         return self.code
@@ -145,7 +149,7 @@ class Order(models.Model):
         ('Credit Card', 'Credit Card (Stripe)'),
     ]
     
-    # Order fields (same as before)
+    
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
     order_date = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
@@ -164,7 +168,6 @@ class Order(models.Model):
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     
 
-    # Custom ID generation method
     def save(self, *args, **kwargs):
         if not self.id:
             self.id = str(random.randint(10000000, 99999999))
@@ -181,7 +184,6 @@ class Order(models.Model):
     
 
     def apply_coupon(self):
-        """Applies the coupon and calculates the discount."""
         if self.coupon:
             if self.coupon.discount_type == 'percentage':
                 self.discount_amount = (self.total_price * self.coupon.discount_value) / 100

@@ -116,7 +116,7 @@ def account_page(request):
         user.save()
         previous_page = request.session.get('previous_page', None)
         if previous_page:
-            return redirect(previous_page)  # Redirect to the page from where the user came
+            return redirect(previous_page)  
         else:
             return redirect('account_page')  
     return render(request, 'account_page.html', {'user': user, 'profiles': profiles, 'from_checkout': from_checkout})
@@ -131,9 +131,9 @@ def edit_user_details(request, user_id):
         user.save()
         previous_page = request.session.get('previous_page', None)
         if previous_page:
-            return redirect(previous_page)  # Redirect to the page from where the user came
+            return redirect(previous_page)  
         else:
-            return redirect('account_page')    # Redirect back to the account page after saving
+            return redirect('account_page')   
 
     return render(request, 'edit_user_details.html', {'user': user})
 
@@ -147,7 +147,7 @@ def set_current_address(request, profile_id):
     profile.save()
     previous_page = request.session.get('previous_page', None)
     if previous_page:
-        return redirect(previous_page)  # Redirect to the page from where the user came
+        return redirect(previous_page)  
     else:
         return redirect('account_page')
 

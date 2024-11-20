@@ -28,4 +28,9 @@ urlpatterns = [
     path('adminhome/orders/', views.admin_order_list, name='admin_order_list'),
     path('adminhome/orders/<int:order_id>/', views.admin_order_details, name='admin_order_details'),
     path('adminhome/orders/cancel/<int:order_id>/', views.admin_order_cancel, name='admin_order_cancel'),
+
+    path('adminhome/couponlist/', views.coupon_list_page, name='coupon_list_page'),
+    path('adminhome/couponlist/add/', views.add_coupon, name='add_coupon'),
+    path('adminhome/couponlist/edit/<int:coupon_id>/',views.edit_coupon, name='edit_coupon'),
+    path('adminhome/couponlist/delete/<int:coupon_id>/', views.delete_coupon, name='delete_coupon'),
 ] 
