@@ -63,7 +63,7 @@ class CouponForm(forms.ModelForm):
 
     def clean_code(self):
         code = self.cleaned_data.get('code')
-        if len(code) < 3 or len(code) > 6:
+        if len(code) < 3 or len(code) > 10:
             raise ValidationError('Coupon code must be between 3 to 6 characters.')
         if not re.match(r'^[a-zA-Z0-9]*$', code):
             raise ValidationError('Coupon code must only contain alphabets and numbers.')
