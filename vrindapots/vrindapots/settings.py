@@ -198,3 +198,6 @@ EMAIL_HOST_PASSWORD = 'yeqb nyec pcfb wyax'
 
 
 
+RAZORPAY_API_KEY = 'rzp_test_ME972J4MUYfQv8'
+RAZORPAY_API_SECRET = '8EgLVmQD8sblZ0rplBMgRo1C'
+

@@ -1,3 +1,7 @@
+import razorpay
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 from django.shortcuts import render,redirect
 from django.shortcuts import get_object_or_404
 from .models import Category,Product,Tag,Banner,Review,Wishlist,Cart,CartItem,OrderItem,Order,Coupon,CouponUsage
@@ -16,6 +20,7 @@ import math
 # Create your views here.
 
 
+razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET))
 
 
 
@@ -465,10 +470,12 @@ def place_order(request):
         else:
             coupon_applied=False
         discount = Decimal(discount) if discount is not None else Decimal(0)
+        final_cost = math.ceil(float(total_cost) - float(discount))
+
         order = Order.objects.create(
             user=request.user,
             status="Pending",
-            total_price=math.ceil(float(total_cost)-float(discount)),
+            total_price=final_cost,
             payment_method="COD", 
             shipping_address=shipping_address,
             shipping_pincode=shipping_pincode,
@@ -504,13 +511,60 @@ def place_order(request):
             item.product.save()
         cart_items.delete()
         delivery_date = order.delivery_date
-        return redirect('order_success', order_id=order.id)
+        print(payment_method)
+        if payment_method == "COD":
+            return redirect('order_success', order_id=order.id)
+        elif payment_method == "Razorpay":
+            # Create Razorpay order
+            razorpay_order = razorpay_client.order.create({
+                "amount": int(final_cost * 100),  # Convert to paise
+                "currency": "INR",
+                "receipt": f"order_rcptid_{order.id}",
+                "payment_capture": 1,  # Auto-capture payment
+            })
+
+            # Store Razorpay order ID in order model
+            order.razorpay_order_id = razorpay_order['id']
+            order.save()
+
+            # Redirect to payment page with Razorpay details
+            return render(request, 'payment_page.html', {
+                'razorpay_order_id': razorpay_order['id'],
+                'razorpay_key': settings.RAZORPAY_API_KEY,
+                'amount': final_cost * 100,
+                'currency': "INR",
+                'order': order,
+            })
         
     else:
         return redirect("checkout_page")
 
 
+@csrf_exempt
+def verify_payment(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        payment_id = data.get('razorpay_payment_id')
+        order_id = data.get('razorpay_order_id')
+        signature = data.get('razorpay_signature')
 
+        try:
+            # Verify payment signature
+            razorpay_client.utility.verify_payment_signature({
+                'razorpay_order_id': order_id,
+                'razorpay_payment_id': payment_id,
+                'razorpay_signature': signature
+            })
+
+            # Mark order as paid
+            order = Order.objects.get(razorpay_order_id=order_id)
+            order.is_paid = True
+            order.payment_method = 'Razorpay'
+            order.save()
+
+            return JsonResponse({"success": True})
+        except razorpay.errors.SignatureVerificationError:
+            return JsonResponse({"success": False, "error": "Signature verification failed."})
 
 
 

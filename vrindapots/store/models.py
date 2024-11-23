@@ -146,7 +146,7 @@ class Order(models.Model):
         ('COD', 'Cash on Delivery'),
         ('Bank Transfer', 'Direct Bank Transfer'),
         ('PayPal', 'PayPal'),
-        ('Credit Card', 'Credit Card (Stripe)'),
+        ('Razorpay', 'Razorpay'),
     ]
     
     
@@ -167,6 +167,8 @@ class Order(models.Model):
     coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null=True, blank=True)
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     
+    razorpay_order_id = models.CharField(max_length=255, null=True, blank=True)
+    razorpay_payment_id = models.CharField(max_length=255, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.id:

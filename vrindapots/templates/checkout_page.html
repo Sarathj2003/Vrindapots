@@ -259,13 +259,13 @@
                                     <div class="card-header" id="heading-5">
                                         <h2 class="card-title">
                                             <a class="collapsed" role="button" data-toggle="collapse" href="#collapse-5" aria-expanded="false" aria-controls="collapse-5">
-                                                Credit Card (Stripe)
+                                                Razorpay
                                             </a>
                                         </h2>
                                     </div>
                                     <div id="collapse-5" class="collapse" aria-labelledby="heading-5" data-parent="#accordion-payment">
                                         <div class="card-body">
-                                            Pay via Stripe for a secure card payment.
+                                            Pay via Razorpay for a secure payment.
                                         </div>
                                     </div>
                                 </div>
@@ -347,8 +347,8 @@
                 paymentMethod = 'COD';
             } else if (selectedMethod === 'PayPal') {
                 paymentMethod = 'PayPal';
-            } else if (selectedMethod === 'Credit Card (Stripe)') {
-                paymentMethod = 'Credit Card';
+            } else if (selectedMethod === 'Razorpay') {
+                paymentMethod = 'Razorpay';
             }
 
             document.getElementById('payment_method').value = paymentMethod;
