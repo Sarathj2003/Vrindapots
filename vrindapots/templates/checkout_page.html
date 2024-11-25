@@ -202,82 +202,18 @@
                             </tbody>
                         </table><!-- End .table table-summary -->
 
+                        <form method="POST" action="{% url 'place_order_cod' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-primary-2 btn-order btn-block">
+                                <span class="btn-text">Cash on Delivery</span>
+                                <span class="btn-hover-text">Cash on Delivery</span>
+                            </button>
+                        </form>
                         <form method="POST" action="{% url 'place_order' %}">
                             {% csrf_token %}
-                            
-                            <div class="accordion-summary" id="accordion-payment">
-                                <!-- Direct Bank Transfer -->
-                                <div class="card">
-                                    <div class="card-header" id="heading-1">
-                                        <h2 class="card-title">
-                                            <a class="collapsed" role="button" data-toggle="collapse" href="#collapse-1" aria-expanded="true" aria-controls="collapse-1">
-                                                Direct bank transfer
-                                            </a>
-                                        </h2>
-                                    </div>
-                                    <div id="collapse-1" class="collapse " aria-labelledby="heading-1" data-parent="#accordion-payment">
-                                        <div class="card-body">
-                                            Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order will not be shipped until the funds have cleared in our account.
-                                        </div>
-                                    </div>
-                                </div>
-                        
-                                <!-- Cash on Delivery -->
-                                <div class="card">
-                                    <div class="card-header" id="heading-3">
-                                        <h2 class="card-title">
-                                            <a  role="button" data-toggle="collapse" href="#collapse-3" aria-expanded="false" aria-controls="collapse-3">
-                                                Cash on delivery
-                                            </a>
-                                        </h2>
-                                    </div>
-                                    <div id="collapse-3" class="collapse show" aria-labelledby="heading-3" data-parent="#accordion-payment">
-                                        <div class="card-body">
-                                            You can choose Cash on Delivery (COD) to pay for your plants at the time they arrive. This way, you only pay when your order is delivered to your doorstep!
-                                        </div>
-                                    </div>
-                                </div>
-                        
-                                <!-- PayPal -->
-                                <div class="card">
-                                    <div class="card-header" id="heading-4">
-                                        <h2 class="card-title">
-                                            <a class="collapsed" role="button" data-toggle="collapse" href="#collapse-4" aria-expanded="false" aria-controls="collapse-4">
-                                                PayPal
-                                            </a>
-                                        </h2>
-                                    </div>
-                                    <div id="collapse-4" class="collapse" aria-labelledby="heading-4" data-parent="#accordion-payment">
-                                        <div class="card-body">
-                                            Pay via PayPal for a quick and secure transaction.
-                                        </div>
-                                    </div>
-                                </div>
-                        
-                                <!-- Credit Card (Stripe) -->
-                                <div class="card">
-                                    <div class="card-header" id="heading-5">
-                                        <h2 class="card-title">
-                                            <a class="collapsed" role="button" data-toggle="collapse" href="#collapse-5" aria-expanded="false" aria-controls="collapse-5">
-                                                Razorpay
-                                            </a>
-                                        </h2>
-                                    </div>
-                                    <div id="collapse-5" class="collapse" aria-labelledby="heading-5" data-parent="#accordion-payment">
-                                        <div class="card-body">
-                                            Pay via Razorpay for a secure payment.
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        
-                            <!-- Hidden field for payment method -->
-                            <input type="hidden" name="payment_method" id="payment_method" value="COD"> <!-- Default value -->
-                        
-                            <!-- Place Order Button -->
-                            <button type="submit" class="btn btn-outline-primary-2 btn-order btn-block">
-                                <span class="btn-text">Place Order</span>
-                                <span class="btn-hover-text">Place Order</span>
+                            <button type="submit" class="btn btn-outline-primary-2 btn-order btn-block" style="margin-top: 15px;">
+                                <span class="btn-text">Pay using Razorpay</span>
+                                <span class="btn-hover-text">Pay using Razorpay</span>
                             </button>
                         </form>
                     </div><!-- End .summary -->

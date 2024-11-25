@@ -433,16 +433,12 @@ def checkout(request):
         'applied_coupon': request.session.get('applied_coupon', None),
     })
 
-
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
-@login_required(login_url='user_login')
-def place_order(request):
+def place_order_cod(request):
     if request.method == "POST":
-        payment_method = request.POST.get('payment_method', 'COD')
+        payment_method = 'COD'
         profile = get_object_or_404(Profile, user=request.user, is_current=True)
         cart, _ = Cart.objects.get_or_create(user=request.user)
         cart_items = CartItem.objects.filter(cart=cart, quantity__gt=0)
-
         if not cart_items:
             messages.error(request, "Your cart is empty.")
             return redirect('cart_detail')
@@ -454,7 +450,7 @@ def place_order(request):
                 else:
                     messages.warning(request, f"Only {item.product.stock} units of '{item.product.name}' available! Please update your cart to proceed.")
                 return redirect('cart_detail')
-        
+            
         total_cost = Decimal(0)
         for item in cart_items:
             total_cost += item.product.new_price * item.quantity
@@ -465,45 +461,45 @@ def place_order(request):
         shipping_state = profile.state
 
         coupon = request.session.get('applied_coupon', None)
-       
         discount = request.session.get('discount', None) 
         if coupon:
             coupon = get_object_or_404(Coupon, code=coupon)
-            coupon_applied=True
+            coupon_applied = True
         else:
-            coupon_applied=False
+            coupon_applied = False
         discount = Decimal(discount) if discount is not None else Decimal(0)
+        
         final_cost = math.ceil(float(total_cost) - float(discount))
-         
 
         order = Order.objects.create(
             user=request.user,
             status="Pending",
             total_price=final_cost,
-            payment_method=payment_method, 
+            payment_method=payment_method,
             shipping_address=shipping_address,
             shipping_pincode=shipping_pincode,
             shipping_phone_number=shipping_phone_number,
             shipping_state=shipping_state,
-            is_paid=False,
+            is_paid=False,  
             coupon_applied=coupon_applied,
             coupon=coupon,
             discount_amount=discount  
-            )
-        
+        )
+
         if coupon:
             CouponUsage.objects.create(
                 coupon=coupon,
                 user=request.user,
                 order=order
             )
+
         try:
             del request.session['applied_coupon']
             del request.session['discount']
             del request.session['total_cost']
         except KeyError:
             pass
-       
+
         for item in cart_items:
             OrderItem.objects.create(
                 order=order,
@@ -513,11 +509,107 @@ def place_order(request):
             )
             item.product.stock -= item.quantity
             item.product.save()
+
         cart_items.delete()
-        delivery_date = order.delivery_date
+        order.save()
+        return redirect('order_success', order_id=order.id)
+    else:
+        messages.warning(request, 'Something went wrong')
+
+
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
+def place_order(request):
+    if request.method == "POST":
+        # Step 1: Determine the payment method
+        payment_method = request.POST.get('payment_method', 'COD')
+
+        # Step 2: Get the current profile of the user
+        profile = get_object_or_404(Profile, user=request.user, is_current=True)
+
+        # Step 3: Retrieve the user's cart and cart items
+        cart, _ = Cart.objects.get_or_create(user=request.user)
+        cart_items = CartItem.objects.filter(cart=cart, quantity__gt=0)
+
+        # Step 4: Check if the cart is empty
+        if not cart_items:
+            messages.error(request, "Your cart is empty.")
+            return redirect('cart_detail')
+
+        # Step 5: Validate stock availability for all cart items
+        for item in cart_items:
+            if item.quantity > item.product.stock:
+                if item.product.stock == 0:
+                    messages.warning(request, f"'{item.product.name}' is out of stock! Please remove the item from your cart to proceed.")
+                else:
+                    messages.warning(request, f"Only {item.product.stock} units of '{item.product.name}' available! Please update your cart to proceed.")
+                return redirect('cart_detail')
+
+        # Step 6: Calculate total cost
+        total_cost = Decimal(0)
+        for item in cart_items:
+            total_cost += item.product.new_price * item.quantity
+
+        # Step 7: Fetch shipping details
+        shipping_address = profile.address
+        shipping_pincode = profile.pincode
+        shipping_phone_number = profile.phone_number
+        shipping_state = profile.state
+
+        # Step 8: Apply coupon logic
+        coupon = request.session.get('applied_coupon', None)
+        discount = request.session.get('discount', None) 
+        if coupon:
+            coupon = get_object_or_404(Coupon, code=coupon)
+            coupon_applied = True
+        else:
+            coupon_applied = False
+        discount = Decimal(discount) if discount is not None else Decimal(0)
         
+        # Final cost after applying discount
+        final_cost = math.ceil(float(total_cost) - float(discount))
+
+        # Step 9: Create the order (but do not finalize it yet)
+        order = Order.objects.create(
+            user=request.user,
+            status="Processing",
+            total_price=final_cost,
+            payment_method=payment_method,
+            shipping_address=shipping_address,
+            shipping_pincode=shipping_pincode,
+            shipping_phone_number=shipping_phone_number,
+            shipping_state=shipping_state,
+            is_paid=False,  # Initially unpaid
+            coupon_applied=coupon_applied,
+            coupon=coupon,
+            discount_amount=discount  
+        )
+        
+
+        # Record coupon usage
+        if coupon:
+            CouponUsage.objects.create(
+                coupon=coupon,
+                user=request.user,
+                order=order
+            )
+
+        # Clear coupon session variables
+        try:
+            del request.session['applied_coupon']
+            del request.session['discount']
+            del request.session['total_cost']
+        except KeyError:
+            pass
+
+        # Step 10: Handle COD orders
         if payment_method == "COD":
+            finalize_order(cart_items, order)  # Custom function to finalize COD orders
             return redirect('order_success', order_id=order.id)
+
+        # Step 11: Handle Razorpay orders
         elif payment_method == "Razorpay":
             # Create Razorpay order
             razorpay_order = razorpay_client.order.create({
@@ -527,11 +619,11 @@ def place_order(request):
                 "payment_capture": 1,  # Auto-capture payment
             })
 
-            # Store Razorpay order ID in order model
+            # Store Razorpay order ID in the order model
             order.razorpay_order_id = razorpay_order['id']
             order.save()
 
-            # Redirect to payment page with Razorpay details
+            # Render payment page with Razorpay details
             return render(request, 'payment_page.html', {
                 'razorpay_order_id': razorpay_order['id'],
                 'razorpay_key': settings.RAZORPAY_API_KEY,
@@ -539,50 +631,66 @@ def place_order(request):
                 'currency': "INR",
                 'order': order,
             })
-        
-    else:
-        return redirect("checkout_page")
+
+        # If invalid payment method
+        else:
+            messages.error(request, "Invalid payment method.")
+            return redirect('checkout_page')
+
+    # If not a POST request
+    return redirect("checkout_page")
+
+
+def finalize_order(cart_items, order):
+    for item in cart_items:
+        OrderItem.objects.create(
+            order=order,
+            product=item.product,
+            quantity=item.quantity,
+            price=item.product.new_price
+        )
+        item.product.stock -= item.quantity
+        item.product.save()
+
+    # Clear the cart
+    cart_items.delete()
+
+    # Update order status
+    order.status = "Pending"
+    order.is_paid = True
+    order.save()
 
 
 @csrf_exempt
 def verify_payment(request):
     if request.method == "POST":
+        data = json.loads(request.body)
+        payment_id = data.get('razorpay_payment_id')
+        order_id = data.get('razorpay_order_id')
+        signature = data.get('razorpay_signature')
+
         try:
-            # Parse the JSON data
-            data = json.loads(request.body)
-            payment_id = data.get('razorpay_payment_id')
-            order_id = data.get('razorpay_order_id')
-            signature = data.get('razorpay_signature')
-
-            # Validate required fields
-            if not payment_id or not order_id or not signature:
-                return JsonResponse({"success": False, "error": "Missing required fields."}, status=400)
-
-            # Verify payment signature
-            try:
-                razorpay_client.utility.verify_payment_signature({
-                    'razorpay_order_id': order_id,
-                    'razorpay_payment_id': payment_id,
-                    'razorpay_signature': signature
-                })
-            except razorpay.errors.SignatureVerificationError:
-                return JsonResponse({"success": False, "error": "Signature verification failed."}, status=400)
+            razorpay_client.utility.verify_payment_signature({
+                'razorpay_order_id': order_id,
+                'razorpay_payment_id': payment_id,
+                'razorpay_signature': signature
+            })
 
             # Mark the order as paid
-            order = get_object_or_404(Order, razorpay_order_id=order_id)
+            order = Order.objects.get(razorpay_order_id=order_id)
             order.is_paid = True
             order.payment_method = 'Razorpay'
             order.save()
 
+            # Reduce stock here
+            for item in order.items.all():
+                item.product.stock -= item.quantity
+                item.product.save()
+            cart_items = CartItem.objects.filter(cart=cart, quantity__gt=0)
+            cart_items.delete()
             return JsonResponse({"success": True})
-        
-        except json.JSONDecodeError:
-            return JsonResponse({"success": False, "error": "Invalid JSON data."}, status=400)
-
-        except Exception as e:
-            return JsonResponse({"success": False, "error": str(e)}, status=500)
-
-    return JsonResponse({"success": False, "error": "Invalid request method."}, status=405)
+        except razorpay.errors.SignatureVerificationError:
+            return JsonResponse({"success": False, "error": "Signature verification failed."})
 
 
 

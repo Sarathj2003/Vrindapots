@@ -48,52 +48,50 @@
             </div>
         </div>
     
+    
+    
         <script>
             var options = {
-                "key": "{{ razorpay_key }}",  // Razorpay API Key
-                "amount": "{{ amount }}",  // Amount in paise
+                "key": "{{ razorpay_key }}", // Enter the Key ID generated from the Dashboard
+                "amount": "{{ amount }}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
                 "currency": "{{ currency }}",
                 "name": "Vrindapots",
                 "description": "Order Payment",
-                "order_id": "{{ razorpay_order_id }}",  // Razorpay Order ID
+                "image": "{% static 'assets/images/Vrindapots_new_text_logo.png' %}",
+                "order_id": "{{ razorpay_order_id }}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
                 "handler": function (response) {
-                    // Send payment details to the server for verification
-                    fetch("{% url 'verify_payment' %}", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRFToken": "{{ csrf_token }}"
-                        },
-                        body: JSON.stringify(response)
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Redirect to the order success page
-                            window.location.href = "{% url 'order_success' order.id %}";
-                        } else {
-                            // Show an alert for failed payment verification
-                            alert("Payment verification failed. Please contact support.");
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error during payment verification:", error);
-                        alert("An error occurred. Please try again later.");
-                    });
+                    alert(response.razorpay_payment_id);
+                    alert(response.razorpay_order_id);
+                    alert(response.razorpay_signature)
+                },
+                "prefill": {
+                    "name": "Gaurav Kumar",
+                    "email": "gaurav.kumar@example.com",
+                    "contact": "9000090000"
+                },
+                "notes": {
+                    "address": "Razorpay Corporate Office"
                 },
                 "theme": {
                     "color": "#3399cc"
                 }
             };
-        
             var rzp1 = new Razorpay(options);
-            document.getElementById('rzp-button1').onclick = function(e) {
+            rzp1.on('payment.failed', function (response) {
+                alert(response.error.code);
+                alert(response.error.description);
+                alert(response.error.source);
+                alert(response.error.step);
+                alert(response.error.reason);
+                alert(response.error.metadata.order_id);
+                alert(response.error.metadata.payment_id);
+            });
+            document.getElementById('rzp-button1').onclick = function (e) {
                 rzp1.open();
                 e.preventDefault();
             }
         </script>
     
-        
     </div>
     <!-- end container for listing all products -->
 
