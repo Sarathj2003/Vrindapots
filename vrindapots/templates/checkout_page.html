@@ -335,23 +335,46 @@
 </main><!-- End .main -->
 
 <script>
-    
     document.querySelectorAll('.card-header a').forEach(function (el) {
         el.addEventListener('click', function () {
             let selectedMethod = this.innerText.trim();
             let paymentMethod = '';
-            
+            let buttonText = 'Place Order'; // Default button text
+            let buttonHoverText = 'Place Order'; // Default hover text
+
+            // Update payment method, button text, and hover text based on the selected method
             if (selectedMethod === 'Direct bank transfer') {
                 paymentMethod = 'Bank Transfer';
+                buttonText = 'Place Order';
+                buttonHoverText = 'Place Order';
             } else if (selectedMethod === 'Cash on delivery') {
                 paymentMethod = 'COD';
+                buttonText = 'Place Order';
+                buttonHoverText = 'Confirm Order';
             } else if (selectedMethod === 'PayPal') {
                 paymentMethod = 'PayPal';
+                buttonText = 'Place Order';
+                buttonHoverText = 'Secure Payment';
             } else if (selectedMethod === 'Razorpay') {
                 paymentMethod = 'Razorpay';
+                buttonText = 'Pay Now'; // Razorpay-specific text
+                buttonHoverText = 'Pay Now';
             }
 
+            // Update the hidden input for payment method
             document.getElementById('payment_method').value = paymentMethod;
+
+            // Update the button text
+            const placeOrderButtonText = document.querySelector('.btn-order .btn-text');
+            const placeOrderButtonHoverText = document.querySelector('.btn-order .btn-hover-text');
+
+            if (placeOrderButtonText) {
+                placeOrderButtonText.textContent = buttonText;
+            }
+
+            if (placeOrderButtonHoverText) {
+                placeOrderButtonHoverText.textContent = buttonHoverText;
+            }
         });
     });
 </script>

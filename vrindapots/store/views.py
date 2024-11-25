@@ -1,4 +1,5 @@
-import razorpay
+
+
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
@@ -17,6 +18,8 @@ from decimal import Decimal
 from django.db import transaction
 from django.utils import timezone
 import math
+import json
+import razorpay
 # Create your views here.
 
 
@@ -471,12 +474,13 @@ def place_order(request):
             coupon_applied=False
         discount = Decimal(discount) if discount is not None else Decimal(0)
         final_cost = math.ceil(float(total_cost) - float(discount))
+         
 
         order = Order.objects.create(
             user=request.user,
             status="Pending",
             total_price=final_cost,
-            payment_method="COD", 
+            payment_method=payment_method, 
             shipping_address=shipping_address,
             shipping_pincode=shipping_pincode,
             shipping_phone_number=shipping_phone_number,
@@ -511,7 +515,7 @@ def place_order(request):
             item.product.save()
         cart_items.delete()
         delivery_date = order.delivery_date
-        print(payment_method)
+        
         if payment_method == "COD":
             return redirect('order_success', order_id=order.id)
         elif payment_method == "Razorpay":
@@ -543,28 +547,42 @@ def place_order(request):
 @csrf_exempt
 def verify_payment(request):
     if request.method == "POST":
-        data = json.loads(request.body)
-        payment_id = data.get('razorpay_payment_id')
-        order_id = data.get('razorpay_order_id')
-        signature = data.get('razorpay_signature')
-
         try:
-            # Verify payment signature
-            razorpay_client.utility.verify_payment_signature({
-                'razorpay_order_id': order_id,
-                'razorpay_payment_id': payment_id,
-                'razorpay_signature': signature
-            })
+            # Parse the JSON data
+            data = json.loads(request.body)
+            payment_id = data.get('razorpay_payment_id')
+            order_id = data.get('razorpay_order_id')
+            signature = data.get('razorpay_signature')
 
-            # Mark order as paid
-            order = Order.objects.get(razorpay_order_id=order_id)
+            # Validate required fields
+            if not payment_id or not order_id or not signature:
+                return JsonResponse({"success": False, "error": "Missing required fields."}, status=400)
+
+            # Verify payment signature
+            try:
+                razorpay_client.utility.verify_payment_signature({
+                    'razorpay_order_id': order_id,
+                    'razorpay_payment_id': payment_id,
+                    'razorpay_signature': signature
+                })
+            except razorpay.errors.SignatureVerificationError:
+                return JsonResponse({"success": False, "error": "Signature verification failed."}, status=400)
+
+            # Mark the order as paid
+            order = get_object_or_404(Order, razorpay_order_id=order_id)
             order.is_paid = True
             order.payment_method = 'Razorpay'
             order.save()
 
             return JsonResponse({"success": True})
-        except razorpay.errors.SignatureVerificationError:
-            return JsonResponse({"success": False, "error": "Signature verification failed."})
+        
+        except json.JSONDecodeError:
+            return JsonResponse({"success": False, "error": "Invalid JSON data."}, status=400)
+
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+    return JsonResponse({"success": False, "error": "Invalid request method."}, status=405)
 
 
 

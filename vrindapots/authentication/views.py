@@ -146,10 +146,7 @@ def set_current_address(request, profile_id):
     profile.is_current = True
     profile.save()
     previous_page = request.session.get('previous_page', None)
-    if previous_page:
-        return redirect(previous_page)  
-    else:
-        return redirect('account_page')
+    return redirect(request.META.get('HTTP_REFERER', 'account_page'))
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='user_login')
