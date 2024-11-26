@@ -139,6 +139,13 @@
 
                         <table class="table table-summary">
                             <thead>
+                                <tr> 
+                                    <th style="font-weight: bold;">Wallet Balance</th>
+                                    <th style="color: {% if wallet_balance == 0 %} red {% else %} green {% endif %};">
+                                        ₹{{ wallet_balance }}
+                                    </th>
+                                </tr>
+                                
                                 <tr>
                                     <th>Product</th>
                                     <th>Total</th>
@@ -209,13 +216,13 @@
                                 <span class="btn-hover-text">Cash on Delivery</span>
                             </button>
                         </form>
-                        <form method="POST" action="{% url 'place_order' %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-outline-primary-2 btn-order btn-block" style="margin-top: 15px;">
+                        
+                            <button type="submit" id="rzp-button" class="btn  btn-outline-primary-2 btn-order btn-block" style="margin-top: 15px;">
                                 <span class="btn-text">Pay using Razorpay</span>
                                 <span class="btn-hover-text">Pay using Razorpay</span>
                             </button>
-                        </form>
+                        
+                    
                     </div><!-- End .summary -->
                     <div class="checkout-discount">
                         <form method="POST">
@@ -271,47 +278,87 @@
 </main><!-- End .main -->
 
 <script>
-    document.querySelectorAll('.card-header a').forEach(function (el) {
-        el.addEventListener('click', function () {
-            let selectedMethod = this.innerText.trim();
-            let paymentMethod = '';
-            let buttonText = 'Place Order'; // Default button text
-            let buttonHoverText = 'Place Order'; // Default hover text
-
-            // Update payment method, button text, and hover text based on the selected method
-            if (selectedMethod === 'Direct bank transfer') {
-                paymentMethod = 'Bank Transfer';
-                buttonText = 'Place Order';
-                buttonHoverText = 'Place Order';
-            } else if (selectedMethod === 'Cash on delivery') {
-                paymentMethod = 'COD';
-                buttonText = 'Place Order';
-                buttonHoverText = 'Confirm Order';
-            } else if (selectedMethod === 'PayPal') {
-                paymentMethod = 'PayPal';
-                buttonText = 'Place Order';
-                buttonHoverText = 'Secure Payment';
-            } else if (selectedMethod === 'Razorpay') {
-                paymentMethod = 'Razorpay';
-                buttonText = 'Pay Now'; // Razorpay-specific text
-                buttonHoverText = 'Pay Now';
-            }
-
-            // Update the hidden input for payment method
-            document.getElementById('payment_method').value = paymentMethod;
-
-            // Update the button text
-            const placeOrderButtonText = document.querySelector('.btn-order .btn-text');
-            const placeOrderButtonHoverText = document.querySelector('.btn-order .btn-hover-text');
-
-            if (placeOrderButtonText) {
-                placeOrderButtonText.textContent = buttonText;
-            }
-
-            if (placeOrderButtonHoverText) {
-                placeOrderButtonHoverText.textContent = buttonHoverText;
-            }
-        });
-    });
+    const csrftoken = "{{ csrf_token }}";
 </script>
+
+<!-- Razorpay Integration Script -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    document.getElementById('rzp-button').onclick = function (e) {
+        e.preventDefault();
+
+        // Step 1: Make an AJAX call to your Django view to create Razorpay Order
+        fetch("{% url 'place_order_razorpay' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrftoken,
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.razorpay_order_id) {
+                // Step 2: Initialize Razorpay with the order details
+                const options = {
+                    key: data.razorpay_key,
+                    amount: data.amount, // Amount in paise
+                    currency: data.currency,
+                    name: "Vrindapots",
+                    description: "Order Payment",
+                    image: "", // Your logo
+                    order_id: data.razorpay_order_id,
+                    handler: function (response) {
+                        // Step 3: Payment Success Handler
+                        verifyPayment(response, data.order_id);
+                    },
+                    prefill: {
+                        name: "{{ request.user.first_name }} {{ request.user.last_name }}",
+                        email: "{{ request.user.email }}",
+                        contact: "{{ profile.phone_number }}",
+                    },
+                    theme: {
+                        color: "#3399cc",
+                    },
+                };
+                const rzp1 = new Razorpay(options);
+                rzp1.open();
+            } else {
+                alert("Failed to create Razorpay order. Please try again.");
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("An error occurred. Please try again.");
+        });
+    };
+
+    // Step 4: Verify Payment Function
+    function verifyPayment(paymentData, orderId) {
+        fetch("{% url 'verify_payment' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrftoken,
+            },
+            body: JSON.stringify({
+                razorpay_payment_id: paymentData.razorpay_payment_id,
+                razorpay_order_id: paymentData.razorpay_order_id,
+                razorpay_signature: paymentData.razorpay_signature,
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = `/order/success/${data.order_id}/`;
+            } else {
+                alert(data.message || "Payment verification failed. Please try again.");
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("An error occurred during payment verification. Please try again.");
+        });
+    }
+</script>
+
 {% endblock %}

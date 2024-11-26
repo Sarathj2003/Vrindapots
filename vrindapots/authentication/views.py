@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.validators import validate_email as django_validate_email
 from django.core.exceptions import ValidationError
 from .models import Profile
+from store.models import Wallet
 
 
 
@@ -25,8 +26,7 @@ from .models import Profile
 def user_login(request):
     
     if request.user.is_authenticated:
-        if request.user.is_staff:
-            return redirect('home')
+        return redirect('home')
     
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -107,7 +107,12 @@ def account_page(request):
     user = request.user
     from_checkout = request.GET.get('from_checkout', False)
     profiles = Profile.objects.filter(user=user).order_by('id')
-    # Handle user details update
+    
+    try:
+        wallet = request.user.wallet
+    except Wallet.DoesNotExist:
+        wallet = None
+
     if request.method == 'POST' and 'update_user_details' in request.POST:
         user.first_name = request.POST.get('firstname')
         user.last_name = request.POST.get('lastname')
@@ -119,7 +124,12 @@ def account_page(request):
             return redirect(previous_page)  
         else:
             return redirect('account_page')  
-    return render(request, 'account_page.html', {'user': user, 'profiles': profiles, 'from_checkout': from_checkout})
+    return render(request, 'account_page.html', {
+        'user': user, 
+        'profiles': profiles,
+        'from_checkout': from_checkout,
+        'wallet_balance': wallet.balance if wallet else 0.00,
+        })
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='user_login')

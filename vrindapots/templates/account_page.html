@@ -27,6 +27,11 @@
                                     <label for="lastname"><strong>Last Name</strong></label>
                                     <p id="lastname">{{ user.last_name }}</p>
                                 </div>
+
+                                <div class="form-group">
+                                  <label for=""><strong>Wallet Balance</strong></label>
+                                  <p id="" style="color: {% if wallet_balance == 0 %} red {% else %} green {% endif %};">₹{{ wallet_balance }}</p>
+                                </div>
                 
                                 
                 

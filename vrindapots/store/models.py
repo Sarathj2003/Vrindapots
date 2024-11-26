@@ -110,6 +110,7 @@ class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="items")
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
+    
 
     def __str__(self):
         return f"{self.quantity} x {self.product.name}"
@@ -167,8 +168,10 @@ class Order(models.Model):
     coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null=True, blank=True)
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     
-    razorpay_order_id = models.CharField(max_length=255, null=True, blank=True)
-    razorpay_payment_id = models.CharField(max_length=255, null=True, blank=True)
+    razorpay_order_id  = models.CharField(max_length=255, null=True, blank=True)
+    razorpay_payment_id  = models.CharField(max_length=255, null=True, blank=True)
+    razorpay_signature  = models.CharField(max_length=255, null=True, blank=True)
+    
 
     def save(self, *args, **kwargs):
         if not self.id:
@@ -239,3 +242,21 @@ class CouponUsage(models.Model):
 
     def __str__(self):
         return f"{self.coupon.code} used by {self.user.username}"
+    
+
+class Wallet(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='wallet')
+    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
+    def __str__(self):
+        return f"{self.user.username}'s Wallet - Balance: {self.balance}"
+
+    def credit(self, amount):
+        self.balance += amount
+        self.save()
+
+    def debit(self, amount):
+        if amount > self.balance:
+            raise ValueError("Insufficient balance")
+        self.balance -= amount
+        self.save()
