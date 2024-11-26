@@ -8,6 +8,10 @@ from authentication.models import Profile
 from store.models import Category,Product, Order,OrderItem,Coupon
 from .forms import CategoryForm, ProductForm, CouponForm
 from django.db import transaction
+from django.http import HttpResponse
+from django.db.models import Sum, F
+from datetime import datetime, timedelta
+from weasyprint import HTML
 
 # Create your views here.
 
@@ -306,3 +310,55 @@ def delete_coupon(request, coupon_id):
     coupon.delete()
     messages.success(request, "Coupon deleted successfully.")
     return redirect('coupon_list_page') 
+
+
+def sales_report(request):
+    # Get filter criteria (Day/Week/Month)
+    filter_type = request.GET.get('filter', 'day')  # Default to 'day'
+    today = datetime.now()
+
+    # Determine date range
+    if filter_type == 'day':
+        start_date = today
+    elif filter_type == 'week':
+        start_date = today - timedelta(days=7)
+    elif filter_type == 'month':
+        start_date = today - timedelta(days=30)
+    else:
+        start_date = today
+
+    # Filter orders within the selected range
+    orders = Order.objects.filter(order_date__gte=start_date, status='Delivered')
+
+    # Calculate totals
+    total_sales = orders.aggregate(total_sales=Sum('total_price'))['total_sales'] or 0
+    total_orders = orders.count()
+    total_items = OrderItem.objects.filter(order__in=orders).aggregate(
+        total_items=Sum('quantity')
+    )['total_items'] or 0
+
+    # Handle PDF download
+    if 'download_pdf' in request.GET:
+        html_template = 'admin_templates/sales_report_pdf.html'
+        context = {
+            'orders': orders,
+            'total_sales': total_sales,
+            'total_orders': total_orders,
+            'total_items': total_items,
+            'filter_type': filter_type,
+        }
+        html_string = render(request, html_template, context).content.decode('utf-8')
+        pdf = HTML(string=html_string).write_pdf()
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="sales_report_{filter_type}.pdf"'
+        return response
+
+    # Render the HTML template for the sales report
+    context = {
+        'orders': orders,
+        'total_sales': total_sales,
+        'total_orders': total_orders,
+        'total_items': total_items,
+        'filter_type': filter_type,
+    }
+    return render(request, 'admin_templates/sales_report.html', context)
