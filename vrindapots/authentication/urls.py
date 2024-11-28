@@ -17,7 +17,7 @@ urlpatterns = [
 
     path('account/', views.account_page, name='account_page'),
     path('set_current_address/<int:profile_id>/', views.set_current_address, name='set_current_address'),
-    path('add_new_address/', views.add_new_address, name='add_new_address'),
+    path('add_new_address/<int:from_flag>/', views.add_new_address, name='add_new_address'),
     path('edit_address/<int:profile_id>/', views.edit_address, name='edit_address'),
     path('delete_address/<int:profile_id>/', views.delete_address, name='delete_address'),
     path('edit_user_details/<int:user_id>/', views.edit_user_details, name='edit_user_details'),

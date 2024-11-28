@@ -160,7 +160,7 @@ def set_current_address(request, profile_id):
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='user_login')
-def add_new_address(request):
+def add_new_address(request,from_flag):
     if request.method == 'POST':
         
         address = request.POST.get('address')
@@ -175,7 +175,7 @@ def add_new_address(request):
         if not re.match(r'^\d{6}$', pincode):
             messages.error(request, 'Pincode must be exactly 6 digits and contain only numbers.')
             return render(request, 'add_address.html')
-        
+    
         Profile.objects.create(
             user=request.user,
             address=address,
@@ -184,8 +184,11 @@ def add_new_address(request):
             state=state
         )
         messages.success(request, 'New address added successfully!')
-        return redirect('account_page')
-    return render(request, 'add_address.html')
+        if from_flag == 0:
+            return redirect('account_page')
+        else:
+            return redirect('checkout_page')
+    return render(request, 'add_address.html',{'from_flag':from_flag})
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)

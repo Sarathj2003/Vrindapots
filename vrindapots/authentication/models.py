@@ -10,7 +10,7 @@ class Profile(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='profile', null=True)
     address = models.TextField(null=True)
     is_current = models.BooleanField(default=False)
-    
+
     pincode = models.CharField(
         max_length=6,
         validators=[RegexValidator(regex='^\d{6}$', message='Pincode must be exactly 6 digits', code='invalid_pincode')],
