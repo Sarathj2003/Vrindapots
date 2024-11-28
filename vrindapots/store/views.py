@@ -30,6 +30,7 @@ import json
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='user_login')
 def home_page(request):
+    query = request.GET.get('q', '').strip()
     sort_by = request.GET.get('sort_by')
     sort_options = {
         'popularity': '-popularity',          
@@ -427,10 +428,6 @@ def checkout(request):
         messages.success(request, "Coupon removed successfully!")
         return redirect('checkout_page')
 
-    
-    
-    
-
     return render(request, 'checkout_page.html', {
         'full_name': full_name,
         'profile': profile,
@@ -443,6 +440,8 @@ def checkout(request):
         
     })
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def place_order_cod(request):
     if request.method == "POST":
         payment_method = 'COD'
@@ -529,7 +528,8 @@ def place_order_cod(request):
 
 razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET))
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def place_order_razorpay(request):
     if request.method == "POST":
         payment_method = 'Razorpay'
@@ -571,16 +571,15 @@ def place_order_razorpay(request):
             final_cost = math.ceil(float(total_cost) - float(discount))
         else:
             final_cost = total_cost
-        
-        # Step 1: Create the Razorpay Order
+    
         razorpay_order = razorpay_client.order.create({
-            "amount": int(final_cost * 100),  # Convert to paise
+            "amount": int(final_cost * 100), 
             "currency": "INR",
             "receipt": f"order_rcptid_{request.user.id}",
-            "payment_capture": 1  # Auto-capture
+            "payment_capture": 1  
         })
 
-        # Step 2: Create the Order in your database
+        
         order = Order.objects.create(
             user=request.user,
             status="Pending",
@@ -620,11 +619,11 @@ def place_order_razorpay(request):
             item.product.save()
         cart_items.delete()
         order.save()
-        # Step 3: Send Razorpay Order ID and required details to the frontend
+        
         context = {
             'razorpay_order_id': razorpay_order['id'],
             'razorpay_key': settings.RAZORPAY_API_KEY,
-            'amount': final_cost * 100,  # In paise
+            'amount': final_cost * 100,  
             'currency': "INR",
             'order_id': order.id
         }
@@ -634,7 +633,8 @@ def place_order_razorpay(request):
         return redirect(request.META.get('HTTP_REFERER', 'checkout_page'))
 
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 @csrf_exempt
 def verify_payment(request):
     if request.method == "POST":
@@ -644,7 +644,7 @@ def verify_payment(request):
         razorpay_signature = data.get('razorpay_signature')
 
         try:
-            # Verify the payment signature
+           
             params = {
                 'razorpay_order_id': razorpay_order_id,
                 'razorpay_payment_id': razorpay_payment_id,
@@ -652,13 +652,11 @@ def verify_payment(request):
             }
             razorpay_client.utility.verify_payment_signature(params)
 
-            # Update the order status
             order = get_object_or_404(Order, razorpay_order_id=razorpay_order_id)
             order.is_paid = True
             order.status = "Completed"
             order.save()
 
-            # Reduce stock and clear cart
             cart_items = CartItem.objects.filter(cart__user=request.user)
             for item in cart_items:
                 item.product.stock -= item.quantity
@@ -732,7 +730,8 @@ def cancel_order(request, order_id):
         messages.success(request, "Order cancelled!")
     return redirect('my_orders')
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def order_success(request,order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
     order_items = order.order_items.all()

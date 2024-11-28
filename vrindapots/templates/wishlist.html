@@ -63,12 +63,14 @@
                             {% endif %}
                         </td>
                         <td class="action-col">
-                            <form action="" method="post">
-                                {% csrf_token %}
+                            
+                            <a href="{% url 'add_to_cart' item.product.id %}">
                                 <button class="btn btn-block btn-outline-primary-2">
                                     <i class="icon-cart-plus"></i>Add to Cart
                                 </button>
-                            </form>
+                            </a>
+                                
+                            
                         </td>
                         <td class="remove-col">
                             <form action="{% url 'remove_from_wishlist' item.product.id %}" method="post">
