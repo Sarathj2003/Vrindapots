@@ -139,9 +139,11 @@ class Order(models.Model):
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
         ('Processing', 'Processing'),
-        ('Shipped', 'Shipped'),
+        ('Delayed', 'Delayed'),
         ('Delivered', 'Delivered'),
         ('Cancelled', 'Cancelled'),
+        ('Return', 'Return'),
+        ('Returned', 'Returned'),
     ]
     PAYMENT_CHOICES = [
         ('COD', 'Cash on Delivery'),
@@ -163,6 +165,7 @@ class Order(models.Model):
     shipping_phone_number = models.CharField(max_length=15, null=True, blank=True)
     shipping_state = models.CharField(max_length=50, null=True, blank=True)
     delivery_date = models.DateTimeField(null=True, blank=True)
+    return_date = models.DateTimeField(null=True, blank=True)
 
     coupon_applied = models.BooleanField(default=False)
     coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null=True, blank=True)

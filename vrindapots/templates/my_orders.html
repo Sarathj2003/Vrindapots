@@ -38,6 +38,8 @@
                                         <span style="color: red;">{{ order.status }}</span>
                                     {% elif order.status == 'Delivered' %}
                                         <span style="color: green;">{{ order.status }} on {{ order.delivery_date|date:"F j, Y" }}</span>
+                                    {% elif order.status == 'Return' %}
+                                        <span style="color: rgb(128, 79, 0);"> {{ order.status }} pickup on {{ order.return_date|date:"F j, Y" }}</span>
                                     {% else %}
                                         {{ order.status }}
                                     {% endif %} 

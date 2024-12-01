@@ -27,6 +27,7 @@ urlpatterns = [
     # path('place-order/', views.place_order, name='place_order'), 
     path('my-orders/', views.my_orders, name='my_orders'),
     path('order/<int:order_id>/', views.order_detail, name='order_detail'),
+    path('order/return/<int:order_id>/', views.return_order, name='return_order'),
     path('order/cancel/<int:order_id>/', views.cancel_order, name='cancel_order'),
     path('order/success/<int:order_id>/', views.order_success, name='order_success'),
     path('order/verify_payment', views.verify_payment, name='verify_payment'),

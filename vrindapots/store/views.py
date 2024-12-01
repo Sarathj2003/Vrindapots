@@ -17,6 +17,7 @@ from django.http import Http404
 from decimal import Decimal
 from django.db import transaction
 from django.utils import timezone
+from datetime import timedelta
 import math
 import json
 
@@ -398,7 +399,7 @@ def checkout(request):
             usage_count = CouponUsage.objects.filter(coupon=coupon, user=request.user).count()
             if coupon.per_user_limit is not None and usage_count >= coupon.per_user_limit:
                 messages.error(request, "You have already used this coupon.")
-                return redirect('cart_detail')
+                return redirect('checkout_page')
             if coupon.discount_type == 'percentage':
                 discount = (total_cost * coupon.discount_value) / 100
             else:
@@ -740,4 +741,15 @@ def order_success(request,order_id):
         'order_items': order_items
     })
 
-    
+
+def return_order(request,order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    if order.status == 'Delivered':
+        order.status = 'Return'
+        order.return_date = order.delivery_date + timedelta(days=7)
+        order.save()
+        messages.success(request, "Applied for return of order.")
+    else:
+        messages.error(request, "unexpected error")
+
+    return redirect('order_detail' ,order.id)

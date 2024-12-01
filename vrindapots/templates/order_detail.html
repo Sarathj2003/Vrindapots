@@ -29,6 +29,10 @@
                 <span style="color: red;">{{ order.status }}</span>
             {% elif order.status == 'Delivered' %}
                 <span style="color: green;">{{ order.status }} on {{ order.delivery_date|date:"F j, Y" }}</span>
+            {% elif order.status == 'Return' %}
+                <span style="color: rgb(128, 79, 0);"> {{ order.status }} pickup on {{ order.return_date|date:"F j, Y" }}</span>
+            {% elif order.status == 'Returned' %}
+            <span style="color: rgb(128, 79, 0);"> {{ order.status }} on {{ order.return_date|date:"F j, Y" }}</span>
             {% else %}
                 {{ order.status }}
             {% endif %}
@@ -64,15 +68,21 @@
             </div>
         
             <!-- Cancel Order Button (if applicable) -->
-            {% if order.status != 'Cancelled' and order.status != 'Delivered'%}
+            {% if order.status != 'Cancelled' and order.status != 'Delivered' and order.status != 'Return' and order.status != 'Returned' %}
                 <form method="POST" action="{% url 'cancel_order' order.id %}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger">Cancel Order</button>
                 </form>
             {% elif order.status == 'Cancelled' %}
                 <p>Your order has been cancelled.</p>
-            {% else %}
+            {% elif order.status == 'Delivered' %}
                 <p>Your order has been Delivered.</p>
+                <form method="POST" action="{% url 'return_order' order.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger" style="margin-top: 15px;">Return Order</button>
+                    <p>You can return your order within 7 days from the delivery date.</p>
+                </form>
+            {% else %}
             {% endif %}
         </div>
         

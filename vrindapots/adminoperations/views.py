@@ -12,6 +12,7 @@ from django.http import HttpResponse
 from django.db.models import Sum, F
 from datetime import datetime, timedelta
 from weasyprint import HTML
+from django.utils.timezone import now
 
 # Create your views here.
 
@@ -226,16 +227,34 @@ def admin_order_details(request, order_id):
         new_status = request.POST.get("status")
         if new_status and new_status != order.status:
             order.status = new_status
+            if new_status == "Delivered":
+                order.delivery_date = now()
             order.save()
             messages.success(request, "Order status updated successfully!")
         else:
             messages.error(request, "Invalid status selected.")
         return redirect("admin_order_details", order_id=order.id)
 
+    if order.status == 'Pending':
+        status_choices = [
+            (choice[0], choice[1]) for choice in Order.STATUS_CHOICES if choice[0] != order.status and (choice[0] == 'Delayed' or choice[0] == 'Delivered')
+        ]
+    elif order.status == 'Delayed':
+        status_choices = [
+            (choice[0], choice[1]) for choice in Order.STATUS_CHOICES if choice[0] != order.status and (choice[0] == 'Pending' or choice[0] == 'Delivered')
+        ]
+    else:
+        status_choices = [
+            (choice[0], choice[1]) for choice in Order.STATUS_CHOICES if choice[0] != order.status and choice[0] != 'Cancelled' and choice[0] != 'Returned'
+        ]
     
-    status_choices = [
-        (choice[0], choice[1]) for choice in Order.STATUS_CHOICES if choice[0] != order.status and choice[0] != 'Cancelled'
-    ]
+
+
+
+
+    # status_choices = [
+    #         (choice[0], choice[1]) for choice in Order.STATUS_CHOICES if choice[0] != order.status and choice[0] != 'Cancelled' and choice[0] != 'Returned'
+    #     ]
 
     return render(request, 'admin_templates/admin_order_details.html', {
         'order': order,
@@ -262,6 +281,14 @@ def admin_order_cancel(request, order_id):
 
     return redirect('admin_order_details', order_id=order.id)
 
+def change_to_returned(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    if order.status == 'Return':
+        order.status = 'Returned'
+        order.return_date = now()
+        order.save()
+        messages.success(request, f"Order #{order.id} has been returned.")
+    return redirect('admin_order_details', order_id=order.id)
 
 def coupon_list_page(request):
     coupons = Coupon.objects.all().order_by('id')
@@ -362,3 +389,5 @@ def sales_report(request):
         'filter_type': filter_type,
     }
     return render(request, 'admin_templates/sales_report.html', context)
+
+
