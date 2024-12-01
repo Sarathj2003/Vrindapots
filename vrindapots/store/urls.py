@@ -22,6 +22,7 @@ urlpatterns = [
     path('checkout-page/', views.checkout, name='checkout_page'),
 
     path('placeorderCOD/', views.place_order_cod, name='place_order_cod'),
+    path('placeorderWallet/', views.place_order_wallet, name='place_order_wallet'),
     path('placeorderRazorpay/', views.place_order_razorpay, name='place_order_razorpay'),
 
     # path('place-order/', views.place_order, name='place_order'), 

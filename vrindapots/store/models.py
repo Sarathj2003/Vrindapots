@@ -150,6 +150,7 @@ class Order(models.Model):
         ('Bank Transfer', 'Direct Bank Transfer'),
         ('PayPal', 'PayPal'),
         ('Razorpay', 'Razorpay'),
+        ('Wallet', 'Wallet')
     ]
     
     

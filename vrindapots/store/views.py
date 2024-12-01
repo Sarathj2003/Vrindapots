@@ -527,6 +527,98 @@ def place_order_cod(request):
         messages.warning(request, 'Something went wrong')
         return redirect(request.META.get('HTTP_REFERER', 'checkout_page'))
 
+def place_order_wallet(request):
+    payment_method = 'Wallet'
+    profile = get_object_or_404(Profile, user=request.user, is_current=True)
+    cart, _ = Cart.objects.get_or_create(user=request.user)
+    cart_items = CartItem.objects.filter(cart=cart, quantity__gt=0)
+    if not cart_items:
+        messages.error(request, "Your cart is empty.")
+        return redirect('cart_detail')
+    
+    for item in cart_items:
+        if item.quantity > item.product.stock:
+            if item.product.stock == 0:
+                messages.warning(request, f"'{item.product.name}' is out of stock! Please remove the item from your cart to proceed.")
+            else:  
+                messages.warning(request, f"Only {item.product.stock} units of '{item.product.name}' available! Please update your cart to proceed.")
+            return redirect('cart_detail')
+    
+    total_cost = Decimal(0)   
+    for item in cart_items:
+        total_cost += item.product.new_price * item.quantity
+
+    shipping_address = profile.address
+    shipping_pincode = profile.pincode
+    shipping_phone_number = profile.phone_number
+    shipping_state = profile.state
+
+    coupon = request.session.get('applied_coupon', None)
+    discount = request.session.get('discount', None)
+    if coupon:
+        coupon = get_object_or_404(Coupon, code=coupon)
+        coupon_applied = True
+    else:
+        coupon_applied = False
+    discount = Decimal(discount) if discount is not None else Decimal(0)
+
+    final_cost = math.ceil(float(total_cost) - float(discount))
+
+    wallet = get_object_or_404(Wallet, user=request.user)
+    if final_cost > wallet.balance:
+        messages.error(request, "There is no enough money in the wallet to purchase.")
+        return redirect('checkout_page')
+    wallet.balance = wallet.balance - final_cost
+    wallet.save()
+    
+    
+
+    order = Order.objects.create(
+        user=request.user,
+        status="Pending",
+        total_price=final_cost,
+        payment_method=payment_method,
+        shipping_address=shipping_address,
+        shipping_pincode=shipping_pincode,
+        shipping_phone_number=shipping_phone_number,
+        shipping_state=shipping_state,
+        is_paid=True,  
+        coupon_applied=coupon_applied,
+        coupon=coupon,
+        discount_amount=discount  
+        )
+    
+    if coupon:
+        CouponUsage.objects.create(
+            coupon=coupon,
+            user=request.user,
+            order=order
+        )
+
+    try:
+        del request.session['applied_coupon']
+        del request.session['discount']
+        del request.session['total_cost']
+    except KeyError:
+        pass
+
+    for item in cart_items:
+        OrderItem.objects.create(
+            order=order,
+            product=item.product,
+            quantity=item.quantity,
+            price=item.product.new_price
+        )
+        item.product.stock -= item.quantity
+        item.product.save()
+
+    cart_items.delete()
+    order.save()
+    return redirect('order_success', order_id=order.id)  
+
+    
+
+
 razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET))
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -655,7 +747,7 @@ def verify_payment(request):
 
             order = get_object_or_404(Order, razorpay_order_id=razorpay_order_id)
             order.is_paid = True
-            order.status = "Completed"
+            order.status = "Pending"
             order.save()
 
             cart_items = CartItem.objects.filter(cart__user=request.user)
