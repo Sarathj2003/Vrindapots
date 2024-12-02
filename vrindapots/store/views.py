@@ -480,6 +480,10 @@ def place_order_cod(request):
         discount = Decimal(discount) if discount is not None else Decimal(0)
         
         final_cost = math.ceil(float(total_cost) - float(discount))
+        
+        if final_cost > 1000:
+            messages.warning(request, "Order above 1000 is not applicable for Cash on Delivery.")
+            return redirect('checkout_page')
 
         order = Order.objects.create(
             user=request.user,
