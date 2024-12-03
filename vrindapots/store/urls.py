@@ -27,6 +27,7 @@ urlpatterns = [
 
     # path('place-order/', views.place_order, name='place_order'), 
     path('my-orders/', views.my_orders, name='my_orders'),
+    path('order/<int:order_id>/invoice/', views.generate_invoice_pdf, name='generate_invoice_pdf'),
     path('order/<int:order_id>/', views.order_detail, name='order_detail'),
     path('order/return/<int:order_id>/', views.return_order, name='return_order'),
     path('order/cancel/<int:order_id>/', views.cancel_order, name='cancel_order'),

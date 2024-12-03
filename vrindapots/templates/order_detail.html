@@ -77,6 +77,9 @@
                 <p>Your order has been cancelled.</p>
             {% elif order.status == 'Delivered' %}
                 <p>Your order has been Delivered.</p>
+                <a href="{% url 'generate_invoice_pdf' order.id %}">
+                    <button type="submit" class="btn btn-primary" style="margin-top: 15px;">Download Invoice</button>
+                </a>
                 <form method="POST" action="{% url 'return_order' order.id %}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger" style="margin-top: 15px;">Return Order</button>

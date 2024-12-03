@@ -18,6 +18,10 @@ from decimal import Decimal
 from django.db import transaction
 from django.utils import timezone
 from datetime import timedelta
+from django.template.loader import render_to_string
+from xhtml2pdf import pisa
+from django.http import HttpResponse
+import io
 import math
 import json
 
@@ -813,6 +817,59 @@ def order_detail(request, order_id):
         'discount_amount': discount_amount,
         'final_price': final_price
     })
+
+
+
+def generate_invoice_pdf(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    order_items = OrderItem.objects.filter(order=order)
+    
+    # Context for the template
+    context = {
+        'invoice_title': "INVOICE",
+        'invoice_number': f"INV-{order.id}",
+        'invoice_date': timezone.now().date(),
+        'customer_name': f"{order.user.first_name} {order.user.last_name}",
+        'customer_address': order.shipping_address,
+        'customer_contact': order.shipping_phone_number,
+        'order_number': order.id,
+        'order_date': order.order_date,
+        'payment_method':order.payment_method,
+        'delivery_date': order.delivery_date,
+        'products': [
+            {
+                'description': item.product.name,
+                'quantity': item.quantity,
+                'unit_price': item.price,
+                'total_price': item.quantity * item.price,
+            }
+            for item in order_items
+        ],
+        'subtotal': sum(item.quantity * item.price for item in order_items),
+        'delivery_charge': 100,  # Hardcoded or fetched from the order.
+        'discounts': order.discount_amount,
+        'grand_total': order.total_price,
+        'terms': "Products can be returned within 7 days if unopened.",
+        'thank_you_message': "Thank you for shopping with us!",
+    }
+
+    # Render the HTML template to a string
+    html = render_to_string('invoice_template.html', context)
+
+    # Create a PDF file in memory
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="invoice_{order.id}.pdf"'
+    pdf = io.BytesIO()
+    pisa_status = pisa.CreatePDF(io.BytesIO(html.encode('utf-8')), dest=pdf)
+
+    if pisa_status.err:
+        return HttpResponse("Error generating PDF", status=500)
+
+    response.write(pdf.getvalue())
+    pdf.close()
+    return response
+
+
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)

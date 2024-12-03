@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .invoice-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .customer-info, .order-info {
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        table th {
+            background-color: #f4f4f4;
+        }
+        .total {
+            text-align: right;
+        }
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-title">INVOICE</div>
+    <p><strong>Invoice Number:</strong> {{ invoice_number }}</p>
+    <p><strong>Invoice Date:</strong> {{ invoice_date }}</p>
+    
+    <div class="customer-info">
+        <h4>Customer Details</h4>
+        <p><strong>Name:</strong> {{ customer_name }}</p>
+        <p><strong>Address:</strong> {{ customer_address }}</p>
+        <p><strong>Contact:</strong> {{ customer_contact }}</p>
+    </div>
+
+    <div class="order-info">
+        <h4>Order Details</h4>
+        <p><strong>Order Number:</strong> {{ order_number }}</p>
+        <p><strong>Payment Method:</strong> {{ payment_method }}</p>
+        <p><strong>Order Date:</strong> {{ order_date }}</p>
+        <p><strong>Delivery Date:</strong> {{ delivery_date }}</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Unit Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>{{ product.description }}</td>
+                <td>{{ product.quantity }}</td>
+                <td>{{ product.unit_price }}</td>
+                <td>{{ product.total_price }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="total">
+        <p><strong>Subtotal:</strong> {{ subtotal }}</p>
+        <p><strong>Delivery Charge:</strong> {{ delivery_charge }}</p>
+        <p><strong>Discounts:</strong> {{ discounts }}</p>
+        <p><strong>Grand Total:</strong> {{ grand_total }}</p>
+    </div>
+
+    <div class="footer">
+        <p>{{ terms }}</p>
+        <p>{{ thank_you_message }}</p>
+    </div>
+</body>
+</html>
