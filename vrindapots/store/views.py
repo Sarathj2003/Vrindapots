@@ -21,6 +21,7 @@ from datetime import timedelta
 from django.template.loader import render_to_string
 from xhtml2pdf import pisa
 from django.http import HttpResponse
+from django.utils.timezone import now
 import io
 import math
 import json
@@ -399,7 +400,12 @@ def checkout(request):
     coupon_code = request.POST.get('coupon_code', None)
     if coupon_code:
         try:
-            coupon = Coupon.objects.get(code=coupon_code, is_active=True, start_date__lte=timezone.now(), end_date__gte=timezone.now())
+            current_date = now().date()
+            coupon = Coupon.objects.get(code=coupon_code, is_active=True)
+            if current_date > coupon.end_date.date():
+                messages.error(request, "This coupon is unavailable.")
+                return redirect('checkout_page')
+
             usage_count = CouponUsage.objects.filter(coupon=coupon, user=request.user).count()
             if coupon.per_user_limit is not None and usage_count >= coupon.per_user_limit:
                 messages.error(request, "You have already used this coupon.")
