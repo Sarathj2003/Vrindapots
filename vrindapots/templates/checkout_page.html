@@ -166,6 +166,10 @@
                                     <td>Subtotal:</td>
                                     <td>₹{{ subtotal_cost }}</td>
                                 </tr>
+                                <tr class="summary-subtotal">
+                                    <td>Delivery Charge:</td>
+                                    <td>₹{{ delivery_fee }}</td>
+                                </tr>
                                 {% if applied_coupon %}
                                     <tr class="">
                                         <td>Coupon applied:</td>
@@ -307,18 +311,19 @@
         })
         .then(response => response.json())
         .then(data => {
+            console.log("Amount sent to Razorpay:", data.amount);
             if (data.razorpay_order_id) {
-                // Step 2: Initialize Razorpay with the order details
+                
                 const options = {
                     key: data.razorpay_key,
-                    amount: data.amount, // Amount in paise
+                    amount: data.amount, 
                     currency: data.currency,
                     name: "Vrindapots",
                     description: "Order Payment",
-                    image: "", // Your logo
+                    image: "", 
                     order_id: data.razorpay_order_id,
                     handler: function (response) {
-                        // Step 3: Payment Success Handler
+                        
                         verifyPayment(response, data.order_id);
                     },
                     prefill: {
@@ -342,7 +347,7 @@
         });
     };
 
-    // Step 4: Verify Payment Function
+    
     function verifyPayment(paymentData, orderId) {
         fetch("{% url 'verify_payment' %}", {
             method: "POST",
@@ -369,6 +374,7 @@
             alert("An error occurred during payment verification. Please try again.");
         });
     }
+    
 </script>
 
 {% endblock %}

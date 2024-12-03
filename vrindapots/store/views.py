@@ -429,15 +429,18 @@ def checkout(request):
         messages.success(request, "Coupon removed successfully!")
         return redirect('checkout_page')
 
+    delivery_fee=100
+
     return render(request, 'checkout_page.html', {
         'full_name': full_name,
         'profile': profile,
         'cart_items': cart_items,
-        'total_cost': math.ceil(total_cost),
+        'total_cost': math.ceil(total_cost)+delivery_fee,
         'subtotal_cost': subtotal_cost,
         'profiles': profiles,
         'applied_coupon': request.session.get('applied_coupon', None),
         'wallet_balance': wallet.balance,
+        'delivery_fee': delivery_fee,
         
     })
 
@@ -480,6 +483,9 @@ def place_order_cod(request):
         discount = Decimal(discount) if discount is not None else Decimal(0)
         
         final_cost = math.ceil(float(total_cost) - float(discount))
+
+        # delivery charge = 100
+        final_cost+=100 
         
         if final_cost > 1000:
             messages.warning(request, "Order above 1000 is not applicable for Cash on Delivery.")
@@ -575,7 +581,8 @@ def place_order_wallet(request):
     wallet.balance = wallet.balance - final_cost
     wallet.save()
     
-    
+    # delivery charge = 100
+    final_cost+=100 
 
     order = Order.objects.create(
         user=request.user,
@@ -676,6 +683,8 @@ def place_order_razorpay(request):
             "payment_capture": 1  
         })
 
+        # delivery charge = 100
+        final_cost+=100 
         
         order = Order.objects.create(
             user=request.user,
@@ -711,7 +720,7 @@ def place_order_razorpay(request):
                 product=item.product,
                 quantity=item.quantity,
                 price=item.product.new_price
-            )
+            )   
             item.product.stock -= item.quantity
             item.product.save()
         cart_items.delete()
