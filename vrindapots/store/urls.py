@@ -24,6 +24,7 @@ urlpatterns = [
     path('placeorderCOD/', views.place_order_cod, name='place_order_cod'),
     path('placeorderWallet/', views.place_order_wallet, name='place_order_wallet'),
     path('placeorderRazorpay/', views.place_order_razorpay, name='place_order_razorpay'),
+    path('continuePayment/<int:order_id>/', views.continue_payment, name='continue_payment'),
 
     # path('place-order/', views.place_order, name='place_order'), 
     path('my-orders/', views.my_orders, name='my_orders'),

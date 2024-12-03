@@ -698,7 +698,7 @@ def place_order_razorpay(request):
         
         order = Order.objects.create(
             user=request.user,
-            status="Pending",
+            status="Processing",
             total_price=final_cost,
             payment_method=payment_method,
             shipping_address=shipping_address,
@@ -731,9 +731,9 @@ def place_order_razorpay(request):
                 quantity=item.quantity,
                 price=item.product.new_price
             )   
-            item.product.stock -= item.quantity
-            item.product.save()
-        cart_items.delete()
+        #     item.product.stock -= item.quantity
+        #     item.product.save()
+        # cart_items.delete()
         order.save()
         
         context = {
@@ -747,6 +747,20 @@ def place_order_razorpay(request):
     else:
         messages.warning(request, 'Something went wrong.')
         return redirect(request.META.get('HTTP_REFERER', 'checkout_page'))
+    
+
+
+def continue_payment(request,order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    
+    context = {
+            'razorpay_order_id': order.razorpay_order_id,
+            'razorpay_key': settings.RAZORPAY_API_KEY,
+            'amount': order.total_price * 100,  
+            'currency': "INR",
+            'order_id': order.id
+        }
+    return JsonResponse(context)
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)

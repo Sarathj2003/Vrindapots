@@ -67,6 +67,12 @@
                 {% endfor %}
             </div>
         
+            {% if order.status  == 'Processing' and order.payment_method == 'Razorpay' %}
+            
+                <button type="submit" id="rzp-button" class="btn btn-primary" style="margin-top: 5px; margin-bottom: 15px;">Continue payment</button>
+        
+            {% endif %}
+
             <!-- Cancel Order Button (if applicable) -->
             {% if order.status != 'Cancelled' and order.status != 'Delivered' and order.status != 'Return' and order.status != 'Returned' %}
                 <form method="POST" action="{% url 'cancel_order' order.id %}">
@@ -128,6 +134,94 @@
         </div><!-- End .container -->
     </div><!-- End .cta -->
 
+    
+
 </main><!-- End .main -->
+
+<script>
+    const csrftoken = "{{ csrf_token }}";
+</script>
+<!-- Razorpay Integration Script -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    document.getElementById('rzp-button').onclick = function (e) {
+        e.preventDefault();
+
+        // Step 1: Make an AJAX call to your Django view to create Razorpay Order
+        fetch("{% url 'continue_payment' order.id %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrftoken,
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Amount sent to Razorpay:", data.amount);
+                if (data.razorpay_order_id) {
+
+                    const options = {
+                        key: data.razorpay_key,
+                        amount: data.amount,
+                        currency: data.currency,
+                        name: "Vrindapots",
+                        description: "Order Payment",
+                        image: "",
+                        order_id: data.razorpay_order_id,
+                        handler: function (response) {
+
+                            verifyPayment(response, data.order_id);
+                        },
+                        prefill: {
+                            name: "{{ request.user.first_name }} {{ request.user.last_name }}",
+                            email: "{{ request.user.email }}",
+                            contact: "{{ profile.phone_number }}",
+                        },
+                        theme: {
+                            color: "#3399cc",
+                        },
+                    };
+                    const rzp1 = new Razorpay(options);
+                    rzp1.open();
+                } else {
+                    alert("Failed to create Razorpay order. Please try again.");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("An error occurred. Please try again.");
+            });
+    };
+
+
+    function verifyPayment(paymentData, orderId) {
+        fetch("{% url 'verify_payment' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrftoken,
+            },
+            body: JSON.stringify({
+                razorpay_payment_id: paymentData.razorpay_payment_id,
+                razorpay_order_id: paymentData.razorpay_order_id,
+                razorpay_signature: paymentData.razorpay_signature,
+            }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = `/order/success/${data.order_id}/`;
+                } else {
+                    alert(data.message || "Payment verification failed. Please try again.");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("An error occurred during payment verification. Please try again.");
+            });
+    }
+
+</script>
+
 
 {% endblock %}
