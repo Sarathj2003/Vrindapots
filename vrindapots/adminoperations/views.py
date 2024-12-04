@@ -12,6 +12,8 @@ from django.http import HttpResponse
 from django.db.models import Sum, F
 from datetime import datetime, timedelta
 from weasyprint import HTML
+from django.http import JsonResponse
+from django.db.models.functions import TruncDay,TruncYear,TruncMonth
 from django.utils.timezone import now
 
 # Create your views here.
@@ -49,7 +51,80 @@ def custom_admin_logout(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='custom_admin_login')
 def admin_home(request):
-    return render(request,'admin_templates/admin_home.html')
+    top_products = (
+        OrderItem.objects.values('product__name')
+        .annotate(total_sales=Sum('quantity'))
+        .order_by('-total_sales')[:10]
+    )
+
+    # Top 3 Best-Selling Categories
+    top_categories = (
+        OrderItem.objects.values('product__category__name')
+        .annotate(total_sales=Sum('quantity'))
+        .order_by('-total_sales')[:3]
+    )
+    
+    context = {
+        'top_products': top_products,
+        'top_categories': top_categories,
+    }
+    
+    return render(request,'admin_templates/admin_home.html',context)
+
+def sales_chart(request):
+    daily_data = (
+        Order.objects.filter(status='Delivered')
+        .annotate(day=TruncDay('order_date')) 
+        .values('day')  
+        .annotate(total_sales=Sum('total_price'))  
+        .order_by('day')  
+    )
+
+    
+    monthly_data = (
+        Order.objects.filter(status='Delivered')  
+        .annotate(month=TruncMonth('order_date'))  
+        .values('month')  
+        .annotate(total_sales=Sum('total_price'))  
+        .order_by('month')  
+    )
+
+   
+    yearly_data = (
+        Order.objects.filter(status='Delivered')  
+        .annotate(year=TruncYear('order_date'))  
+        .values('year')  
+        .annotate(total_sales=Sum('total_price'))  
+        .order_by('year') 
+    )
+
+    
+    daily_labels = [entry['day'].strftime('%Y-%m-%d') for entry in daily_data]
+    daily_sales = [entry['total_sales'] for entry in daily_data]
+
+    
+    monthly_labels = [entry['month'].strftime('%B') for entry in monthly_data]
+    monthly_sales = [entry['total_sales'] for entry in monthly_data]
+
+    yearly_labels = [entry['year'].strftime('%Y') for entry in yearly_data]
+    yearly_sales = [entry['total_sales'] for entry in yearly_data]
+
+
+    return JsonResponse({
+        'daily':{
+            'labels':daily_labels,
+            'data':daily_sales,
+        },
+        'monthly':{
+            'labels':monthly_labels,
+            'data':monthly_sales,
+        },
+        'yearly':{
+            'labels':yearly_labels,
+            'data':yearly_sales
+        }
+    })
+
 
 
 
@@ -389,5 +464,7 @@ def sales_report(request):
         'filter_type': filter_type,
     }
     return render(request, 'admin_templates/sales_report.html', context)
+
+
 
 

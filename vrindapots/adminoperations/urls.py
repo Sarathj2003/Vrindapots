@@ -36,4 +36,6 @@ urlpatterns = [
     path('adminhome/couponlist/delete/<int:coupon_id>/', views.delete_coupon, name='delete_coupon'),
 
     path('sales-report/', views.sales_report, name='sales_report'),
+    path('sales-chart-data/', views.sales_chart, name='sales_chart_data')
+    
 ] 

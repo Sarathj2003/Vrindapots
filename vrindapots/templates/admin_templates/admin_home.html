@@ -4,9 +4,82 @@
 
 {% block content %}
 <div class="container mt-5">
+
     <a href="{% url 'custom_admin_logout' %}" class="btn btn-danger">Logout</a>
     <h1 class="text-center mb-4">Admin Dashboard</h1>
+
+
     <div class="row">
+        <div class="col-md-12 mb-4" style="background-color: rgba(0, 0, 0, 0.093);">
+
+            <h3>Sales Chart</h3>
+            <div>
+                <button class="filter-btn" data-filter="daily">Daily</button>
+                <button class="filter-btn" data-filter="monthly">Monthly</button>
+                <button class="filter-btn" data-filter="yearly">Yearly</button>
+            </div>
+
+            <canvas id="salesChart" width="400" height="200"></canvas>
+
+        </div>
+    </div>
+
+    <h2 class="text-center mb-4">Top 10 Best-Selling Products</h2>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover table-striped">
+            <thead class="table-primary text-center">
+                <tr>
+                    <th scope="col">Rank</th>
+                    <th scope="col">Product</th>
+                    <th scope="col">Total Sold</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in top_products %}
+                <tr>
+                    <td class="text-center">{{ forloop.counter }}</td>
+                    <td>{{ product.product__name }}</td>
+                    <td class="text-center">{{ product.total_sales }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center text-muted">No products found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Top 3 Best-Selling Categories -->
+    <h2 class="text-center mt-5 mb-4">Top 3 Best-Selling Categories</h2>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover table-striped">
+            <thead class="table-success text-center">
+                <tr>
+                    <th scope="col">Rank</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Total Sold</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in top_categories %}
+                <tr>
+                    <td class="text-center">{{ forloop.counter }}</td>
+                    <td>{{ category.product__category__name }}</td>
+                    <td class="text-center">{{ category.total_sales }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center text-muted">No categories found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    
+    <div class="row" style="margin-top: 20px;">
+        
         <div class="col-md-4 mb-4">
             <div class="admin-card bg-white">
                 <i class="fas fa-user-cog fa-3x mb-3"></i>
@@ -59,4 +132,68 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        let salesChart;
+
+        // Fetch chart data and initialize
+        const fetchChartData = (filterType = 'monthly') => {
+            fetch('/sales-chart-data/') // Adjust to your Django URL
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to fetch chart data');
+                    return response.json();
+                })
+                .then(data => {
+                    const labels = data[filterType].labels;
+                    const salesData = data[filterType].data;
+
+                    // If chart exists, update its data
+                    if (salesChart) {
+                        salesChart.data.labels = labels;
+                        salesChart.data.datasets[0].data = salesData;
+                        salesChart.update();
+                    } else {
+                        // Create the chart
+                        salesChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: 'Total Sales',
+                                    data: salesData,
+                                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                    borderColor: 'rgba(75, 192, 192, 1)',
+                                    borderWidth: 1,
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                    }
+                                }
+                            }
+                        });
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        };
+
+        // Initial load with default filter
+        fetchChartData();
+
+        // Filter button event listeners
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const filterType = button.dataset.filter; // 'daily', 'monthly', or 'yearly'
+                fetchChartData(filterType);
+            });
+        });
+    });
+</script>
 {% endblock %}
