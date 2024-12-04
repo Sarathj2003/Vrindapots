@@ -57,7 +57,7 @@ def admin_home(request):
         .order_by('-total_sales')[:10]
     )
 
-    # Top 3 Best-Selling Categories
+    
     top_categories = (
         OrderItem.objects.values('product__category__name')
         .annotate(total_sales=Sum('quantity'))
@@ -71,6 +71,8 @@ def admin_home(request):
     
     return render(request,'admin_templates/admin_home.html',context)
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='custom_admin_login')
 def sales_chart(request):
     daily_data = (
         Order.objects.filter(status='Delivered')
@@ -356,6 +358,8 @@ def admin_order_cancel(request, order_id):
 
     return redirect('admin_order_details', order_id=order.id)
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='custom_admin_login')
 def change_to_returned(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     if order.status == 'Return':
@@ -365,6 +369,8 @@ def change_to_returned(request, order_id):
         messages.success(request, f"Order #{order.id} has been returned.")
     return redirect('admin_order_details', order_id=order.id)
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='custom_admin_login')
 def coupon_list_page(request):
     coupons = Coupon.objects.all().order_by('id')
 
@@ -372,7 +378,8 @@ def coupon_list_page(request):
         'coupons': coupons,
     })
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='custom_admin_login')
 def add_coupon(request):
     if request.method == "POST":
         form = CouponForm(request.POST)
@@ -390,7 +397,8 @@ def add_coupon(request):
         'form': form
     })
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='custom_admin_login')
 def edit_coupon(request, coupon_id):
     coupon = get_object_or_404(Coupon, id=coupon_id)
 
@@ -407,19 +415,20 @@ def edit_coupon(request, coupon_id):
 
     return render(request, 'admin_templates/edit_coupon.html', {'form': form, 'coupon': coupon})
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='custom_admin_login')
 def delete_coupon(request, coupon_id):
     coupon = get_object_or_404(Coupon, id=coupon_id)
     coupon.delete()
     messages.success(request, "Coupon deleted successfully.")
     return redirect('coupon_list_page') 
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='custom_admin_login')
 def sales_report(request):
-    # Get filter criteria (Day/Week/Month)
-    filter_type = request.GET.get('filter', 'day')  # Default to 'day'
+    
+    filter_type = request.GET.get('filter', 'day')  
     today = datetime.now()
-
-    # Determine date range
     if filter_type == 'day':
         start_date = today
     elif filter_type == 'week':
@@ -429,17 +438,14 @@ def sales_report(request):
     else:
         start_date = today
 
-    # Filter orders within the selected range
     orders = Order.objects.filter(order_date__gte=start_date, status='Delivered')
 
-    # Calculate totals
     total_sales = orders.aggregate(total_sales=Sum('total_price'))['total_sales'] or 0
     total_orders = orders.count()
     total_items = OrderItem.objects.filter(order__in=orders).aggregate(
         total_items=Sum('quantity')
     )['total_items'] or 0
 
-    # Handle PDF download
     if 'download_pdf' in request.GET:
         html_template = 'admin_templates/sales_report_pdf.html'
         context = {
@@ -455,7 +461,6 @@ def sales_report(request):
         response['Content-Disposition'] = f'attachment; filename="sales_report_{filter_type}.pdf"'
         return response
 
-    # Render the HTML template for the sales report
     context = {
         'orders': orders,
         'total_sales': total_sales,

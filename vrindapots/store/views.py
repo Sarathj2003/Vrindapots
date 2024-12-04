@@ -547,6 +547,9 @@ def place_order_cod(request):
         messages.warning(request, 'Something went wrong')
         return redirect(request.META.get('HTTP_REFERER', 'checkout_page'))
 
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def place_order_wallet(request):
     payment_method = 'Wallet'
     profile = get_object_or_404(Profile, user=request.user, is_current=True)
@@ -839,12 +842,12 @@ def order_detail(request, order_id):
     })
 
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def generate_invoice_pdf(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
     order_items = OrderItem.objects.filter(order=order)
     
-    # Context for the template
     context = {
         'invoice_title': "INVOICE",
         'invoice_number': f"INV-{order.id}",
@@ -866,17 +869,15 @@ def generate_invoice_pdf(request, order_id):
             for item in order_items
         ],
         'subtotal': sum(item.quantity * item.price for item in order_items),
-        'delivery_charge': 100,  # Hardcoded or fetched from the order.
+        'delivery_charge': 100,  
         'discounts': order.discount_amount,
         'grand_total': order.total_price,
         'terms': "Products can be returned within 7 days if unopened.",
         'thank_you_message': "Thank you for shopping with us!",
     }
 
-    # Render the HTML template to a string
     html = render_to_string('invoice_template.html', context)
 
-    # Create a PDF file in memory
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="invoice_{order.id}.pdf"'
     pdf = io.BytesIO()
@@ -923,7 +924,8 @@ def order_success(request,order_id):
         'order_items': order_items
     })
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def return_order(request,order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
     if order.status == 'Delivered':
