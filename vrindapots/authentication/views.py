@@ -124,7 +124,7 @@ def account_page(request):
             return redirect(previous_page)  
         else:
             return redirect('account_page')  
-    print(profiles)
+
     return render(request, 'account_page.html', {
         'user': user, 
         'profiles': profiles,

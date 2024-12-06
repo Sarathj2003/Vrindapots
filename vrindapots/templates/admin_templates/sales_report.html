@@ -50,8 +50,9 @@
         <p><strong>Total Orders:</strong> {{ total_orders }}</p>
         <p><strong>Total Items Sold:</strong> {{ total_items }}</p>
     </div>
-
+    {% if orders %}
     <a href="?filter={{ filter_type }}&download_pdf=1" class="btn btn-primary mt-3">Download PDF</a>
+    {% endif %}
 </div>
 
 {% endblock %}
