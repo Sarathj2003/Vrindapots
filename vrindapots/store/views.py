@@ -22,6 +22,7 @@ from django.template.loader import render_to_string
 from xhtml2pdf import pisa
 from django.http import HttpResponse
 from django.utils.timezone import now
+from django.core.exceptions import ObjectDoesNotExist
 import io
 import math
 import json
@@ -239,6 +240,9 @@ def product_detail_view(request, id):
         rating_percentage=Coalesce(Avg('reviews__rating') * 20, Value(0, output_field=FloatField()))  
     )[:3] 
     if request.method == 'POST':
+        if not (request.user.first_name and request.user.last_name):
+            messages.error(request, "Please complete your first name and last name in your profile to give rating and review.")
+            return redirect('account_page')
         rating = request.POST.get('rating')
         comment = request.POST.get('comment')
         if rating is not None and comment is not None:
@@ -368,6 +372,18 @@ def update_cart_item_quantity(request, item_id):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='user_login')
 def checkout(request):
+    try:
+        profile = request.user.profile.first()
+        if not (request.user.first_name and request.user.last_name):
+            messages.error(request, "Please complete your first name and last name in your profile.")
+            return redirect('account_page')
+        if not profile or not (profile.address and profile.pincode and profile.phone_number and profile.state):
+            messages.error(request, "Please complete all required profile details before proceeding to checkout.")
+            return redirect('account_page')    
+    except ObjectDoesNotExist:
+        messages.error(request, "Please create your profile before proceeding to checkout.")
+        return redirect('account_page')  
+
     try:
         del request.session['applied_coupon']
     except KeyError:
