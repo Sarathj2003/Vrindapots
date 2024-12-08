@@ -17,6 +17,7 @@ from django.http import Http404
 from decimal import Decimal
 from django.db import transaction
 from django.utils import timezone
+
 from datetime import timedelta
 from django.template.loader import render_to_string
 from xhtml2pdf import pisa
@@ -457,6 +458,15 @@ def checkout(request):
 
     delivery_fee=100
 
+
+    current_time = timezone.now()
+    available_coupons = Coupon.objects.filter(
+        is_active=True, 
+        start_date__lte=current_time, 
+        end_date__gte=current_time
+    )
+    print(available_coupons)
+    print(current_time)
     return render(request, 'checkout_page.html', {
         'full_name': full_name,
         'profile': profile,
@@ -467,7 +477,7 @@ def checkout(request):
         'applied_coupon': request.session.get('applied_coupon', None),
         'wallet_balance': wallet.balance,
         'delivery_fee': delivery_fee,
-        
+        'available_coupons':available_coupons,
     })
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)

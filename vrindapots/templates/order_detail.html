@@ -91,7 +91,13 @@
                     <button type="submit" class="btn btn-danger" style="margin-top: 15px;">Return Order</button>
                     <p>You can return your order within 7 days from the delivery date.</p>
                 </form>
+            
             {% else %}
+            {% endif %}
+            {% if order.status == 'Pending' and order.is_paid == True%}
+                <a href="{% url 'generate_invoice_pdf' order.id %}">
+                    <button type="submit" class="btn btn-primary" style="margin-top: 15px;">Download Invoice</button>
+                </a>
             {% endif %}
         </div>
         

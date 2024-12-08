@@ -222,13 +222,14 @@
                                 <span class="btn-hover-text">Cash on Delivery</span>
                             </button>
                         </form>
+                        {% if wallet_balance >= total_cost %}
                         <a href="{% url 'place_order_wallet' %}">
                             <button type="submit" class="btn btn-outline-primary-2 btn-order btn-block" style="margin-top: 15px;">
                                 <span class="btn-text">Pay using Wallet</span>
                                 <span class="btn-hover-text">Pay using Wallet</span>
                             </button>
                         </a>
-                            
+                        {% endif %}
                         
                         
                             <button type="submit" id="rzp-button" class="btn  btn-outline-primary-2 btn-order btn-block" style="margin-top: 15px;">
@@ -245,6 +246,27 @@
                             <!-- <label for="checkout-discount-input" class="text-truncate">Have a coupon? <span>Click here to enter your code</span></label> -->
                         </form>
                     </div><!-- End .checkout-discount -->
+                    {% if available_coupons %}
+                    <div class="summary">
+                        <h3 class="summary-title">Available Coupons</h3>
+                        <table class="table table-summary">
+                            <tbody>
+                                {% for coupon in available_coupons %}
+                                <tr>
+                                    <td>{{ coupon.code }}</td>
+                                    <td>
+                                        {% if coupon.discount_type == 'percentage' %}
+                                            {{ coupon.discount_value }}%
+                                        {% else %}
+                                            ₹{{ coupon.discount_value }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
                 </aside><!-- End .col-lg-3 -->
             </div><!-- End .row -->
 
