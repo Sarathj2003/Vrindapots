@@ -120,6 +120,31 @@ def home_page(request):
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='user_login')
+def search_products(request):
+    banner = Banner.objects.first()
+    query = request.GET.get('q')
+    all_products = []
+
+    if query:
+        all_products = Product.objects.filter(
+            Q(name__icontains=query) | Q(category__name__icontains=query),
+            is_deleted=False 
+        )
+    if not all_products:
+        messages.warning(request, 'No products found matching your search criteria.')
+        return redirect(request.META.get('HTTP_REFERER'))
+        
+
+    return render(request, 'search_page.html', {
+        'all_products': all_products,
+        'query':query,
+        'banner':banner
+        })
+
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='user_login')
 def all_products_page(request):
     sort_by = request.GET.get('sort_by')
     sort_options = {
