@@ -426,19 +426,35 @@ def delete_coupon(request, coupon_id):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='custom_admin_login')
 def sales_report(request):
+    # Get filter type from request
+    filter_type = request.GET.get('filter', 'None')
     
-    filter_type = request.GET.get('filter', 'day')  
+    # Get custom start and end dates if provided
+    custom_start_date = request.GET.get('custom_start_date')
+    custom_end_date = request.GET.get('custom_end_date')
+
     today = datetime.now()
+
+    # Initialize start_date and end_date
+    start_date = today
+    end_date = today  # Default end_date is today if no custom range is provided
+
+    # Set the start date based on the filter type or custom date range
     if filter_type == 'day':
         start_date = today
     elif filter_type == 'week':
         start_date = today - timedelta(days=7)
     elif filter_type == 'month':
         start_date = today - timedelta(days=30)
-    else:
-        start_date = today
+    elif custom_start_date and custom_end_date:
+        start_date = datetime.strptime(custom_start_date, '%Y-%m-%d')
+        end_date = datetime.strptime(custom_end_date, '%Y-%m-%d')
 
-    orders = Order.objects.filter(order_date__gte=start_date, status='Delivered')
+    # Filter orders based on the selected date range
+    if custom_start_date and custom_end_date:
+        orders = Order.objects.filter(order_date__range=(start_date, end_date), status='Delivered').order_by('order_date')
+    else:
+        orders = Order.objects.filter(order_date__gte=start_date, status='Delivered').order_by('order_date')
 
     total_sales = orders.aggregate(total_sales=Sum('total_price'))['total_sales'] or 0
     total_orders = orders.count()
@@ -454,6 +470,8 @@ def sales_report(request):
             'total_orders': total_orders,
             'total_items': total_items,
             'filter_type': filter_type,
+            'custom_start_date': custom_start_date,
+            'custom_end_date': custom_end_date,
         }
         html_string = render(request, html_template, context).content.decode('utf-8')
         pdf = HTML(string=html_string).write_pdf()
@@ -467,8 +485,11 @@ def sales_report(request):
         'total_orders': total_orders,
         'total_items': total_items,
         'filter_type': filter_type,
+        'custom_start_date': custom_start_date,
+        'custom_end_date': custom_end_date,
     }
     return render(request, 'admin_templates/sales_report.html', context)
+
 
 
 
