@@ -4,7 +4,7 @@
 {% block content %}
         
 <div class="container mt-5" style="margin-bottom: 50px;">
-    <a href="{% url 'admin_home' %}">Back to Admin Dashboard</a>
+    
     <h1>Edit Product: {{ product.name }}</h1>  
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}

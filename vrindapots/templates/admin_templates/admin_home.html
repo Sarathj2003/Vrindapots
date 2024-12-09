@@ -3,9 +3,13 @@
 
 
 {% block content %}
+
+
+
+
+
 <div class="container mt-5">
 
-    <a href="{% url 'custom_admin_logout' %}" class="btn btn-danger">Logout</a>
     <h1 class="text-center mb-4">Admin Dashboard</h1>
 
 
@@ -78,58 +82,7 @@
     </div>
 
     
-    <div class="row" style="margin-top: 20px;">
-        
-        <div class="col-md-4 mb-4">
-            <div class="admin-card bg-white">
-                <i class="fas fa-user-cog fa-3x mb-3"></i>
-                <h3>User Management</h3>
-                <p>Manage users and permissions.</p>
-                <a href="{% url 'user_list' %}" class="btn btn-primary">Go to User Management</a>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="admin-card bg-white">
-                <i class="fas fa-th-list fa-3x mb-3"></i>
-                <h3>Category Management</h3>
-                <p>Manage product categories.</p>
-                <a href="{% url 'category_list' %}" class="btn btn-primary">Go to Category Management</a>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="admin-card bg-white">
-                <i class="fas fa-box fa-3x mb-3"></i>
-                <h3>Product Management</h3>
-                <p>Manage products, inventory, and pricing.</p>
-                <a href="{% url 'product_list' %}" class="btn btn-primary">Go to Product Management</a>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="admin-card bg-white">
-                <i class="fas fa-solid fa-sort fa-3x mb-3"></i>
-                <h3>Order Management</h3>
-                <p>Manage orders.</p>
-                <a href="{% url 'admin_order_list' %}" class="btn btn-primary">Go to Order Management</a>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="admin-card bg-white">
-                <i class="fas fa-solid fa-receipt fa-3x mb-3"></i>
-                <h3>Coupon Management</h3>
-                <p>Manage coupons.</p>
-                <a href="{% url 'coupon_list_page' %}" class="btn btn-primary">Go to Coupon Management</a>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="admin-card bg-white">
-                <i class="fas fa-solid fa-receipt fa-3x mb-3"></i>
-                <h3>Sales Management</h3>
-                <p>Print sales report.</p>
-                <a href="{% url 'sales_report' %}" class="btn btn-primary">Go to Sales Management</a>
-            </div>
-        </div>
-
-    </div>
+    
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
