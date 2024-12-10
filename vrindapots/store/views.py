@@ -988,3 +988,8 @@ def return_order(request,order_id):
         messages.error(request, "unexpected error")
 
     return redirect('order_detail' ,order.id)
+
+
+def failed_payment(request,order_id):
+    order = Order.objects.get(id=order_id)
+    return render(request,'failed_payment_page.html',{'order':order})
