@@ -37,6 +37,8 @@ urlpatterns = [
     path('order/failed/<int:order_id>/', views.failed_payment, name='failed_payment'),
     path('order/verify_payment', views.verify_payment, name='verify_payment'),
 
+   
+
  
     
     

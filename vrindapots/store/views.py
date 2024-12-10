@@ -490,8 +490,7 @@ def checkout(request):
         start_date__lte=current_time, 
         end_date__gte=current_time
     )
-    print(available_coupons)
-    print(current_time)
+    
     return render(request, 'checkout_page.html', {
         'full_name': full_name,
         'profile': profile,
@@ -993,3 +992,7 @@ def return_order(request,order_id):
 def failed_payment(request,order_id):
     order = Order.objects.get(id=order_id)
     return render(request,'failed_payment_page.html',{'order':order})
+
+
+
+
