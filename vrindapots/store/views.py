@@ -320,7 +320,7 @@ def cart_detail(request):
     cart, _ = Cart.objects.get_or_create(user=request.user)
     cart_items = CartItem.objects.filter(cart=cart).order_by('id')
     total_cost = Decimal(0)    
-    print(cart_items)
+    
     for item in cart_items:
                 
         item.subtotal = item.product.new_price * item.quantity  

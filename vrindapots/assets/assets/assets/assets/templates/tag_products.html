@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<main class="main">
+
+    <!-- custom banner -->
+    <div class="container">
+        <div class=" ">
+            <div class="intro-slide">
+                <figure class="">
+                    <picture>
+                        <source media="(max-width: 480px)" srcset="{{ banner.image.url }}">
+                        <img src="{{ banner.image.url }}" alt="Image Desc">
+                    </picture>
+                </figure><!-- End .slide-image -->
+    
+                <div class="intro-content">
+                    <h1 class="text-center text-white">Plant Happiness in Every Corner.</h1>
+                    <!-- End .intro-title -->
+                </div><!-- End .intro-content -->
+            </div><!-- End .intro-slide -->
+        </div>
+    </div>
+     <!-- custom banner end -->
+
+    
+    <div class="container">
+        <hr class="mt-2 mb-1">
+    </div><!-- End .container -->
+
+    <!-- product section -->
+
+    <!-- new container for listing Exclusive Offer products -->
+    <div class="bg-lighter ">
+        <div class="container">
+            <div class="heading heading-flex mb-3">
+                <div class="heading-left text-center">
+                    <h2 class="title text-center"> {{ tag_name }} </h2><!-- End .title -->
+                </div><!-- End .heading-left -->
+
+
+            </div><!-- End .heading -->
+
+            <div class="row">
+                
+                {% for product in tag_products %}
+                <!-- product card stating -->
+                <div class="col-6 col-md-4 col-lg-4">
+                    <div class="product product-7 text-center">
+                        <figure class="product-media">
+                            <a href="{% url 'product_detail' product.id %}">
+                                <div style="height: 376px;width:376px;">
+                                <img src="{{ product.image_1.url }}" style="width: 100%;height: 100%;object-fit: cover;"
+                                    alt="Product image" class="product-image">
+                                </div>
+                            </a>
+
+                            <div class="product-action-vertical">
+                                <a href="{% url 'add_to_wishlist' product.id %}" class="btn-product-icon btn-wishlist btn-expandable"><span>Add to Wishlist</span></a>
+                                <a href="{% url 'product_detail' product.id %}" class="btn-product-icon btn-quickview"
+                                    title="Quick view"><span>Quick view</span></a>
+                            </div><!-- End .product-action-vertical -->
+
+                            <div class="product-action">
+                                <a href="{% url 'add_to_cart' product.id %}" class="btn-product btn-cart"><span>add to cart</span></a>
+                            </div><!-- End .product-action -->
+                        </figure><!-- End .product-media -->
+
+                        <div class="product-body">
+                            <span class="product-title" style="font-size: 18px;font-weight: bold;">
+                                <a href="{% url 'product_detail' product.id %}">{{ product.name }}
+                                    <span class="new-price" style="font-size: 15px;font-weight: lighter;">
+                                        -{{ product.discount|floatformat:0 }}% off
+                                    </span>
+                                </a>
+                            </span>
+                            <br>
+                            <span>{{ product.category }}</span>
+                            <!-- End .product-title -->
+                            <div class="product-price">
+                                <span class="new-price">Now ₹{{ product.new_price }}</span>
+                                <span class="old-price">Was ₹{{ product.old_price }}</span>
+                            </div><!-- End .product-price -->
+                        
+                            <div class="ratings-container">
+                                <div class="ratings">
+                                    <div class="ratings-val" style="width: {{ product.rating_percentage }}%;"></div><!-- End .ratings-val -->
+                                </div><!-- End .ratings -->
+                                <span class="ratings-text">( {{ product.total_reviews }} Reviews)</span>
+                            </div><!-- End .ratings-container -->
+                        </div><!-- End .product-body -->
+                    </div><!-- End .product -->
+                </div>
+                <!-- product card ending -->
+                {% endfor %}
+
+            </div>
+        </div><!-- End .container -->
+    </div>
+    <!-- end container for listing all products -->
+
+    <!-- product section end-->
+
+
+
+    <div class="container">
+        <hr class="mt-3 mb-4">
+    </div><!-- End .container -->
+
+
+
+    <div class="container">
+        <hr class="mt-3 mt-xl-1 mb-0">
+    </div><!-- End .container -->
+
+    <div class="cta pt-4 pt-lg-6 pb-5 pb-lg-7 mb-0">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-sm-10 col-md-8 col-lg-6">
+                    <div class="cta-heading text-center">
+                        <h3 class="cta-title">Sign Up for updates from Molla</h3><!-- End .cta-title -->
+                        <p class="cta-desc">and receive <span class="font-weight-normal">$20 coupon</span> for first shopping</p><!-- End .cta-desc -->
+                    </div><!-- End .text-center -->
+                
+                    <form action="#">
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Enter your Email Address" aria-label="Email Adress" required>
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="submit" title="Sing up"><i class="icon-long-arrow-right"></i></button>
+                            </div><!-- .End .input-group-append -->
+                        </div><!-- .End .input-group -->
+                    </form>
+                </div><!-- End .col-sm-10 col-md-8 col-lg-6 -->
+            </div><!-- End .row -->
+        </div><!-- End .container -->
+    </div><!-- End .cta -->
+
+</main><!-- End .main -->
+
+{% endblock %}

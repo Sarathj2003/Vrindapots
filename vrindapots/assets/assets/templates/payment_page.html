@@ -1,0 +1,135 @@
+
+
+
+
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<main class="main">
+    
+
+    
+    <div class="container">
+        <hr class="mt-2 mb-1">
+    </div><!-- End .container -->
+
+    <!-- product section -->
+
+    <!-- new container for listing Exclusive Offer products -->
+    <div class="bg-lighter ">
+        <div class="container mt-5">
+            <!-- Payment Section -->
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card shadow-lg">
+                        <div class="card-header bg-primary text-white text-center">
+                            <h3>Complete Your Payment</h3>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-center">
+                                <strong>Order Amount:</strong> ₹100 <br>
+                                <strong>Order Description:</strong> Purchase from Vrindapots
+                            </p>
+                            <div class="text-center mt-4">
+                                <button id="rzp-button1" class="btn btn-primary btn-lg">
+                                    Pay Now
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-footer text-center">
+                            <small class="text-muted">Your payment is secure with Razorpay.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    
+    
+        
+    
+    </div>
+    <!-- end container for listing all products -->
+
+    <!-- product section end-->
+
+
+
+    <div class="container">
+        <hr class="mt-3 mb-4">
+    </div><!-- End .container -->
+
+
+
+    <div class="container">
+        <hr class="mt-3 mt-xl-1 mb-0">
+    </div><!-- End .container -->
+
+    <div class="cta pt-4 pt-lg-6 pb-5 pb-lg-7 mb-0">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-sm-10 col-md-8 col-lg-6">
+                    <div class="cta-heading text-center">
+                        <h3 class="cta-title">Sign Up for updates from Molla</h3><!-- End .cta-title -->
+                        <p class="cta-desc">and receive <span class="font-weight-normal">$20 coupon</span> for first shopping</p><!-- End .cta-desc -->
+                    </div><!-- End .text-center -->
+                
+                    <form action="#">
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Enter your Email Address" aria-label="Email Adress" required>
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="submit" title="Sing up"><i class="icon-long-arrow-right"></i></button>
+                            </div><!-- .End .input-group-append -->
+                        </div><!-- .End .input-group -->
+                    </form>
+                </div><!-- End .col-sm-10 col-md-8 col-lg-6 -->
+            </div><!-- End .row -->
+        </div><!-- End .container -->
+    </div><!-- End .cta -->
+
+
+
+    
+</main><!-- End .main -->
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+    var options = {
+        "key": "rzp_test_ME972J4MUYfQv8", // Enter the Key ID generated from the Dashboard
+        "amount": "{{ payment.amount }}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+        "currency": "INR",
+        "name": "Vrindapots",
+        "description": "Test Transaction",
+        "image": "https://example.com/your_logo",
+        "order_id": "{{ payment.id }}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+        "handler": function (response) {
+
+
+            window.location.href = 'http://127.0.0.1:8000/order/success/?order_id={{payment.id}}'
+
+            
+        "theme": {
+            "color": "#3399cc"
+        }
+    };
+    var rzp1 = new Razorpay(options);
+    rzp1.on('payment.failed', function (response) {
+        alert(response.error.code);
+        alert(response.error.description);
+        alert(response.error.source);
+        alert(response.error.step);
+        alert(response.error.reason);
+        alert(response.error.metadata.order_id);
+        alert(response.error.metadata.payment_id);
+    });
+    document.getElementById('rzp-button1').onclick = function (e) {
+        rzp1.open();
+        e.preventDefault();
+    }
+</script>
+
+{% endblock %}

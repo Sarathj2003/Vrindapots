@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container">
+    <div class="product-details-top">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="product-gallery product-gallery-vertical">
+                    <div class="row">
+                        <style>
+                            #imageZoom {
+                                position: relative;
+                            }
+                            #imageZoom img {
+                                width: 100%;
+                                height: 100%;
+                                object-fit: cover;
+                            }
+                            #imageZoom::after {
+                                display: var(--display);
+                                content: '';
+                                width: 100%;
+                                height: 100%;
+                                background-color: black;
+                                background-image: var(--url);
+                                background-size: 200%; /* Adjust the zoom level here */
+                                background-position: var(--zoom-x) var(--zoom-y);
+                                position: absolute;
+                                left: 0;
+                                top: 0;
+                                pointer-events: none;
+                            }
+                        </style>
+                        
+                        <div class="product-main-image" id="imageZoom" style="
+                            --url: url('{{ product.image_1.url }}');
+                            --zoom-x: 0%; --zoom-y: 0%;
+                            --display: none;
+                        ">
+                            <img id="mainImage" src="{{ product.image_1.url }}" alt="">
+                        </div>
+                        
+                        <script>
+                            const imageZoom = document.getElementById('imageZoom');
+                            const mainImage = document.getElementById('mainImage');
+                    
+                            // Function to update the image and zoom
+                            function updateImage(imageSrc, zoomImageSrc) {
+                                mainImage.src = imageSrc;
+                                imageZoom.style.setProperty('--url', `url('${zoomImageSrc}')`);
+                            }
+                    
+                            // Zoom functionality
+                            imageZoom.addEventListener('mousemove', (event) => {
+                                const rect = imageZoom.getBoundingClientRect();
+                                const offsetX = event.clientX - rect.left;
+                                const offsetY = event.clientY - rect.top;
+                                
+                                const pointerX = Math.min(Math.max((offsetX / rect.width) * 100, 0), 100);
+                                const pointerY = Math.min(Math.max((offsetY / rect.height) * 100, 0), 100);
+                                
+                                imageZoom.style.setProperty('--zoom-x', pointerX + '%');
+                                imageZoom.style.setProperty('--zoom-y', pointerY + '%');
+                                imageZoom.style.setProperty('--display', 'block');
+                            });
+                    
+                            imageZoom.addEventListener('mouseout', () => {
+                                imageZoom.style.setProperty('--display', 'none');
+                            });
+                        </script>
+                        
+                        <div id="product-zoom-gallery" class="product-image-gallery" style="height: 200px;">
+                            
+                                
+                            <a class="product-gallery-item" href="#" onclick="updateImage('{{ product.image_1.url }}', '{{ product.image_1.url }}'); return false;">
+                                <img src="{{ product.image_1.url }}" alt="Product Image">
+                            </a>
+                            <a class="product-gallery-item" href="#" onclick="updateImage('{{ product.image_2.url }}', '{{ product.image_2.url }}'); return false;">
+                                <img src="{{ product.image_2.url }}" alt="Product Image">
+                            </a>
+                            <a class="product-gallery-item" href="#" onclick="updateImage('{{ product.image_3.url }}', '{{ product.image_3.url }}'); return false;">
+                                <img src="{{ product.image_3.url }}" alt="Product Image">
+                            </a>
+                                
+                            
+                        </div><!-- End .product-image-gallery -->
+                    </div><!-- End .row -->
+                    
+                </div><!-- End .product-gallery -->
+            </div><!-- End .col-md-6 -->
+
+            <div class="col-md-6">
+                <div class="product-details " style="margin-top: 50px;">
+                    <div class="product-title" style="font-size: 30px;">{{ product.name }}</div>
+                    <div class="product-title" style="font-size: 20px; color: rgba(0, 0, 0, 0.562);">({{ product.category }})</div>
+
+                    <div class="ratings-container">
+                        <div class="ratings">
+                            <div class="ratings-val" style="width: {{ rating_percentage }}%;"></div><!-- End .ratings-val -->
+                        </div><!-- End .ratings -->
+                        <a class="ratings-text" href="#product-review-link" id="review-link">( {{ total_reviews }} Reviews )</a>
+                    </div><!-- End .rating-container -->
+                    
+                    <div class="product-price" style="font-size: 30px;">
+                        ₹{{ product.new_price }}
+                    </div><!-- End .product-price -->
+
+                    <div class="old-price" style="font-size: 20px;margin-top: -20px;">
+                        ₹{{ product.old_price }}
+                    </div><!-- End .product-price -->
+                    
+                    <div class="details-filter-row details-row-size" >
+                        <span style="color: {% if product.stock > 5 %}green{% elif product.stock > 0 %}orange{% else %}red{% endif %};">
+                            {% if product.stock == 0 %}
+                                Out of Stock
+                            {% elif product.stock < 5 %}
+                                Only a few left: {{ product.stock }} available
+                            {% else %}
+                                Available: {{ product.stock }} in stock
+                            {% endif %}
+                        </span>
+                    </div><!-- End .details-filter-row -->
+
+                    <div class="product-content" style="margin-top: -20px;" >
+                        <p>{{ product.description }} </p>
+                    </div><!-- End .product-content -->
+
+                    <form action="{% url 'add_to_cart' product.id %}" method="post">
+                        {% csrf_token %}
+                        <div class="details-filter-row details-row-size">
+                            <label for="qty">Qty:</label>
+                            <div class="product-details-quantity">
+                                <input type="number" id="qty" name="quantity" class="form-control" value="1" min="0" max="" step="1" data-decimals="0" required>
+                            </div><!-- End .product-details-quantity -->
+                        </div><!-- End .details-filter-row -->
+                    
+                        <div class="product-details-action">
+                            <button type="submit" class="btn-product btn-cart"><span>Add to Cart</span></button>
+                            
+                            <div class="details-action-wrapper">
+                                <a href="{% url 'add_to_wishlist' product.id %}" class="btn-product btn-wishlist" title="Wishlist"><span>Add to Wishlist</span></a>
+                            </div><!-- End .details-action-wrapper -->
+                        </div><!-- End .product-details-action -->
+                    </form>
+                    
+
+                    
+                </div><!-- End .product-details -->
+            </div><!-- End .col-md-6 -->
+        </div><!-- End .row -->
+
+        <!-- review section -->
+
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="card" style="width: 40rem;">
+                    <div class="card-body">
+                        <h5 class="card-title" style="margin-bottom: 10px;">Customer Reviews</h5>
+                        <div class="ratings-container">
+                            <div class="ratings" >
+                                <div class="ratings-val" style="width: {{ rating_percentage }}%;" ></div><!-- End .ratings-val -->
+                                <h6 style="margin-top: 10px;"> {{ average_rating|default:"No ratings yet" }} </h6>
+                            </div><!-- End .ratings -->
+                        </div><!-- End .ratings-container -->
+                        <span class="ratings-text">( {{ total_reviews }} Reviews )</span>
+                    </div>
+                </div>
+
+                <div class="card" style="width: 40rem;">
+                    <div class="card-body">
+                        <h5 class="card-title" style="margin-bottom: 10px;">Add Review and Rating</h5>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <label for="rating">Rating:</label>
+                        <select name="rating" id="rating" required>
+                            <option value="">Select </option>
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                        <br>
+                        <label for="comment">Review:</label>
+                        <textarea style="width: 300px;" name="comment" id="comment" rows="4" placeholder="Write your review here..." required></textarea>
+                        <br>
+                        <button type="submit" class="btn btn-primary">Submit Review</button>
+                        </form>
+                    </div>
+                </div>
+
+                
+
+            </div>
+            <div class="col-md-1">
+            </div>
+            <div class="col-md-7">
+                <div class="card" style="width: 60rem;">
+                    {% for review in reviews %}
+                    <div class="card-body">
+                        <div class="card-title" style="margin-bottom: 10px; color: black;">{{ review.user.profile.full_name }}</div>
+                        <div class="ratings-container">
+                            <div class="ratings">
+                                <div class="ratings-val" style="width: 50%;"></div><!-- End .ratings-val -->
+                            </div><!-- End .ratings -->
+                        </div><!-- End .ratings-container -->
+                        <div class="card-text" style="color: rgba(0, 0, 0, 0.473);">Reviewed on {{ review.created_at|date:"F j, Y" }}</div>
+                        <p class="card-text">{{ review.comment }}</p>
+                    </div>
+                    {% empty %}
+                    <li>No reviews yet. Be the first to review this product!</li>
+                    {% endfor %}
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- review section end -->
+
+    </div><!-- End .product-details-top -->
+
+
+    <div class="container">
+        <hr class="mt-2 mb-1">
+    </div><!-- End .container -->
+
+    <!-- product section -->
+
+    <!-- new container for listing Exclusive Offer products -->
+    <div class="bg-lighter ">
+        <div class="container">
+            <div class="heading heading-flex mb-3">
+                <div class="heading-left text-center">
+                    <h2 class="title text-center"> Related Products</h2><!-- End .title -->
+                </div><!-- End .heading-left -->
+
+
+            </div><!-- End .heading -->
+
+            <div class="row">
+                
+                {% for r_product in related_products %}
+                <!-- product card stating -->
+                <div class="col-6 col-md-4 col-lg-4">
+                    <div class="product product-7 text-center">
+                        <figure class="product-media">
+                            <a href="{% url 'product_detail' r_product.id %}">
+                                <div style="height: 376px;width:376px;">
+                                <img src="{{ r_product.image_1.url }}" style="width: 100%;height: 100%;object-fit: cover;"
+                                    alt="Product image" class="product-image">
+                                </div>
+                            </a>
+
+                            <div class="product-action-vertical">
+                                <a href="{% url 'add_to_wishlist' r_product.id %}" class="btn-product-icon btn-wishlist btn-expandable"><span>add to
+                                        wishlist</span></a>
+                                <a href="{% url 'product_detail' r_product.id %}" class="btn-product-icon btn-quickview"
+                                    title="Quick view"><span>Quick view</span></a>
+                            </div><!-- End .product-action-vertical -->
+
+                            <div class="product-action">
+                                <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
+                            </div><!-- End .product-action -->
+                        </figure><!-- End .product-media -->
+
+                        <div class="product-body">
+                            <span class="product-title" style="font-size: 18px;font-weight: bold;">
+                                <a href="{% url 'product_detail' r_product.id %}">{{ r_product.name }}
+                                    <span class="new-price" style="font-size: 15px;font-weight: lighter;">
+                                        -{{ r_product.discount|floatformat:0 }}% off
+                                    </span>
+                                </a>
+                            </span>
+                            <br>
+                            
+                            <!-- End .product-title -->
+                            <div class="product-price">
+                                <span class="new-price">Now ₹{{ r_product.new_price }}</span>
+                                <span class="old-price">Was ₹{{ r_product.old_price }}</span>
+                            </div><!-- End .product-price -->
+                        
+                            <div class="ratings-container">
+                                <div class="ratings">
+                                    <div class="ratings-val" style="width: {{ r_product.rating_percentage }}%;"></div><!-- End .ratings-val -->
+                                </div><!-- End .ratings -->
+                                <span class="ratings-text">( {{ r_product.total_reviews }} Reviews )</span>
+                            </div><!-- End .ratings-container -->
+                        </div><!-- End .product-body -->
+                    </div><!-- End .product -->
+                </div>
+                <!-- product card ending -->
+                {% endfor %}
+
+            </div>
+            
+        </div><!-- End .container -->
+    </div>
+    <!-- end container for listing all products -->
+</div>
+
+{% endblock %}

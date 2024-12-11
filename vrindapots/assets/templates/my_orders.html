@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<main class="main">
+
+    
+
+    
+    <div class="container">
+        <hr class="mt-2 mb-1">
+    </div><!-- End .container -->
+
+    <!-- product section -->
+
+    <!-- new container for listing Exclusive Offer products -->
+    <div class="bg-lighter ">
+        <div class="container">
+            <h4>Your Orders</h4>
+            <div class="container">
+                <hr class="mt-2 mb-1">
+            </div><!-- End .container -->
+            <div class="order-list">
+                {% if orders %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover table-striped">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th scope="col">Order ID</th>
+                                    <th scope="col">Order Date</th>
+                                    <th scope="col">Total Price</th>
+                                    <th scope="col">Payment Method</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                    <tr>
+                                        <td>#{{ order.id }}</td>
+                                        <td>{{ order.order_date|date:"F j, Y" }}</td>
+                                        <td>₹{{ order.total_price }}</td>
+                                        <td>{{ order.payment_method }}</td>
+                                        <td>
+                                            {% if order.status == 'Pending' %}
+                                                <span style="color: green;">Delivery on {{ order.delivery_date|date:"F j, Y" }}</span>
+                                            {% elif order.status == 'Cancelled' %}
+                                                <span style="color: red;">{{ order.status }}</span>
+                                            {% elif order.status == 'Delivered' %}
+                                                <span style="color: green;">{{ order.status }} on {{ order.delivery_date|date:"F j, Y" }}</span>
+                                            {% elif order.status == 'Return' %}
+                                                <span style="color: rgb(128, 79, 0);">{{ order.status }} pickup on {{ order.return_date|date:"F j, Y" }}</span>
+                                            {% else %}
+                                                {{ order.status }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'order_detail' order.id %}" class="btn btn-primary btn-sm">View Details</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p>You have no orders yet.</p>
+                {% endif %}
+            </div>
+            
+        </div>
+        
+    </div>
+    <!-- end container for listing all products -->
+
+    <!-- product section end-->
+
+
+
+    <div class="container">
+        <hr class="mt-3 mb-4">
+    </div><!-- End .container -->
+
+
+
+    <div class="container">
+        <hr class="mt-3 mt-xl-1 mb-0">
+    </div><!-- End .container -->
+
+    <div class="cta pt-4 pt-lg-6 pb-5 pb-lg-7 mb-0">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-sm-10 col-md-8 col-lg-6">
+                    <div class="cta-heading text-center">
+                        <h3 class="cta-title">Sign Up for updates from Molla</h3><!-- End .cta-title -->
+                        <p class="cta-desc">and receive <span class="font-weight-normal">$20 coupon</span> for first shopping</p><!-- End .cta-desc -->
+                    </div><!-- End .text-center -->
+                
+                    <form action="#">
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Enter your Email Address" aria-label="Email Adress" required>
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="submit" title="Sing up"><i class="icon-long-arrow-right"></i></button>
+                            </div><!-- .End .input-group-append -->
+                        </div><!-- .End .input-group -->
+                    </form>
+                </div><!-- End .col-sm-10 col-md-8 col-lg-6 -->
+            </div><!-- End .row -->
+        </div><!-- End .container -->
+    </div><!-- End .cta -->
+
+</main><!-- End .main -->
+
+{% endblock %}

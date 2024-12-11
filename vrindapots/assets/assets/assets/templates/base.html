@@ -34,6 +34,7 @@
 
         <!-- navbar -->
         {% include 'includes/navbar.html' %}
+        {% include 'includes/errorbar.html' %}
 
         {% block content %}
         <!-- content -->
@@ -65,21 +66,21 @@
             <nav class="mobile-nav">
                 <ul class="mobile-menu">
                     <li class="">
-                        <a href="index.html">Home</a>
+                        <a href="{% url 'home' %}">Home</a>
                     </li>
                     <li>
                         <a href="#" class="sf-with-ul">Shop</a>
                         <ul>
-                            <li><a href="#">All Products</a></li>
+                            <li><a href="{% url 'all_products' %}">All Products</a></li>
                             {% for category in categories %}
-                                <li><a href="">{{ category.name }}</a></li>
+                                <li><a href="{% url 'category_products' category.id %}">{{ category.name }}</a></li>
                             {% endfor %}
                         </ul>
                     </li>
                     <li>
                         <a href="#" class="sf-with-ul">Account</a>
                         <ul>
-                            <li><a href="#">Account Overview</a></li>
+                            <li><a href="{% url 'user_profile' %}">Account</a></li>
                             <li><a href="#">My Orders</a></li>
                             <li><a href="#">My Wishlist</a></li>
                             <li><a href="#">My Cart</a></li>
@@ -89,11 +90,10 @@
                     <li>
                         <a href="#" class="sf-with-ul">Top Deals</a>
                         <ul>
-                            <li><a href="#">Exclusive Offers</a></li>
-                            <li><a href="#">Best Sellers</a></li>
-                            <li><a href="#">New Arrivals</a></li>
-                            <li><a href="#">Pots & Planters</a></li>
-                            <li><a href="#">Seasonal Specials</a></li>
+                            <li><a href="{% url 'tag_products' 2 %}">Exclusive Offers</a></li>
+                            <li><a href="{% url 'tag_products' 3 %}">Best Sellers</a></li>
+                            <li><a href="{% url 'tag_products' 4 %}">New Arrivals</a></li>
+                            <li><a href="{% url 'tag_products' 5 %}">Seasonal Specials</a></li>
                         </ul>
                     </li>
 

@@ -1,0 +1,92 @@
+{% extends 'admin_templates/admin_base.html' %}
+{% load static %}
+
+
+{% block content %}
+        
+<div class="container mt-5">
+    
+    <h4>Order Details - #{{ order.id }}</h4>
+
+    <div class="order-info">
+        <p><strong>Order Date:</strong> {{ order.order_date|date:"F j, Y" }}</p>
+        <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
+        <p><strong>Total Price:</strong> ₹{{ order.total_price }}</p>
+        <p><strong>Status:</strong> 
+            {% if order.status == 'Pending' %}
+                <span style="color: green;">Delivery on {{ order.delivery_date|date:"F j, Y" }}</span>
+            {% elif order.status == 'Cancelled' %}
+                <span style="color: red;">{{ order.status }}</span>
+            {% elif order.status == 'Delivered' %}
+                <span style="color: green;">{{ order.status }} on {{ order.delivery_date|date:"F j, Y" }}</span>
+            {% elif order.status == 'Return' %}
+                <span style="color: rgb(128, 79, 0);"> {{ order.status }} pickup on {{ order.return_date|date:"F j, Y" }}</span>
+            {% elif order.status == 'Returned' %}
+                <span style="color: rgb(128, 79, 0);"> {{ order.status }} on {{ order.return_date|date:"F j, Y" }}</span>
+            {% else %}
+                {{ order.status }}
+            {% endif %}
+        </p>
+        <p><strong>Shipping Address:</strong> {{ order.shipping_address }}</p>
+    </div>
+
+    <h5>Order Items</h5>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Subtotal</th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order_items %}
+                <tr>
+                    <td>
+                        <img src="{{ item.product.image_1.url }}" alt="{{ item.product.name }}" style="width: 50px;">
+                        {{ item.product.name }}
+                    </td>
+                    <td>{{ item.quantity }}</td>
+                    <td>₹{{ item.product.new_price }}</td>
+                    <td>₹{{ item.subtotal }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Add action buttons based on the order status -->
+    
+    {% if order.status != 'Cancelled' and order.status != 'Delivered' and order.status != 'Return' and order.status != 'Returned' %}
+    <h5>Change order status</h5>
+    <form method="POST">
+        {% csrf_token %}
+        
+        <select name="status" id="status">
+            <option value="" disabled selected> Change </option>
+            {% for status, display in status_choices %}
+                <option value="{{ status }}">{{ display }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <button type="submit" class="btn btn-success" style="margin-top: 10px;">Update Status</button>
+    </form>
+    {% elif  order.status == 'Return' %}
+    <form method="POST" action="{% url 'change_to_returned' order.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger" style="margin-top: 10px;">Change to Returned</button>
+    </form>
+    {% else %}
+
+    {% endif %}
+    
+    {% if  order.status != 'Delivered' and order.status != 'Return' and order.status != 'Returned' %}
+        <form method="POST" action="{% url 'admin_order_cancel' order.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger" style="margin-top: 10px;">Cancel Order</button>
+        </form>
+    {% endif %}
+</div>
+
+{% endblock %}

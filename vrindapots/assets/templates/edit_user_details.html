@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<main class="container "  >
+    <div class="login-page bg-image pt-8 pb-8 pt-md-12 pb-md-12 pt-lg-17 pb-lg-17" style="background-image: url('{% static 'assets/images/home_img_1.jpg' %}');background-size: cover;background-position: center;background-repeat: no-repeat;height: 700px;">
+    <div class="container">
+        <div class="form-box" style="margin-top: -70px; ">
+            <div class="form-tab">
+                <ul class="nav nav-pills nav-fill" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="signin-tab-2" data-toggle="tab" href="#signin-2" role="tab"
+                            aria-controls="signin-2" aria-selected="false">User Details</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="register-2" role="tabpanel"
+                        aria-labelledby="register-tab-2">
+                        <form method="post" action="{% url 'edit_user_details' user.id %}">
+                            {% csrf_token %}
+
+                            <div class="form-group">
+                                <label for="first_name" style="font-weight: bold;">First Name:</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" 
+                                    value="{{ user.first_name }}" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="last_name" style="font-weight: bold;">Last Name:</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" 
+                                    value="{{ user.last_name }}" required>
+                            </div>
+
+                            
+
+                            
+
+                            <div class="form-footer">
+                                
+                                <button type="submit" class="btn btn-outline-primary-2">
+                                    <span>Save Changes</span>
+                                </button>
+
+                            </div><!-- End .form-footer -->
+                        </form>
+                    </div><!-- .End .tab-pane -->
+                </div><!-- End .tab-content -->
+            </div><!-- End .form-tab -->
+        </div><!-- End .form-box -->
+    </div><!-- End .container -->
+    </div><!-- End .login-page section-bg -->
+</main>
+
+{% endblock %}

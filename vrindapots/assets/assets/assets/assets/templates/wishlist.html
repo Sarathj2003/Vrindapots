@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<main class="main">
+
+    
+
+    
+    <div class="container">
+        <hr class="mt-2 mb-1">
+    </div><!-- End .container -->
+
+    <!-- product section -->
+
+    <!-- new container for listing Exclusive Offer products -->
+    <div class="bg-lighter ">
+        <div class="container">
+            <div class="heading heading-flex mb-1">
+                <div class="heading-left text-center">
+                    <h2 class="title text-center">Wishlist</h2><!-- End .title -->
+                </div><!-- End .heading-left -->
+
+
+            </div><!-- End .heading -->
+
+            <table class="table table-wishlist table-mobile">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Stock Status</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% if wishlist_items %}
+                    {% for item in wishlist_items %}
+                    <tr>
+                        <td class="product-col">
+                            <div class="product">
+                                <figure class="product-media">
+                                    <a href="{% url 'product_detail' item.product.id %}">
+                                        <img src="{{ item.product.image_1.url }}" alt="{{ item.product.name }}">
+                                    </a>
+                                </figure>
+                                <h3 class="product-title">
+                                    <a href="{% url 'product_detail' item.product.id %}">{{ item.product.name }}</a>
+                                </h3>
+                            </div>
+                        </td>
+                        <td class="price-col">₹{{ item.product.new_price }}</td>
+                        <td class="stock-col">
+                            {% if item.product.stock > 5 %}
+                                <span class="in-stock">In stock</span>
+                            {% elif item.product.stock  %}
+                                <span class="out-of-stock" style="color: orange;">Only {{ wishlist_count }}  left:  </span>
+                            {% else %}
+                                <span class="out-of-stock">Out of stock</span>
+                            {% endif %}
+                        </td>
+                        <td class="action-col">
+                            
+                            <a href="{% url 'add_to_cart' item.product.id %}">
+                                <button class="btn btn-block btn-outline-primary-2">
+                                    <i class="icon-cart-plus"></i>Add to Cart
+                                </button>
+                            </a>
+                                
+                            
+                        </td>
+                        <td class="remove-col">
+                            <form action="{% url 'remove_from_wishlist' item.product.id %}" method="post">
+                                {% csrf_token %}
+                                <button class="btn-remove"><i class="icon-close"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center">Your wishlist is empty.</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table><!-- End .table table-wishlist -->
+
+
+        </div><!-- End .container -->
+    </div>
+    <!-- end container for listing all products -->
+
+    <!-- product section end-->
+
+
+
+    <div class="container">
+        <hr class="mt-3 mb-4">
+    </div><!-- End .container -->
+
+
+
+    <div class="container">
+        <hr class="mt-3 mt-xl-1 mb-0">
+    </div><!-- End .container -->
+
+    <div class="cta pt-4 pt-lg-6 pb-5 pb-lg-7 mb-0">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-sm-10 col-md-8 col-lg-6">
+                    <div class="cta-heading text-center">
+                        <h3 class="cta-title">Sign Up for updates from Molla</h3><!-- End .cta-title -->
+                        <p class="cta-desc">and receive <span class="font-weight-normal">$20 coupon</span> for first shopping</p><!-- End .cta-desc -->
+                    </div><!-- End .text-center -->
+                
+                    <form action="#">
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Enter your Email Address" aria-label="Email Adress" required>
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="submit" title="Sing up"><i class="icon-long-arrow-right"></i></button>
+                            </div><!-- .End .input-group-append -->
+                        </div><!-- .End .input-group -->
+                    </form>
+                </div><!-- End .col-sm-10 col-md-8 col-lg-6 -->
+            </div><!-- End .row -->
+        </div><!-- End .container -->
+    </div><!-- End .cta -->
+
+</main><!-- End .main -->
+
+{% endblock %}

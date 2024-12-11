@@ -32,7 +32,8 @@
                     <li>
                         <a href="#">Links</a>
                         <ul>
-                            <li><a href="{% url 'user_login' %}" data-toggle=""><i class="icon-user"></i>Login</a></li>
+                            <li><a href="{% url 'user_logout' %}" data-toggle=""><i class="icon-user"></i>Logout</a></li>
+                            
                         </ul>
                     </li>
                 </ul><!-- End .top-menu -->
@@ -48,35 +49,38 @@
             <div class="header-left">
                 <div class="header-search header-search-extended header-search-visible d-none d-lg-block">
                     <a href="#" class="search-toggle" role="button"><i class="icon-search"></i></a>
-                    <form action="#" method="get">
+
+                    <form action="{% url 'search_products' %}" method="get">
                         <div class="header-search-wrapper search-wrapper-wide">
                             <label for="q" class="sr-only">Search</label>
                             <button class="btn btn-primary" type="submit"><i class="icon-search"></i></button>
                             <input type="search" class="form-control" name="q" id="q" placeholder="Search product ..."
-                                required>
+                                value="{{ query }}"  required>
                         </div><!-- End .header-search-wrapper -->
                     </form>
+
                 </div><!-- End .header-search -->
             </div>
             <div class="header-center">
-                <a href="index.html" class="logo">
+                <a href="{% url 'home' %}" class="logo">
                     <img src="{% static 'assets/images/Vrindapots_new_text_logo.png' %}" alt="Molla Logo" width="50%"
                         height="40">
                 </a>
             </div><!-- End .header-left -->
 
             <div class="header-right">
-                <a href="wishlist.html" class="wishlist-link">
+                <a href="{% url 'wishlist'  %}" class="wishlist-link">
                     <i class="icon-heart-o"></i>
-                    <span class="wishlist-count">3</span>
+                    {% if not wishlist_count == 0 %}
+                    <span class="wishlist-count">{{ wishlist_count }}</span>
+                    {% endif %}
                     <span class="wishlist-txt">My Wishlist</span>
                 </a>
 
                 <div class="dropdown cart-dropdown">
-                    <a href="#" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true"
-                        aria-expanded="false" data-display="static">
+                    <a href="{% url 'cart_detail'  %}" class="dropdown-toggle">
                         <i class="icon-shopping-cart"></i>
-                        <span class="cart-count">2</span>
+                        <span class="cart-count">{{ cart_item_count }}</span>
                         <span class="cart-txt">My Cart</span>
                     </a>
 
@@ -92,37 +96,53 @@
                 <nav class="main-nav">
                     <ul class="menu sf-arrows">
                         <li>
-                            <a href="index.html">Home</a>
+                            <a href="{% url 'home' %}">Home</a>
                         </li>
                         <li>
                             <a href="#" class="sf-with-ul">Shop</a>
 
                             <ul>
-                                <li><a href="">All Products</a></li>
+                                <li><a href="{% url 'all_products' %}">All Products</a></li>
                                 {% for category in categories %}
-                                <li><a href="">{{ category.name }}</a></li>
+                                <li><a href="{% url 'category_products' category.id %}">{{ category.name }}</a></li>
                                 {% endfor %}
                             </ul>
                         </li>
                         <li>
                             <a href="" class="sf-with-ul">Account</a>
                             <ul>
-                                <li><a href="">Account Overview</a></li>
-                                <li><a href="">My Orders</a></li>
-                                <li><a href="#">My Wishlist</a></li>
-                                <li><a href="#">My Cart</a></li>
+                                <li><a href="{% url 'account_page' %}">Account</a></li>
+                                <li><a href="{% url 'my_orders' %}">My Orders</a></li>
+                                <li><a href="{% url 'wishlist'  %}">My Wishlist</a></li>
+                                <li><a href="{% url 'cart_detail'  %}">My Cart</a></li>
                                 <li><a href="#">My Wallet</a></li>
                             </ul>
                         </li>
                         <li>
                             <a href="" class="sf-with-ul">Top Deals</a>
                             <ul>
-                                <li><a href="">Exclusive Offers</a></li>
-                                <li><a href="">Best Sellers</a></li>
-                                <li><a href="">New Arrivals</a></li>
-                                <li><a href="">Seasonal Specials</a></li>
+                                <li><a href="{% url 'tag_products' 2 %}">Exclusive Offers</a></li>
+                                <li><a href="{% url 'tag_products' 3 %}">Best Sellers</a></li>
+                                <li><a href="{% url 'tag_products' 4 %}">New Arrivals</a></li>
+                                <li><a href="{% url 'tag_products' 5 %}">Seasonal Specials</a></li>
                             </ul>
                         </li>
+
+                        {% if show_button %}
+                        <li>
+                            <a href="" class="sf-with-ul">Sort</a>
+                            <ul>
+                                <li><a href="#">Popularity</a></li>
+                                <li><a href="?sort_by=price_low_high">Price: Low to High</a></li>
+                                <li><a href="?sort_by=price_high_low">Price: High to Low</a></li>
+                                <li><a href="?sort_by=ratings">Ratings</a></li>
+                                <li><a href="?sort_by=a_to_z">A - Z</a></li>
+                                <li><a href="?sort_by=z_to_a">Z - A</a></li>
+                            </ul>
+                        </li>
+                        {% endif %}
+
+
                     </ul><!-- End .menu -->
                 </nav><!-- End .main-nav -->
 

@@ -1,0 +1,27 @@
+
+{% extends 'login_base.html' %}
+
+{% load static %}
+
+
+{% block content %}
+<main class="main">
+    <div class="container">
+        <div class="row justify-content-center" style="margin-top: 50px;">
+            <div class="col-md-8 text-center">
+                <div class="card shadow-lg" style="border-radius: 15px;">
+                    <div class="card-header bg-danger text-white">
+                        <h3 class="mb-0">🚨 Oops, Something Went Wrong!</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">We are sorry, but something went wrong while processing your request. Please try again later.</p>
+                        <p>If the issue persists, feel free to <a href="">contact us</a>.</p>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+{% endblock %}

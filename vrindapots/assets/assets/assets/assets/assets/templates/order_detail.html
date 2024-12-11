@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<main class="main">
+
+    
+
+    
+    <div class="container">
+        <hr class="mt-2 mb-1">
+    </div><!-- End .container -->
+
+    <!-- product section -->
+
+    <!-- new container for listing Exclusive Offer products -->
+    <div class="bg-lighter ">
+        <div class="container">
+            <h4>Order #{{ order.id }} Details</h4>
+        
+            <!-- Order Information -->
+            <p><strong>Order Date:</strong> {{ order.order_date }}</p>
+            <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
+            <p><strong>Status:</strong> 
+            {% if order.status == 'Pending' %}
+                <span style="color: green;">Delivery on {{ order.delivery_date|date:"F j, Y" }}</span>
+            {% elif order.status == 'Cancelled' %}
+                <span style="color: red;">{{ order.status }}</span>
+            {% elif order.status == 'Delivered' %}
+                <span style="color: green;">{{ order.status }} on {{ order.delivery_date|date:"F j, Y" }}</span>
+            {% elif order.status == 'Return' %}
+                <span style="color: rgb(128, 79, 0);"> {{ order.status }} pickup on {{ order.return_date|date:"F j, Y" }}</span>
+            {% elif order.status == 'Returned' %}
+            <span style="color: rgb(128, 79, 0);"> {{ order.status }} on {{ order.return_date|date:"F j, Y" }}</span>
+            {% else %}
+                {{ order.status }}
+            {% endif %}
+            </p>
+            <p><strong>Total Price:</strong> ₹{{ total_cost }}</p>
+            <p><strong>Coupon discount:</strong> 
+                {% if discount_amount == 0 %}
+                    None
+                {% else %}
+                    -₹{{ discount_amount }}
+                {% endif %}
+            </p>
+            <p><strong>Final Price:</strong> ₹{{ final_price }}</p>
+        
+            <div class="order-items">
+                <h5>Order Items:</h5>
+                {% for item in order_items %}
+                    <div class="order-item">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <!-- Product Image -->
+                                <img src="{{ item.product.image_1.url }}" alt="{{ item.product.name }}" class="img-fluid">
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Product:</strong> {{ item.product.name }}</p>
+                                <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+                                <p><strong>Price:</strong> ₹{{ item.price }}</p>
+                                <p><strong>Subtotal:</strong> ₹{{ item.subtotal }}</p>
+                            </div>
+                        </div>
+                        <hr>
+                {% endfor %}
+            </div>
+        
+            {% if order.status  == 'Processing' and order.payment_method == 'Razorpay' %}
+            
+                <button type="submit" id="rzp-button" class="btn btn-primary" style="margin-top: 5px; margin-bottom: 15px;">Continue payment</button>
+        
+            {% endif %}
+
+            <!-- Cancel Order Button (if applicable) -->
+            {% if order.status != 'Cancelled' and order.status != 'Delivered' and order.status != 'Return' and order.status != 'Returned' %}
+                <form method="POST" action="{% url 'cancel_order' order.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Cancel Order</button>
+                </form>
+            {% elif order.status == 'Cancelled' %}
+                <p>Your order has been cancelled.</p>
+            {% elif order.status == 'Delivered' %}
+                <p>Your order has been Delivered.</p>
+                <a href="{% url 'generate_invoice_pdf' order.id %}">
+                    <button type="submit" class="btn btn-primary" style="margin-top: 15px;">Download Invoice</button>
+                </a>
+                <form method="POST" action="{% url 'return_order' order.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger" style="margin-top: 15px;">Return Order</button>
+                    <p>You can return your order within 7 days from the delivery date.</p>
+                </form>
+            
+            {% else %}
+            {% endif %}
+            {% if order.status == 'Pending' and order.is_paid == True%}
+                <a href="{% url 'generate_invoice_pdf' order.id %}">
+                    <button type="submit" class="btn btn-primary" style="margin-top: 15px;">Download Invoice</button>
+                </a>
+            {% endif %}
+        </div>
+        
+    </div>
+    <!-- end container for listing all products -->
+
+    <!-- product section end-->
+
+
+
+    <div class="container">
+        <hr class="mt-3 mb-4">
+    </div><!-- End .container -->
+
+
+
+    <div class="container">
+        <hr class="mt-3 mt-xl-1 mb-0">
+    </div><!-- End .container -->
+
+    <div class="cta pt-4 pt-lg-6 pb-5 pb-lg-7 mb-0">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-sm-10 col-md-8 col-lg-6">
+                    <div class="cta-heading text-center">
+                        <h3 class="cta-title">Sign Up for updates from Molla</h3><!-- End .cta-title -->
+                        <p class="cta-desc">and receive <span class="font-weight-normal">$20 coupon</span> for first shopping</p><!-- End .cta-desc -->
+                    </div><!-- End .text-center -->
+                
+                    <form action="#">
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Enter your Email Address" aria-label="Email Adress" required>
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="submit" title="Sing up"><i class="icon-long-arrow-right"></i></button>
+                            </div><!-- .End .input-group-append -->
+                        </div><!-- .End .input-group -->
+                    </form>
+                </div><!-- End .col-sm-10 col-md-8 col-lg-6 -->
+            </div><!-- End .row -->
+        </div><!-- End .container -->
+    </div><!-- End .cta -->
+
+    
+
+</main><!-- End .main -->
+
+<script>
+    const csrftoken = "{{ csrf_token }}";
+</script>
+<!-- Razorpay Integration Script -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    document.getElementById('rzp-button').onclick = function (e) {
+        e.preventDefault();
+
+        // Step 1: Make an AJAX call to your Django view to create Razorpay Order
+        fetch("{% url 'continue_payment' order.id %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrftoken,
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Amount sent to Razorpay:", data.amount);
+                if (data.razorpay_order_id) {
+
+                    const options = {
+                        key: data.razorpay_key,
+                        amount: data.amount,
+                        currency: data.currency,
+                        name: "Vrindapots",
+                        description: "Order Payment",
+                        image: "",
+                        order_id: data.razorpay_order_id,
+                        handler: function (response) {
+
+                            verifyPayment(response, data.order_id);
+                        },
+                        prefill: {
+                            name: "{{ request.user.first_name }} {{ request.user.last_name }}",
+                            email: "{{ request.user.email }}",
+                            contact: "{{ profile.phone_number }}",
+                        },
+                        theme: {
+                            color: "#3399cc",
+                        },
+                    };
+                    const rzp1 = new Razorpay(options);
+                    rzp1.open();
+                } else {
+                    alert("Failed to create Razorpay order. Please try again.");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("An error occurred. Please try again.");
+            });
+    };
+
+
+    function verifyPayment(paymentData, orderId) {
+        fetch("{% url 'verify_payment' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrftoken,
+            },
+            body: JSON.stringify({
+                razorpay_payment_id: paymentData.razorpay_payment_id,
+                razorpay_order_id: paymentData.razorpay_order_id,
+                razorpay_signature: paymentData.razorpay_signature,
+            }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = `/order/success/${data.order_id}/`;
+                } else {
+                    alert(data.message || "Payment verification failed. Please try again.");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("An error occurred during payment verification. Please try again.");
+            });
+    }
+
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'admin_templates/admin_base.html' %}
+{% load static %}
+
+
+{% block content %}
+        
+<div class="container mt-5">
+    
+    <h4>Order Management</h4>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>User Name</th>
+                <th>Order Date</th>
+                <th>Total Price</th>
+                <th>Payment Method</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.user.get_full_name }}</td>  <!-- You can use `get_full_name` or any custom field if you prefer -->
+                    <td>{{ order.order_date|date:"F j, Y" }}</td>
+                    <td>₹{{ order.total_price }}</td>
+                    <td>{{ order.payment_method }}</td>
+                    <td>
+                        {% if order.status == 'Pending' %}
+                            <span style="color: rgb(0, 0, 0);">{{ order.status }}</span>
+                        {% elif order.status == 'Cancelled' %}
+                            <span style="color: red;">{{ order.status }}</span>
+                        {% elif order.status == 'Delivered' %}
+                            <span style="color: green;">{{ order.status }}</span>
+                        {% else %}
+                            {{ order.status }}
+                        {% endif %} 
+                    </td>
+                    <td>
+                        <a href="{% url 'admin_order_details' order.id %}" class="btn btn-primary">View Details</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="7">No orders found.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

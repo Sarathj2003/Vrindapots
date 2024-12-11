@@ -1,0 +1,94 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .admin-card {
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .admin-card:hover {
+            transform: scale(1.05);
+        }
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            position: fixed;
+            background-color: #343a40;
+            color: white;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            padding: 15px 20px;
+            display: block;
+        }
+
+        .sidebar a:hover {
+            background-color: #495057;
+            border-radius: 4px;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .admin-card {
+            border: 1px solid #ddd;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .admin-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .filter-btn {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    {% include 'includes/errorbar.html' %}
+
+    <div class="sidebar">
+        <h2 class="text-center">Admin Panel</h2>
+        <a href="{% url 'admin_home' %}"><i class="fas fa-home"></i> Dashboard</a>
+        <a href="{% url 'user_list' %}"><i class="fas fa-users"></i> User Management</a>
+        <a href="{% url 'category_list' %}"><i class="fas fa-tags"></i> Category Management</a>
+        <a href="{% url 'product_list' %}"><i class="fas fa-box"></i> Product Management</a>
+        <a href="{% url 'admin_order_list' %}"><i class="fas fa-shopping-cart"></i> Order Management</a>
+        <a href="{% url 'coupon_list_page' %}"><i class="fas fa-ticket-alt"></i> Coupon Management</a>
+        <a href="{% url 'sales_report' %}"><i class="fas fa-chart-bar"></i> Sales Reports</a>
+        <a href="{% url 'custom_admin_logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+    <div class="main-content">
+    {% block content %}
+        
+    {% endblock %}
+    </div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
