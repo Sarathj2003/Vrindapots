@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os
 from django.contrib.messages import constants as messages
+from decouple import config
 
 
 
@@ -24,12 +25,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&4u-ddoy%o@%68tfoi&z16_7!qf4%ku_0_t2b9r4ipkv^5tri2'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='').split(',')
 
 
 # Application definition
@@ -113,11 +114,11 @@ WSGI_APPLICATION = 'vrindapots.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'vrindapots',
-        'USER': 'postgres',
-        'PASSWORD': 'sarath',
-        'HOST': 'localhost',  # or your database server's IP address
-        'PORT': '5432',        # default PostgreSQL port
+        'NAME': config('DATABASE_NAME'),
+        'USER': config('DATABASE_USER'),
+        'PASSWORD': config('DATABASE_PASSWORD'),
+        'HOST': config('DATABASE_HOST'),  # or your database server's IP address
+        'PORT': config('DATABASE_PORT'),        # default PostgreSQL port
     }
 }
 
@@ -192,12 +193,12 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'sarathjayakumar46@gmail.com'  
-EMAIL_HOST_PASSWORD = 'yeqb nyec pcfb wyax'  
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD') 
 
 
 
 
-RAZORPAY_API_KEY = 'rzp_test_ME972J4MUYfQv8'
-RAZORPAY_API_SECRET = '8EgLVmQD8sblZ0rplBMgRo1C'
+RAZORPAY_API_KEY = config('RAZORPAY_API_KEY')
+RAZORPAY_API_SECRET = config('RAZORPAY_API_SECRET')
 
